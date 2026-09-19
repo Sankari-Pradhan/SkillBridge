@@ -1,10 +1,12 @@
-const CACHE_NAME = "skillbridge-v1";
+const CACHE_NAME = "skillbridge-v2";
 
 const FILES_TO_CACHE = [
     "/",
     "/assets/style.css",
     "/assets/script.js",
-    "/manifest.json"
+    "/manifest.json",
+    "/assets/icon-192.png",
+    "/assets/icon-512.png"
 ];
 
 self.addEventListener("install", event => {
@@ -13,6 +15,8 @@ self.addEventListener("install", event => {
             return cache.addAll(FILES_TO_CACHE);
         })
     );
+
+    self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
@@ -25,6 +29,8 @@ self.addEventListener("activate", event => {
             )
         )
     );
+
+    self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
