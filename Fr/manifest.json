@@ -1,0 +1,10 @@
+{
+  "name": "SkillBridge",
+  "short_name": "SkillBridge",
+  "description": "Your Personal Career and Learning Assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait"
+}
