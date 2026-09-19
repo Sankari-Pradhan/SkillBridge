@@ -12,9 +12,10 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="/assets/style.css">
-
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
 </head>
-
+    
 
 <body>
 
@@ -465,7 +466,18 @@
 
 <script src="/assets/script.js"></script>
 
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("/service-worker.js")
+                .then(() => console.log("SkillBridge PWA ready"))
+                .catch(error => console.log("Service Worker error:", error));
+        });
+    }
+</script>
 
+</body>
+</html>
 </body>
 
 </html>
