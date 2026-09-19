@@ -124,6 +124,39 @@ def script():
     }
 
 
+
+@app.get("/manifest.json")
+def manifest():
+
+    manifest_file = FRONTEND_DIR / "manifest.json"
+
+    if manifest_file.exists():
+        return FileResponse(
+            manifest_file,
+            media_type="application/manifest+json"
+        )
+
+    return {
+        "error": "manifest.json not found"
+    }
+
+
+@app.get("/service-worker.js")
+def service_worker():
+
+    sw_file = FRONTEND_DIR / "service-worker.js"
+
+    if sw_file.exists():
+        return FileResponse(
+            sw_file,
+            media_type="application/javascript"
+        )
+
+    return {
+        "error": "service-worker.js not found"
+    }
+
+
 # =========================================================
 # HELLO
 # =========================================================
