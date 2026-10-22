@@ -342,6 +342,65 @@ class ActivityLog(Base):
     )
 
 
+
+@app.post("/api/activity")
+def record_activity(
+    action: str,
+    payload: dict = Depends(verify_access_token)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    allowed_actions = {
+        "resume_analyzer",
+        "cover_letter",
+        "learning_hub"
+    }
+
+    if action not in allowed_actions:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid activity action."
+        )
+
+    try:
+        user_id = int(payload["sub"])
+        email = payload["email"]
+
+        with engine.begin() as connection:
+            connection.execute(
+                text("""
+                    INSERT INTO activity_logs
+                    (user_id, email, action, created_at)
+                    VALUES (:user_id, :email, :action, :created_at)
+                """),
+                {
+                    "user_id": user_id,
+                    "email": email,
+                    "action": action,
+                    "created_at": datetime.now(timezone.utc)
+                }
+            )
+
+        return {
+            "success": True,
+            "message": "Activity recorded."
+        }
+
+    except HTTPException:
+        raise
+    except (SQLAlchemyError, ValueError, KeyError):
+        import logging
+        logging.exception("Could not record activity")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not record activity."
+        )
+
+
 @app.post("/api/db-create-tables")
 def create_database_tables():
     if engine is None:
