@@ -872,3 +872,39 @@ async function checkLoginSession() {
 }
 
 document.addEventListener("DOMContentLoaded", checkLoginSession);
+
+
+
+async function registerUser(event) {
+    event.preventDefault();
+
+    const message = document.getElementById("authMessage");
+
+    try {
+        const response = await fetch(`${API}/api/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: document.getElementById("registerName").value.trim(),
+                email: document.getElementById("registerEmail").value.trim(),
+                password: document.getElementById("registerPassword").value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                typeof data.detail === "string"
+                    ? data.detail
+                    : "Registration failed. Please check your details."
+            );
+        }
+
+        message.textContent = "Account created! Please log in.";
+        document.getElementById("registerForm").reset();
+
+    } catch (error) {
+        message.textContent = error.message || "Could not connect to server.";
+    }
+}
