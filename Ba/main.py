@@ -118,6 +118,33 @@ def verify_access_token(
         )
 
 
+#==========================================
+# SKILLBRIDGE APPLICATION
+#==========================================
+
+app = FastAPI(
+    title="SkillBridge",
+    description="Your Personal Career and Learning Assistant",
+    version="1.0.0"
+)
+
+
+
+def verify_admin_key(x_admin_key: str = Header(...)):
+    expected_key = os.getenv("ADMIN_API_KEY")
+
+    if not expected_key or not secrets.compare_digest(
+        x_admin_key, expected_key
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid admin key"
+        )
+
+    return True
+
+
+
 @app.get("/api/me")
 def get_current_user(
     payload: dict = Depends(verify_access_token)
@@ -171,33 +198,6 @@ def get_current_user(
             status_code=500,
             detail="Could not retrieve user."
         )
-
-
-#==========================================
-# SKILLBRIDGE APPLICATION
-#==========================================
-
-app = FastAPI(
-    title="SkillBridge",
-    description="Your Personal Career and Learning Assistant",
-    version="1.0.0"
-)
-
-
-
-def verify_admin_key(x_admin_key: str = Header(...)):
-    expected_key = os.getenv("ADMIN_API_KEY")
-
-    if not expected_key or not secrets.compare_digest(
-        x_admin_key, expected_key
-    ):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid admin key"
-        )
-
-    return True
-
 
 
 
