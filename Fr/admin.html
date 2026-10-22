@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkillBridge Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      margin: 0;
+      padding: 24px;
+      color: #20263a;
+    }
+    h1 { color: #4338ca; }
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      min-width: 160px;
+      box-shadow: 0 2px 10px #0001;
+    }
+    input, button {
+      padding: 11px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #4338ca;
+      color: white;
+      cursor: pointer;
+      border: 0;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      background: white;
+      border-radius: 10px;
+      margin-top: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    th { background: #e9eaff; }
+    #message { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>SkillBridge Admin Dashboard</h1>
+  <p>Registered user accounts</p>
+
+  <label for="adminKey">Admin API Key</label><br>
+  <input id="adminKey" type="password"
+         placeholder="Enter your admin key"
+         autocomplete="current-password">
+  <button id="loadUsers">Load Users</button>
+  <button id="clearKey">Clear</button>
+
+  <p id="message" role="status"></p>
+
+  <div class="cards">
+    <div class="card">
+      <p>Total Users</p>
+      <h2 id="totalUsers">—</h2>
+    </div>
+    <div class="card">
+      <p>Login Records</p>
+      <h2 id="totalLogins">Not available yet</h2>
+    </div>
+    <div class="card">
+      <p>Activity Records</p>
+      <h2 id="totalActivities">Not available yet</h2>
+    </div>
+  </div>
+
+  <h2>Registered Users</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Registered At</th>
+        </tr>
+      </thead>
+      <tbody id="usersBody">
+        <tr><td colspan="4">Load users to view accounts.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const API = "https://skillbridge-dka3.onrender.com";
+
+    const keyInput = document.getElementById("adminKey");
+    const message = document.getElementById("message");
+
+    document.getElementById("loadUsers").addEventListener("click", loadUsers);
+
+    document.getElementById("clearKey").addEventListener("click", () => {
+      keyInput.value = "";
+      document.getElementById("usersBody").replaceChildren();
+      document.getElementById("totalUsers").textContent = "—";
+      message.textContent = "Admin key cleared.";
+    });
+
+    async function loadUsers() {
+      const key = keyInput.value.trim();
+
+      if (!key) {
+        message.textContent = "Enter your admin key first.";
+        return;
+      }
+
+      message.textContent = "Loading users…";
+
+      try {
+        const response = await fetch(`${API}/api/admin/users`, {
+          headers: { "x-admin-key": key }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Could not load users.");
+        }
+
+        const body = document.getElementById("usersBody");
+        body.replaceChildren();
+
+        for (const user of data.users || []) {
+          const row = document.createElement("tr");
+
+          for (const value of [
+            user.id, user.name, user.email, user.created_at || "—"
+          ]) {
+            const cell = document.createElement("td");
+            cell.textContent = String(value ?? "");
+            row.appendChild(cell);
+          }
+
+          body.appendChild(row);
+        }
+
+        document.getElementById("totalUsers").textContent =
+          String(data.total ?? 0);
+
+        message.textContent = "User accounts loaded successfully.";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>
