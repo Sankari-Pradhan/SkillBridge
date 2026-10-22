@@ -10,7 +10,8 @@ from pypdf import PdfReader
 
 
 import secrets
-from fastapi import Header, HTTPException
+from fastapi import Depends, Header, HTTPException
+
 
 from pydantic import BaseModel, EmailStr
 
@@ -81,6 +82,40 @@ def create_access_token(user_id: int, email: str) -> str:
         secret_key,
         algorithm=JWT_ALGORITHM
     )
+
+
+def verify_access_token(
+    authorization: str = Header(...)
+):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authorization header."
+        )
+
+    token = authorization.split(" ", 1)[1]
+    secret_key = os.getenv("JWT_SECRET_KEY")
+
+    if not secret_key:
+        raise HTTPException(
+            status_code=500,
+            detail="JWT secret is not configured."
+        )
+
+    try:
+        payload = jwt.decode(
+            token,
+            secret_key,
+            algorithms=[JWT_ALGORITHM]
+        )
+
+        return payload
+
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token."
+        )
 
 #==========================================
 # SKILLBRIDGE APPLICATION
