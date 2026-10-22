@@ -293,9 +293,16 @@ def login_user(user: UserLogin):
                 detail="Invalid email or password."
             )
 
+        access_token = create_access_token(
+            user_id=result["id"],
+            email=result["email"]
+        )
         return {
             "success": True,
             "message": "Login successful.",
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             "user": {
                 "id": result["id"],
                 "name": result["name"],
