@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone
 from pypdf import PdfReader
 
+
 from pydantic import BaseModel, EmailStr
 
 from pathlib import Path
@@ -164,16 +165,18 @@ def create_user(user: UserCreate):
                     "message": "This email is already registered."
                 }
 
-            connection.execute(
-                text("""
-                    INSERT INTO users (name, email, password_hash)
-                    VALUES (:name, :email, :password_hash)
-                """),
-                {
-                    "name": user.name,
-                    "email": user.email,
-                    "password_hash": "NOT_SET"
-                }
+ connection.execute(
+    text("""
+        INSERT INTO users (name, email, password_hash, created_at)
+        VALUES (:name, :email, :password_hash, :created_at)
+    """),
+    {
+        "name": user.name,
+        "email": user.email,
+        "password_hash": "NOT_SET",
+        "created_at": datetime.now(timezone.utc)
+    }
+)
             )
 
         return {
