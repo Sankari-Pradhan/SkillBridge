@@ -22,6 +22,7 @@ import webbrowser
 #==========================================
 # PostgreSQL Database Connection
 #==========================================
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = None
@@ -37,8 +38,24 @@ if DATABASE_URL:
     )
 
 
+#==========================================
+# SKILLBRIDGE APPLICATION
+#==========================================
+
+app = FastAPI(
+    title="SkillBridge",
+    description="Your Personal Career and Learning Assistant",
+    version="1.0.0"
+)
+
+
+#==========================================
+# DATABASE STATUS CHECK
+#==========================================
+
 @app.get("/api/db-status")
 def database_status():
+
     if engine is None:
         return {
             "connected": False,
@@ -59,18 +76,6 @@ def database_status():
             "connected": False,
             "message": "Database connection failed."
         }
-
-# =========================================================
-# SKILLBRIDGE
-# =========================================================
-
-app = FastAPI(
-    title="SkillBridge",
-    description="Your Personal Career and Learning Assistant",
-    version="1.0.0"
-)
-
-
 # =========================================================
 # CORS
 # =========================================================
