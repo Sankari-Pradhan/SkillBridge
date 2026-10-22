@@ -54,6 +54,34 @@ if DATABASE_URL:
 
 
 password_hash = PasswordHash.recommended()
+
+JWT_ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+def create_access_token(user_id: int, email: str) -> str:
+    secret_key = os.getenv("JWT_SECRET_KEY")
+
+    if not secret_key:
+        raise RuntimeError("JWT_SECRET_KEY is not configured")
+
+    now = datetime.now(timezone.utc)
+
+    payload = {
+        "sub": str(user_id),
+        "email": email,
+        "iat": now,
+        "exp": now + timedelta(
+            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        )
+    }
+
+    return jwt.encode(
+        payload,
+        secret_key,
+        algorithm=JWT_ALGORITHM
+    )
+
 #==========================================
 # SKILLBRIDGE APPLICATION
 #==========================================
