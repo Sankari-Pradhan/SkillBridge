@@ -13,6 +13,7 @@ from fastapi import Header, HTTPException
 
 from pydantic import BaseModel, EmailStr
 
+from pwdlib import PasswordHash
 
 from pathlib import Path
 
@@ -48,6 +49,7 @@ if DATABASE_URL:
     )
 
 
+password_hash = PasswordHash.recommended()
 #==========================================
 # SKILLBRIDGE APPLICATION
 #==========================================
