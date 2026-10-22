@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone
 from pypdf import PdfReader
 
+
 import secrets
 from fastapi import Header, HTTPException
 
@@ -18,6 +19,7 @@ from pwdlib import PasswordHash
 from pathlib import Path
 
 import os
+from sqlalchemy import text
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -214,6 +216,72 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+@app.post("/api/login")
+def login_user(user: UserLogin):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(
+                text("""
+                    SELECT id, name, email, password_hash
+                    FROM users
+                    WHERE email = :email
+                """),
+                {"email": user.email}
+            ).mappings().first()
+
+        if result is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password."
+            )
+
+        if result["password_hash"] == "NOT_SET":
+            raise HTTPException(
+                status_code=401,
+                detail="Please register again with a password."
+            )
+
+        if not password_hash.verify(
+            user.password,
+            result["password_hash"]
+        ):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid email or password."
+            )
+
+        return {
+            "success": True,
+            "message": "Login successful.",
+            "user": {
+                "id": result["id"],
+                "name": result["name"],
+                "email": result["email"]
+            }
+        }
+
+    except HTTPException:
+        raise
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Database error during login")
+        raise HTTPException(
+            status_code=500,
+            detail="Login failed due to a server error."
+        )
 
 
 
