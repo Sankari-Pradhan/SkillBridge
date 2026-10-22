@@ -47,39 +47,9 @@
 
             <button type="submit">Login</button>
         </form>
-    </div>
+        
+       <p>Don't have an account? <a href="/register.html">Create Account</a></p>
 
-    <div class="card">
-        <h3>Create Account</h3>
-
-        <form id="registerForm" onsubmit="registerUser(event)">
-            <input
-                type="text"
-                id="registerName"
-                placeholder="Full Name"
-                autocomplete="name"
-                required
-            >
-
-            <input
-                type="email"
-                id="registerEmail"
-                placeholder="Email Address"
-                autocomplete="email"
-                required
-            >
-
-            <input
-                type="password"
-                id="registerPassword"
-                placeholder="Create Password"
-                autocomplete="new-password"
-                minlength="8"
-                required
-            >
-
-            <button type="submit">Register</button>
-        </form>
     </div>
 
     <p id="authMessage" role="status"></p>
