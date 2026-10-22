@@ -7,6 +7,10 @@ from pypdf import PdfReader
 
 from pathlib import Path
 
+import os
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import SQLAlchemyError
+
 import io
 import re
 import sys
@@ -14,6 +18,47 @@ import threading
 import time
 import webbrowser
 
+
+#==========================================
+# PostgreSQL Database Connection
+#==========================================
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+engine = None
+
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://", "postgresql://", 1
+    )
+
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True
+    )
+
+
+@app.get("/api/db-status")
+def database_status():
+    if engine is None:
+        return {
+            "connected": False,
+            "message": "DATABASE_URL is not configured."
+        }
+
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+
+        return {
+            "connected": True,
+            "message": "PostgreSQL connection successful."
+        }
+
+    except SQLAlchemyError:
+        return {
+            "connected": False,
+            "message": "Database connection failed."
+        }
 
 # =========================================================
 # SKILLBRIDGE
