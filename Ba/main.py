@@ -213,6 +213,7 @@ def create_database_tables():
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
+    password: str
 
 
 
@@ -245,7 +246,7 @@ def create_user(user: UserCreate):
                 {
                     "name": user.name,
                     "email": user.email,
-                    "password_hash": "NOT_SET",
+                    "password_hash": password_hash.hash(user.password),
                     "created_at": datetime.now(timezone.utc)
                 }
             )
