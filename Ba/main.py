@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, String, DateTime
+from datetime import datetime, timezone
 from pypdf import PdfReader
 
 from pathlib import Path
@@ -87,6 +90,49 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ==========================================
+# SkillBridge Users Database Table
+# ==========================================
+
+Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=False)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
+
+@app.post("/api/db-create-tables")
+def create_database_tables():
+    if engine is None:
+        return {
+            "success": False,
+            "message": "Database is not configured."
+        }
+
+    try:
+        Base.metadata.create_all(bind=engine)
+        return {
+            "success": True,
+            "message": "Users table created successfully."
+        }
+    except SQLAlchemyError:
+        return {
+            "success": False,
+            "message": "Could not create database tables."
+        }
 
 
 # =========================================================
