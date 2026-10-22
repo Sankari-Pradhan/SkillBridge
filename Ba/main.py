@@ -8,6 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone
 from pypdf import PdfReader
 
+import secrets
+from fastapi import Header, HTTPException
 
 from pydantic import BaseModel, EmailStr
 
@@ -54,6 +56,21 @@ app = FastAPI(
     description="Your Personal Career and Learning Assistant",
     version="1.0.0"
 )
+
+
+
+def verify_admin_key(x_admin_key: str = Header(...)):
+    expected_key = os.getenv("ADMIN_API_KEY")
+
+    if not expected_key or not secrets.compare_digest(
+        x_admin_key, expected_key
+    ):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid admin key"
+        )
+
+    return True
 
 
 #==========================================
