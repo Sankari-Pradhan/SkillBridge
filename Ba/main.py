@@ -27,6 +27,7 @@ import threading
 import time
 import webbrowser
 
+from fastapi import Depends
 
 #==========================================
 # PostgreSQL Database Connection
@@ -71,6 +72,56 @@ def verify_admin_key(x_admin_key: str = Header(...)):
         )
 
     return True
+
+
+
+
+@app.get("/api/admin/users")
+def list_users(
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(
+                text("""
+                    SELECT id, name, email, created_at
+                    FROM users
+                    ORDER BY id DESC
+                """)
+            )
+
+            users = [
+                {
+                    "id": row.id,
+                    "name": row.name,
+                    "email": row.email,
+                    "created_at": (
+                        row.created_at.isoformat()
+                        if row.created_at else None
+                    )
+                }
+                for row in result
+            ]
+
+        return {
+            "success": True,
+            "total": len(users),
+            "users": users
+        }
+
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not retrieve users")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve users."
+        )
 
 
 #==========================================
