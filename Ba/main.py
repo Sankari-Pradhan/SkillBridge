@@ -452,6 +452,54 @@ def login_user(user: UserLogin):
         )
 
 
+
+@app.get("/api/admin/login-history")
+def get_login_history(
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.connect() as connection:
+            rows = connection.execute(
+                text("""
+                    SELECT id, user_id, email, login_at
+                    FROM login_history
+                    ORDER BY login_at DESC
+                    LIMIT 200
+                """)
+            ).mappings().all()
+
+        return {
+            "success": True,
+            "total": len(rows),
+            "login_history": [
+                {
+                    "id": row["id"],
+                    "user_id": row["user_id"],
+                    "email": row["email"],
+                    "login_at": (
+                        row["login_at"].isoformat()
+                        if row["login_at"] else None
+                    )
+                }
+                for row in rows
+            ]
+        }
+
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not retrieve login history")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve login history."
+        )
+
+
 @app.post("/api/users")
 def create_user(user: UserCreate):
     if engine is None:
