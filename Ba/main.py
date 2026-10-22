@@ -182,6 +182,8 @@ def create_user(user: UserCreate):
         }
 
     except SQLAlchemyError:
+        import logging
+        logging.exception("Error saving user to database")
         return {
             "success": False,
             "message": "Could not save user."
