@@ -117,6 +117,62 @@ def verify_access_token(
             detail="Invalid or expired token."
         )
 
+
+@app.get("/api/me")
+def get_current_user(
+    payload: dict = Depends(verify_access_token)
+):
+    user_id = payload.get("sub")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload."
+        )
+
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.connect() as connection:
+            user = connection.execute(
+                text("""
+                    SELECT id, name, email
+                    FROM users
+                    WHERE id = :user_id
+                """),
+                {"user_id": int(user_id)}
+            ).mappings().first()
+
+        if user is None:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found."
+            )
+
+        return {
+            "success": True,
+            "user": {
+                "id": user["id"],
+                "name": user["name"],
+                "email": user["email"]
+            }
+        }
+
+    except HTTPException:
+        raise
+    except (SQLAlchemyError, ValueError):
+        import logging
+        logging.exception("Could not retrieve current user")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve user."
+        )
+
+
 #==========================================
 # SKILLBRIDGE APPLICATION
 #==========================================
