@@ -2,7 +2,7 @@
    CAREERMATE - COMPLETE JAVASCRIPT
    ========================================= */
 
-const API = "";
+const API = "https://skillbridge-dka3.onrender.com";
 
 /* =========================================
    NAVIGATION
@@ -747,3 +747,128 @@ function formatText(text) {
     return escapeHTML(text)
         .replace(/\n/g, "<br>");
 }
+
+
+
+const TOKEN_KEY = "skillbridge_access_token";
+
+async function registerUser(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("registerName").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const message = document.getElementById("authMessage");
+
+    message.textContent = "Creating account...";
+
+    try {
+        const response = await fetch(`${API}/api/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Registration failed.");
+        }
+
+        message.textContent = "Account created successfully! Please log in.";
+        document.getElementById("registerForm").reset();
+    } catch (error) {
+        message.textContent = error.message || "Could not connect to the server.";
+    }
+}
+
+async function loginUser(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    const message = document.getElementById("authMessage");
+
+    message.textContent = "Logging in...";
+
+    try {
+        const response = await fetch(`${API}/api/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Login failed.");
+        }
+
+        if (!data.access_token) {
+            throw new Error("The server did not return an access token.");
+        }
+
+        sessionStorage.setItem(TOKEN_KEY, data.access_token);
+
+        const meResponse = await fetch(`${API}/api/me`, {
+            headers: {
+                Authorization: `Bearer ${data.access_token}`
+            }
+        });
+
+        if (!meResponse.ok) {
+            sessionStorage.removeItem(TOKEN_KEY);
+            throw new Error("Could not verify your login. Please try again.");
+        }
+
+        showAppContent();
+        document.getElementById("loginForm").reset();
+        message.textContent = "";
+    } catch (error) {
+        message.textContent = error.message || "Could not connect to the server.";
+    }
+}
+
+function showAppContent() {
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("appContent").style.display = "block";
+}
+
+function logoutUser() {
+    sessionStorage.removeItem(TOKEN_KEY);
+
+    document.getElementById("appContent").style.display = "none";
+    document.getElementById("authSection").style.display = "block";
+    document.getElementById("authMessage").textContent = "You have logged out.";
+}
+
+async function checkLoginSession() {
+    const token = sessionStorage.getItem(TOKEN_KEY);
+
+    if (!token) {
+        document.getElementById("authSection").style.display = "block";
+        document.getElementById("appContent").style.display = "none";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API}/api/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+            showAppContent();
+        } else {
+            sessionStorage.removeItem(TOKEN_KEY);
+            document.getElementById("authSection").style.display = "block";
+            document.getElementById("appContent").style.display = "none";
+        }
+    } catch (error) {
+        document.getElementById("authSection").style.display = "block";
+        document.getElementById("appContent").style.display = "none";
+        document.getElementById("authMessage").textContent =
+            "Could not connect to SkillBridge. Please try again.";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", checkLoginSession);
