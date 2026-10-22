@@ -497,6 +497,13 @@ app.mount(
 )
 
 
+from fastapi.responses import FileResponse
+
+@app.get("/register.html")
+def register_page():
+    return FileResponse(FRONTEND_DIR / "register.html")
+
+
 # =========================================================
 # HOME PAGE
 # =========================================================
