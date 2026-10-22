@@ -363,6 +363,7 @@ class UserLogin(BaseModel):
 
 
 
+
 @app.post("/api/login")
 def login_user(user: UserLogin):
     if engine is None:
@@ -372,6 +373,7 @@ def login_user(user: UserLogin):
         )
 
     try:
+        # Find user by email
         with engine.connect() as connection:
             result = connection.execute(
                 text("""
@@ -388,6 +390,7 @@ def login_user(user: UserLogin):
                 detail="Invalid email or password."
             )
 
+        # Check password
         if result["password_hash"] == "NOT_SET":
             raise HTTPException(
                 status_code=401,
@@ -447,7 +450,6 @@ def login_user(user: UserLogin):
             status_code=500,
             detail="Login failed due to a server error."
         )
-
 
 
 @app.post("/api/users")
