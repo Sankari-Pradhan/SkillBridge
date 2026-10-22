@@ -328,6 +328,19 @@ class LoginHistory(Base):
     )
 
 
+class ActivityLog(Base):
+    __tablename__ = "activity_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    email = Column(String(255), nullable=False)
+    action = Column(String(100), nullable=False)
+    created_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
 
 @app.post("/api/db-create-tables")
 def create_database_tables():
