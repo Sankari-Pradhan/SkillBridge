@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | SkillBridge</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+    <section class="section active">
+        <div class="card">
+            <h1>🚀 Join SkillBridge</h1>
+            <p>Create your account to get started.</p>
+
+            <form id="registerForm">
+                <input type="text" id="registerName"
+                       placeholder="Full Name" required>
+
+                <input type="email" id="registerEmail"
+                       placeholder="Email Address" required>
+
+                <input type="password" id="registerPassword"
+                       placeholder="Create Password"
+                       minlength="8" required>
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <p id="registerMessage" role="status"></p>
+
+            <p>Already have an account?
+                <a href="/">Login here</a>
+            </p>
+        </div>
+    </section>
+
+    <script src="/assets/register.js"></script>
+</body>
+</html>
