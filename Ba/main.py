@@ -9,8 +9,10 @@ from datetime import datetime, timezone, timedelta
 from pypdf import PdfReader
 
 
+
 import secrets
 from fastapi import Depends, Header, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 from pydantic import BaseModel, EmailStr
@@ -55,6 +57,7 @@ if DATABASE_URL:
 
 
 password_hash = PasswordHash.recommended()
+bearer_scheme = HTTPBearer()
 
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -85,15 +88,9 @@ def create_access_token(user_id: int, email: str) -> str:
 
 
 def verify_access_token(
-    authorization: str = Header(...)
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
 ):
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization header."
-        )
-
-    token = authorization.split(" ", 1)[1]
+    token = credentials.credentials
     secret_key = os.getenv("JWT_SECRET_KEY")
 
     if not secret_key:
@@ -108,6 +105,13 @@ def verify_access_token(
             secret_key,
             algorithms=[JWT_ALGORITHM]
         )
+
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token payload."
+            )
 
         return payload
 
