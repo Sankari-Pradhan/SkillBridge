@@ -19,10 +19,77 @@
 
 <body>
 
+    
+<!-- LOGIN & REGISTRATION -->
+<section id="authSection" class="section active">
+    <h2>🔐 Welcome to SkillBridge</h2>
+<p>Log in to your account or create a new one.</p>
 
+    <div class="card">
+        <h3>Login</h3>
+
+        <form id="loginForm" onsubmit="loginUser(event)">
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Email Address"
+                autocomplete="email"
+                required
+            >
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                autocomplete="current-password"
+                required
+            >
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Create Account</h3>
+
+        <form id="registerForm" onsubmit="registerUser(event)">
+            <input
+                type="text"
+                id="registerName"
+                placeholder="Full Name"
+                autocomplete="name"
+                required
+            >
+
+            <input
+                type="email"
+                id="registerEmail"
+                placeholder="Email Address"
+                autocomplete="email"
+                required
+            >
+
+            <input
+                type="password"
+                id="registerPassword"
+                placeholder="Create Password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+            >
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <p id="authMessage" role="status"></p>
+</section>
+
+
+<div id="appContent" style="display: none;"> </div>
 <!-- =====================================================
      HEADER
-     ===================================================== -->
+ ================================================================ -->
 
 <header>
 
@@ -59,6 +126,7 @@
             ✉️ Cover Letter
         </button>
 
+        <button onclick="logoutUser()">🚪 Logout</button>
     </nav>
 
 </header>
