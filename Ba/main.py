@@ -11,6 +11,7 @@ from pypdf import PdfReader
 
 from pydantic import BaseModel, EmailStr
 
+
 from pathlib import Path
 
 import os
@@ -144,6 +145,7 @@ class UserCreate(BaseModel):
     email: EmailStr
 
 
+
 @app.post("/api/users")
 def create_user(user: UserCreate):
     if engine is None:
@@ -165,18 +167,17 @@ def create_user(user: UserCreate):
                     "message": "This email is already registered."
                 }
 
- connection.execute(
-    text("""
-        INSERT INTO users (name, email, password_hash, created_at)
-        VALUES (:name, :email, :password_hash, :created_at)
-    """),
-    {
-        "name": user.name,
-        "email": user.email,
-        "password_hash": "NOT_SET",
-        "created_at": datetime.now(timezone.utc)
-    }
-)
+            connection.execute(
+                text("""
+                    INSERT INTO users (name, email, password_hash, created_at)
+                    VALUES (:name, :email, :password_hash, :created_at)
+                """),
+                {
+                    "name": user.name,
+                    "email": user.email,
+                    "password_hash": "NOT_SET",
+                    "created_at": datetime.now(timezone.utc)
+                }
             )
 
         return {
@@ -186,7 +187,7 @@ def create_user(user: UserCreate):
 
     except SQLAlchemyError:
         import logging
-        logging.exception("Error saving user to database")
+        logging.exception("Database error while saving user")
         return {
             "success": False,
             "message": "Could not save user."
