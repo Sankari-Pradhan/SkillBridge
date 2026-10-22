@@ -315,6 +315,20 @@ class User(Base):
     )
 
 
+class LoginHistory(Base):
+    __tablename__ = "login_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    email = Column(String(255), nullable=False)
+    login_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
+
+
 @app.post("/api/db-create-tables")
 def create_database_tables():
     if engine is None:
@@ -346,6 +360,7 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
 
 
 @app.post("/api/login")
@@ -388,10 +403,27 @@ def login_user(user: UserLogin):
                 detail="Invalid email or password."
             )
 
+        # Save successful login history
+        with engine.begin() as connection:
+            connection.execute(
+                text("""
+                    INSERT INTO login_history
+                    (user_id, email, login_at)
+                    VALUES (:user_id, :email, :login_at)
+                """),
+                {
+                    "user_id": result["id"],
+                    "email": result["email"],
+                    "login_at": datetime.now(timezone.utc)
+                }
+            )
+
+        # Generate access token
         access_token = create_access_token(
             user_id=result["id"],
             email=result["email"]
         )
+
         return {
             "success": True,
             "message": "Login successful.",
@@ -407,6 +439,7 @@ def login_user(user: UserLogin):
 
     except HTTPException:
         raise
+
     except SQLAlchemyError:
         import logging
         logging.exception("Database error during login")
