@@ -572,6 +572,55 @@ def get_login_history(
         )
 
 
+
+@app.get("/api/admin/activity-logs")
+def get_activity_logs(
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.connect() as connection:
+            rows = connection.execute(
+                text("""
+                    SELECT id, user_id, email, action, created_at
+                    FROM activity_logs
+                    ORDER BY created_at DESC
+                    LIMIT 200
+                """)
+            ).mappings().all()
+
+        return {
+            "success": True,
+            "total": len(rows),
+            "activities": [
+                {
+                    "id": row["id"],
+                    "user_id": row["user_id"],
+                    "email": row["email"],
+                    "action": row["action"],
+                    "created_at": (
+                        row["created_at"].isoformat()
+                        if row["created_at"] else None
+                    )
+                }
+                for row in rows
+            ]
+        }
+
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not retrieve activity logs")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve activity logs."
+        )
+
+
 @app.post("/api/users")
 def create_user(user: UserCreate):
     if engine is None:
