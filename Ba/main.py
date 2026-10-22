@@ -8,6 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone
 from pypdf import PdfReader
 
+from pydantic import BaseModel, EmailStr
+
 from pathlib import Path
 
 import os
@@ -132,6 +134,57 @@ def create_database_tables():
         return {
             "success": False,
             "message": "Could not create database tables."
+        }
+
+
+
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+
+
+@app.post("/api/users")
+def create_user(user: UserCreate):
+    if engine is None:
+        return {
+            "success": False,
+            "message": "Database is not configured."
+        }
+
+    try:
+        with engine.begin() as connection:
+            existing_user = connection.execute(
+                text("SELECT id FROM users WHERE email = :email"),
+                {"email": user.email}
+            ).first()
+
+            if existing_user:
+                return {
+                    "success": False,
+                    "message": "This email is already registered."
+                }
+
+            connection.execute(
+                text("""
+                    INSERT INTO users (name, email, password_hash)
+                    VALUES (:name, :email, :password_hash)
+                """),
+                {
+                    "name": user.name,
+                    "email": user.email,
+                    "password_hash": "NOT_SET"
+                }
+            )
+
+        return {
+            "success": True,
+            "message": "User saved successfully."
+        }
+
+    except SQLAlchemyError:
+        return {
+            "success": False,
+            "message": "Could not save user."
         }
 
 
