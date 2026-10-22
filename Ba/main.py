@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pypdf import PdfReader
 
 
@@ -19,6 +19,8 @@ from pwdlib import PasswordHash
 from pathlib import Path
 
 import os
+import jwt
+
 from sqlalchemy import text
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
