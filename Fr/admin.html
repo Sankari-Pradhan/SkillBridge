@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SkillBridge Admin Dashboard</title>
+
   <style>
+    * { box-sizing: border-box; }
+
     body {
       font-family: Arial, sans-serif;
       background: #f4f6fb;
@@ -13,80 +16,113 @@
       padding: 24px;
       color: #20263a;
     }
+
     h1 { color: #4338ca; }
+
     .cards {
       display: flex;
       flex-wrap: wrap;
       gap: 16px;
       margin: 20px 0;
     }
+
     .card {
       background: white;
       padding: 20px;
       border-radius: 12px;
       min-width: 160px;
+      flex: 1;
       box-shadow: 0 2px 10px #0001;
     }
+
     input, button {
       padding: 11px;
       margin: 5px 0;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
+    input { max-width: 100%; width: 360px; }
+
     button {
       background: #4338ca;
       color: white;
       cursor: pointer;
       border: 0;
     }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
     .table-wrap {
       overflow-x: auto;
       background: white;
       border-radius: 10px;
-      margin-top: 16px;
+      margin: 16px 0 28px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
     }
+
     th, td {
       text-align: left;
       padding: 12px;
       border-bottom: 1px solid #eee;
+      white-space: nowrap;
     }
+
     th { background: #e9eaff; }
-    #message { white-space: pre-wrap; }
+
+    #message {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .muted { color: #687089; font-size: 14px; }
   </style>
 </head>
+
 <body>
   <h1>SkillBridge Admin Dashboard</h1>
-  <p>Registered user accounts</p>
+  <p>Users, login records and feature activity</p>
 
   <label for="adminKey">Admin API Key</label><br>
-  <input id="adminKey" type="password"
-         placeholder="Enter your admin key"
-         autocomplete="current-password">
-  <button id="loadUsers">Load Users</button>
-  <button id="clearKey">Clear</button>
+  <input
+    id="adminKey"
+    type="password"
+    placeholder="Enter your admin key"
+    autocomplete="off"
+  >
+  <br>
 
-  <p id="message" role="status"></p>
+  <button id="loadDashboard">Load Dashboard</button>
+  <button id="clearKey">Clear Key</button>
+
+  <p id="message" role="status" aria-live="polite"></p>
 
   <div class="cards">
     <div class="card">
       <p>Total Users</p>
       <h2 id="totalUsers">—</h2>
     </div>
+
     <div class="card">
       <p>Login Records</p>
-      <h2 id="totalLogins">Not available yet</h2>
+      <h2 id="totalLogins">—</h2>
     </div>
+
     <div class="card">
       <p>Activity Records</p>
-      <h2 id="totalActivities">Not available yet</h2>
+      <h2 id="totalActivities">—</h2>
     </div>
   </div>
 
   <h2>Registered Users</h2>
+  <p class="muted">Account registration details.</p>
   <div class="table-wrap">
     <table>
       <thead>
@@ -98,7 +134,44 @@
         </tr>
       </thead>
       <tbody id="usersBody">
-        <tr><td colspan="4">Load users to view accounts.</td></tr>
+        <tr><td colspan="4">Click Load Dashboard.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Login History</h2>
+  <p class="muted">Successful logins recorded after login tracking was added.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Record ID</th>
+          <th>User ID</th>
+          <th>Email</th>
+          <th>Login Time</th>
+        </tr>
+      </thead>
+      <tbody id="loginsBody">
+        <tr><td colspan="4">Not loaded.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Activity History</h2>
+  <p class="muted">Recorded feature actions. Only actions actually sent to the activity API appear here.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Record ID</th>
+          <th>User ID</th>
+          <th>Email</th>
+          <th>Action</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="activitiesBody">
+        <tr><td colspan="5">Not loaded.</td></tr>
       </tbody>
     </table>
   </div>
@@ -108,60 +181,182 @@
 
     const keyInput = document.getElementById("adminKey");
     const message = document.getElementById("message");
+    const loadButton = document.getElementById("loadDashboard");
 
-    document.getElementById("loadUsers").addEventListener("click", loadUsers);
+    document.getElementById("loadDashboard")
+      .addEventListener("click", loadDashboard);
 
     document.getElementById("clearKey").addEventListener("click", () => {
       keyInput.value = "";
-      document.getElementById("usersBody").replaceChildren();
       document.getElementById("totalUsers").textContent = "—";
-      message.textContent = "Admin key cleared.";
+      document.getElementById("totalLogins").textContent = "—";
+      document.getElementById("totalActivities").textContent = "—";
+
+      for (const [id, cols] of [
+        ["usersBody", 4],
+        ["loginsBody", 4],
+        ["activitiesBody", 5]
+      ]) {
+        const body = document.getElementById(id);
+        body.replaceChildren();
+        const row = body.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = cols;
+        cell.textContent = "Cleared. Reload dashboard to view.";
+      }
+
+      message.textContent = "Admin key cleared from this page.";
     });
 
-    async function loadUsers() {
-      const key = keyInput.value.trim();
+    function addCell(row, value) {
+      const cell = row.insertCell();
+      cell.textContent = value == null ? "—" : String(value);
+    }
 
-      if (!key) {
-        message.textContent = "Enter your admin key first.";
+    function formatDate(value) {
+      if (!value) return "—";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime())
+        ? String(value)
+        : date.toLocaleString();
+    }
+
+    async function fetchAdmin(path, key) {
+      const response = await fetch(`${API}${path}`, {
+        headers: { "x-admin-key": key }
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          `${path}: ${data.detail || "Request failed (" + response.status + ")"}`
+        );
+      }
+
+      return data;
+    }
+
+    function showUsers(users) {
+      const body = document.getElementById("usersBody");
+      body.replaceChildren();
+
+      if (!users.length) {
+        body.insertRow().insertCell().textContent = "No users found.";
+        body.rows[0].cells[0].colSpan = 4;
         return;
       }
 
-      message.textContent = "Loading users…";
+      for (const user of users) {
+        const row = body.insertRow();
+        addCell(row, user.id);
+        addCell(row, user.name);
+        addCell(row, user.email);
+        addCell(row, formatDate(user.created_at));
+      }
+    }
+
+    function showLogins(logins) {
+      const body = document.getElementById("loginsBody");
+      body.replaceChildren();
+
+      if (!logins.length) {
+        const row = body.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 4;
+        cell.textContent = "No login records found yet.";
+        return;
+      }
+
+      for (const item of logins) {
+        const row = body.insertRow();
+        addCell(row, item.id);
+        addCell(row, item.user_id);
+        addCell(row, item.email);
+        addCell(row, formatDate(item.login_at));
+      }
+    }
+
+    function showActivities(activities) {
+      const body = document.getElementById("activitiesBody");
+      body.replaceChildren();
+
+      if (!activities.length) {
+        const row = body.insertRow();
+        const cell = row.insertCell();
+        cell.colSpan = 5;
+        cell.textContent = "No activity records found yet.";
+        return;
+      }
+
+      for (const item of activities) {
+        const row = body.insertRow();
+        addCell(row, item.id);
+        addCell(row, item.user_id);
+        addCell(row, item.email);
+        addCell(row, item.action);
+        addCell(row, formatDate(item.created_at));
+      }
+    }
+
+    async function loadDashboard() {
+      const key = keyInput.value.trim();
+
+      if (!key) {
+        message.textContent = "Please enter your Admin API Key.";
+        return;
+      }
+
+      loadButton.disabled = true;
+      message.textContent = "Loading dashboard…";
 
       try {
-        const response = await fetch(`${API}/api/admin/users`, {
-          headers: { "x-admin-key": key }
-        });
+        const results = await Promise.allSettled([
+          fetchAdmin("/api/admin/users", key),
+          fetchAdmin("/api/admin/login-history", key),
+          fetchAdmin("/api/admin/activity-logs", key)
+        ]);
 
-        const data = await response.json();
+        const labels = ["Users", "Login History", "Activity History"];
+        const errors = [];
 
-        if (!response.ok) {
-          throw new Error(data.detail || "Could not load users.");
+        if (results[0].status === "fulfilled") {
+          const data = results[0].value;
+          showUsers(data.users || []);
+          document.getElementById("totalUsers").textContent =
+            String(data.total ?? (data.users || []).length);
+        } else {
+          errors.push(labels[0] + ": " + results[0].reason.message);
         }
 
-        const body = document.getElementById("usersBody");
-        body.replaceChildren();
-
-        for (const user of data.users || []) {
-          const row = document.createElement("tr");
-
-          for (const value of [
-            user.id, user.name, user.email, user.created_at || "—"
-          ]) {
-            const cell = document.createElement("td");
-            cell.textContent = String(value ?? "");
-            row.appendChild(cell);
-          }
-
-          body.appendChild(row);
+        if (results[1].status === "fulfilled") {
+          const data = results[1].value;
+          const logins = data.login_history || [];
+          showLogins(logins);
+          document.getElementById("totalLogins").textContent =
+            String(data.total ?? logins.length);
+        } else {
+          errors.push(labels[1] + ": " + results[1].reason.message);
         }
 
-        document.getElementById("totalUsers").textContent =
-          String(data.total ?? 0);
+        if (results[2].status === "fulfilled") {
+          const data = results[2].value;
+          const activities = data.activities || [];
+          showActivities(activities);
+          document.getElementById("totalActivities").textContent =
+            String(data.total ?? activities.length);
+        } else {
+          errors.push(labels[2] + ": " + results[2].reason.message);
+        }
 
-        message.textContent = "User accounts loaded successfully.";
+        message.textContent = errors.length
+          ? "Some sections could not load:\n" + errors.join("\n")
+          : "Dashboard loaded successfully.";
+
       } catch (error) {
-        message.textContent = error.message;
+        message.textContent = error.message || "Could not load dashboard.";
+      } finally {
+        loadButton.disabled = false;
       }
     }
   </script>
