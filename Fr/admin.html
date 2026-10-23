@@ -13,6 +13,7 @@
 <section class="card"><div class="row"><h2>Activity History</h2><button id="refreshActivities" class="secondary">↻ Refresh Activity History</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Action</th><th>Time</th></tr></thead><tbody id="activityBody"></tbody></table></div><div id="activityStatus" class="status"></div></section>
 <section class="card"><div class="row"><h2>Refresh All Data</h2><button id="refreshAll">↻ Refresh All</button></div><div id="allStatus" class="status">Reload users, login records and activity records together.</div></section>
 </div></main>
+  
 <script>
 (()=>{const $=id=>document.getElementById(id);let key="",users=[];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -30,4 +31,26 @@ $("clear").addEventListener("click",()=>{key="";users=[];$("adminKey").value="";
 $("refreshUsers").addEventListener("click",()=>loadUsers().catch(()=>{}));$("refreshLogins").addEventListener("click",()=>loadLogins().catch(()=>{}));$("refreshActivities").addEventListener("click",()=>loadActivities().catch(()=>{}));$("refreshAll").addEventListener("click",refreshAll);$("search").addEventListener("input",renderUsers);
 $("usersBody").addEventListener("click",async e=>{const b=e.target.closest("button[data-a]");if(!b)return;const id=Number(b.dataset.id),u=users.find(x=>Number(x.id)===id);if(!u)return;try{if(b.dataset.a==="edit"){const name=prompt("Edit name:",u.name||"");if(name===null)return;const email=prompt("Edit email:",u.email||"");if(email===null)return;const body={};if(name.trim())body.name=name.trim();if(email.trim())body.email=email.trim();await api(`/api/admin/users/${id}`,{method:"PATCH",body:JSON.stringify(body)});await loadUsers()}else if(b.dataset.a==="toggle"){const active=b.dataset.active!=="false";if(!confirm(`${active?"Deactivate":"Activate"} ${u.email}?`))return;await api(`/api/admin/users/${id}/status?is_active=${active}`,{method:"PATCH"});await loadUsers()}else if(b.dataset.a==="delete"){if(!confirm(`Permanently delete ${u.email}? History rows are retained.`))return;await api(`/api/admin/users/${id}`,{method:"DELETE"});await refreshAll()}}catch(err){msg("usersStatus",err.message,"error")}});
 })();
-</script></body></html>
+
+
+function formatIST(dateString) {
+  const date = new Date(dateString);
+
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(date);
+
+  const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
+
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+}  
+</script>
+</body>
+</html>
