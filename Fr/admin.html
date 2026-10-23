@@ -1,18 +1,141 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SkillBridge Admin Dashboard</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f6fc;color:#1f2937;font:16px Arial,sans-serif}.wrap{max-width:1200px;margin:auto;padding:18px}h1{color:#263f80;font-size:clamp(26px,4vw,36px);margin:0 0 8px}h2{font-size:clamp(21px,3vw,28px);margin:0 0 16px}p,.muted{color:#667085}.card,.stat{background:#fff;border-radius:14px;padding:18px;margin:0 0 18px;box-shadow:0 3px 12px #1725540c}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}input,button{font:inherit;border-radius:8px;padding:10px 12px}input{border:1px solid #cbd5e1;max-width:100%}button{border:0;background:#244fc1;color:white;cursor:pointer;font-weight:600}button.secondary{background:#e8eefc;color:#23418c}button.green{background:#16804a}button.danger{background:#b42318}.keyrow{display:flex;gap:8px;flex-wrap:wrap}.keyrow input{flex:1;min-width:200px;width:100%}.status{margin-top:10px;min-height:20px;font-size:14px;overflow-wrap:anywhere}.error{color:#b42318}.success{color:#087443}.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat span{display:block;color:#667085}.stat strong{display:block;font-size:30px;margin-top:8px}.search{width:min(100%,380px);margin-bottom:12px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #e6eaf0;font-size:14px;vertical-align:top}th{background:#edf2ff;white-space:nowrap}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px}.off{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 9px}.empty{text-align:center;color:#667085;padding:18px}@media(max-width:640px){.wrap{padding:12px}.card,.stat{padding:14px}.stats{grid-template-columns:1fr}.keyrow{display:block}.keyrow button{margin-top:8px;width:100%}th,td{font-size:12px;padding:8px 6px}}
-</style></head><body><main class="wrap">
-<header><h1>SkillBridge Admin Dashboard</h1><p>Manage registered users, login history and feature activity.</p></header>
-<section class="card"><h2>Admin Access</h2><label for="adminKey">Admin API Key</label><div class="keyrow" style="margin-top:6px"><input id="adminKey" type="password" autocomplete="current-password" placeholder="Enter Admin API Key"><button id="load">Load Dashboard</button><button id="clear" class="secondary">Clear Key &amp; Data</button></div><div id="accessStatus" class="status"></div><p>Your key stays in this page's memory and is not saved to local storage.</p></section>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fc;color:#1f2937;font:16px Arial,sans-serif}
+.wrap{max-width:1200px;margin:auto;padding:18px}
+h1{color:#263f80;font-size:clamp(26px,4vw,36px);margin:0 0 8px}
+h2{font-size:clamp(21px,3vw,28px);margin:0 0 16px}
+p,.muted{color:#667085}
+.card,.stat{background:#fff;border-radius:14px;padding:18px;margin:0 0 18px;box-shadow:0 3px 12px #1725540c}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+input,button{font:inherit;border-radius:8px;padding:10px 12px}
+input{border:1px solid #cbd5e1;max-width:100%}
+button{border:0;background:#244fc1;color:white;cursor:pointer;font-weight:600}
+button.secondary{background:#e8eefc;color:#23418c}
+button.green{background:#16804a}
+button.danger{background:#b42318}
+.keyrow{display:flex;gap:8px;flex-wrap:wrap}
+.keyrow input{flex:1;min-width:200px;width:100%}
+.status{margin-top:10px;min-height:20px;font-size:14px;overflow-wrap:anywhere}
+.error{color:#b42318}
+.success{color:#087443}
+.hidden{display:none!important}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.stat span{display:block;color:#667085}
+.stat strong{display:block;font-size:30px;margin-top:8px}
+.search{width:min(100%,380px);margin-bottom:12px}
+.tablewrap{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:650px}
+th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #e6eaf0;font-size:14px;vertical-align:top}
+th{background:#edf2ff;white-space:nowrap}
+.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px}
+.off{background:#fee2e2;color:#991b1b}
+.actions{display:flex;gap:5px;flex-wrap:wrap}
+.actions button{font-size:12px;padding:7px 9px}
+.empty{text-align:center;color:#667085;padding:18px}
+@media(max-width:640px){
+.wrap{padding:12px}
+.card,.stat{padding:14px}
+.stats{grid-template-columns:1fr}
+.keyrow{display:block}
+.keyrow button{margin-top:8px;width:100%}
+th,td{font-size:12px;padding:8px 6px}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header>
+<h1>SkillBridge Admin Dashboard</h1>
+<p>Manage registered users, login history and feature activity.</p>
+</header>
+
+<section class="card">
+<h2>Admin Access</h2>
+<label for="adminKey">Admin API Key</label>
+<div class="keyrow" style="margin-top:6px">
+<input id="adminKey" type="password" autocomplete="current-password" placeholder="Enter Admin API Key">
+<button id="load">Load Dashboard</button>
+<button id="clear" class="secondary">Clear Key &amp; Data</button>
+</div>
+<div id="accessStatus" class="status"></div>
+<p>Your key stays in this page's memory and is not saved to local storage.</p>
+</section>
+
 <div id="dashboard" class="hidden">
-<div class="stats"><div class="stat"><span>Registered Users</span><strong id="usersCount">—</strong></div><div class="stat"><span>Login Records</span><strong id="loginCount">—</strong></div><div class="stat"><span>Activity Records</span><strong id="activityCount">—</strong></div></div>
-<section class="card"><div class="row"><h2>Registered Users</h2><button id="refreshUsers" class="secondary">↻ Refresh Users</button></div><input id="search" class="search" placeholder="Search by name, email or user ID"><div class="tablewrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Registered At</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div><div id="usersStatus" class="status"></div></section>
-<section class="card"><div class="row"><h2>Login History</h2><button id="refreshLogins" class="secondary">↻ Refresh Login History</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Login Time</th></tr></thead><tbody id="loginBody"></tbody></table></div><div id="loginStatus" class="status"></div></section>
-<section class="card"><div class="row"><h2>Activity History</h2><button id="refreshActivities" class="secondary">↻ Refresh Activity History</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Action</th><th>Time</th></tr></thead><tbody id="activityBody"></tbody></table></div><div id="activityStatus" class="status"></div></section>
-<section class="card"><div class="row"><h2>Refresh All Data</h2><button id="refreshAll">↻ Refresh All</button></div><div id="allStatus" class="status">Reload users, login records and activity records together.</div></section>
-</div></main>
+<div class="stats">
+<div class="stat"><span>Registered Users</span><strong id="usersCount">—</strong></div>
+<div class="stat"><span>Login Records</span><strong id="loginCount">—</strong></div>
+<div class="stat"><span>Activity Records</span><strong id="activityCount">—</strong></div>
+</div>
+
+<section class="card">
+<div class="row">
+<h2>Registered Users</h2>
+<button id="refreshUsers" class="secondary">↻ Refresh Users</button>
+</div>
+<input id="search" class="search" placeholder="Search by name, email or user ID">
+<div class="tablewrap">
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Registered At</th><th>Status</th><th>Actions</th></tr></thead>
+<tbody id="usersBody"></tbody>
+</table>
+</div>
+<div id="usersStatus" class="status"></div>
+</section>
+
+<section class="card">
+<div class="row">
+<h2>Login History</h2>
+<button id="refreshLogins" class="secondary">↻ Refresh Login History</button>
+</div>
+<div class="tablewrap">
+<table>
+<thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Login Time</th></tr></thead>
+<tbody id="loginBody"></tbody>
+</table>
+</div>
+<div id="loginStatus" class="status"></div>
+</section>
+
+<section class="card">
+<div class="row">
+<h2>Activity History</h2>
+<button id="refreshActivities" class="secondary">↻ Refresh Activity History</button>
+</div>
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>User ID</th>
+<th>Email</th>
+<th>Activity</th>
+<th>Details</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody id="activityBody"></tbody>
+</table>
+</div>
+<div id="activityStatus" class="status"></div>
+</section>
+
+<section class="card">
+<div class="row">
+<h2>Refresh All Data</h2>
+<button id="refreshAll">↻ Refresh All</button>
+</div>
+<div id="allStatus" class="status">Reload users, login records and activity records together.</div>
+</section>
+</div>
+</main>
+
   
 
 <script>
@@ -173,19 +296,20 @@
 
       $("activityCount").textContent = d.total ?? rows.length;
 
-      if (rows.length) {
-        $("activityBody").innerHTML = rows.map(r => `
-          <tr>
-            <td>${esc(r.id)}</td>
-            <td>${esc(r.user_id)}</td>
-            <td>${esc(r.email)}</td>
-            <td>${esc(r.action)}</td>
-            <td>${esc(formatIST(r.created_at))}</td>
-          </tr>
-        `).join("");
-      } else {
-        empty("activityBody", 5, "No activity records yet.");
-      }
+     if (rows.length) {
+  $("activityBody").innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.id)}</td>
+      <td>${esc(r.user_id)}</td>
+      <td>${esc(r.email)}</td>
+      <td>${esc(r.action)}</td>
+      <td>${esc(r.details || "—")}</td>
+      <td>${esc(formatIST(r.created_at))}</td>
+    </tr>
+  `).join("");
+} else {
+  empty("activityBody", 6, "No activity records yet.");
+}
 
       msg("activityStatus", `Loaded ${rows.length} activity record(s).`, "success");
     } catch (e) {
