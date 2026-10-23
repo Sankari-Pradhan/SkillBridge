@@ -31,6 +31,10 @@ from sqlalchemy.exc import SQLAlchemyError
 import io
 import re
 import sys
+import hashlib
+import json
+import urllib.request
+import urllib.error
 import threading
 import time
 import webbrowser
@@ -206,51 +210,31 @@ def get_current_user(
 
 
 @app.get("/api/admin/users")
-def list_users(
-    admin: bool = Depends(verify_admin_key)
-):
+def list_users(admin: bool = Depends(verify_admin_key)):
     if engine is None:
-        raise HTTPException(
-            status_code=503,
-            detail="Database is not configured."
-        )
-
+        raise HTTPException(status_code=503, detail="Database is not configured.")
     try:
+        ensure_admin_user_columns()
         with engine.connect() as connection:
-            result = connection.execute(
-                text("""
-                    SELECT id, name, email, created_at
-                    FROM users
-                    ORDER BY id DESC
-                """)
-            )
-
-            users = [
-                {
-                    "id": row.id,
-                    "name": row.name,
-                    "email": row.email,
-                    "created_at": (
-                        row.created_at.isoformat()
-                        if row.created_at else None
-                    )
-                }
-                for row in result
-            ]
-
-        return {
-            "success": True,
-            "total": len(users),
-            "users": users
-        }
-
+            rows = connection.execute(text("""
+                SELECT id, name, email, created_at, is_active
+                FROM users
+                ORDER BY id DESC
+            """)).mappings().all()
+        users = [{
+            "id": row["id"],
+            "name": row["name"],
+            "email": row["email"],
+            "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+            "is_active": row["is_active"]
+        } for row in rows]
+        return {"success": True, "total": len(users), "users": users}
+    except HTTPException:
+        raise
     except SQLAlchemyError:
         import logging
         logging.exception("Could not retrieve users")
-        raise HTTPException(
-            status_code=500,
-            detail="Could not retrieve users."
-        )
+        raise HTTPException(status_code=500, detail="Could not retrieve users.")
 
 
 #==========================================
@@ -445,11 +429,17 @@ def login_user(user: UserLogin):
         )
 
     try:
+        # Ensure existing databases have the account-status column.
+        with engine.begin() as connection:
+            connection.execute(text("""
+                ALTER TABLE users
+                ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE
+            """))
         # Find user by email
         with engine.connect() as connection:
             result = connection.execute(
                 text("""
-                    SELECT id, name, email, password_hash
+                    SELECT id, name, email, password_hash, is_active
                     FROM users
                     WHERE email = :email
                 """),
@@ -461,6 +451,10 @@ def login_user(user: UserLogin):
                 status_code=401,
                 detail="Invalid email or password."
             )
+
+        # Deactivated accounts cannot log in.
+        if result.get("is_active") is False:
+            raise HTTPException(status_code=403, detail="This account has been deactivated. Contact the administrator.")
 
         # Check password
         if result["password_hash"] == "NOT_SET":
@@ -621,52 +615,343 @@ def get_activity_logs(
         )
 
 
+# =========================================================
+# EMAIL OTP REGISTRATION (Mailjet)
+# =========================================================
+
+class RegistrationOTPRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+
+class RegistrationOTPVerify(BaseModel):
+    email: EmailStr
+    otp: str
+
+
+def ensure_registration_otp_table():
+    """Create a table for pending registrations; OTPs are stored hashed."""
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    with engine.begin() as connection:
+        connection.execute(text("""
+            CREATE TABLE IF NOT EXISTS registration_otps (
+                email VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                otp_hash VARCHAR(64) NOT NULL,
+                expires_at TIMESTAMPTZ NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0,
+                last_sent_at TIMESTAMPTZ NOT NULL
+            )
+        """))
+
+
+def send_mailjet_otp(recipient_email: str, otp: str):
+    api_key = os.getenv("MAILJET_API_KEY")
+    secret_key = os.getenv("MAILJET_SECRET_KEY")
+    sender_email = os.getenv("MAILJET_SENDER_EMAIL")
+    if not api_key or not secret_key or not sender_email:
+        raise HTTPException(status_code=503, detail="Email service is not configured.")
+
+    payload = {
+        "Messages": [{
+            "From": {"Email": sender_email, "Name": "SkillBridge"},
+            "To": [{"Email": recipient_email}],
+            "Subject": "Your SkillBridge registration OTP",
+            "TextPart": f"Your SkillBridge verification code is {otp}. It expires in 10 minutes. If you did not request this code, ignore this email.",
+            "HTMLPart": f"<p>Your SkillBridge verification code is:</p><h2>{otp}</h2><p>This code expires in 10 minutes. If you did not request it, ignore this email.</p>"
+        }]
+    }
+    request = urllib.request.Request(
+        "https://api.mailjet.com/v3.1/send",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+    import base64
+    credentials = base64.b64encode(f"{api_key}:{secret_key}".encode("utf-8")).decode("ascii")
+    request.add_header("Authorization", f"Basic {credentials}")
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            response_body = json.loads(response.read().decode("utf-8"))
+            messages = response_body.get("Messages", [])
+            if not messages or messages[0].get("Status") != "success":
+                raise HTTPException(status_code=502, detail="Email provider did not accept the OTP email.")
+    except urllib.error.HTTPError as exc:
+        # Do not expose provider credentials or full provider response to the client.
+        import logging
+        logging.error("Mailjet rejected OTP email; HTTP status %s", exc.code)
+        raise HTTPException(status_code=502, detail="Could not send verification email. Check Mailjet sender and API settings.")
+    except (urllib.error.URLError, TimeoutError):
+        raise HTTPException(status_code=502, detail="Email service is temporarily unavailable.")
+
+
+@app.post("/api/register/send-otp")
+def send_registration_otp(user: RegistrationOTPRequest):
+    """Send an OTP; does not create a user account yet."""
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    name = user.name.strip()
+    email = str(user.email).strip().lower()
+    if not name or len(name) > 100:
+        raise HTTPException(status_code=400, detail="Enter a valid name (maximum 100 characters).")
+    if len(user.password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
+    ensure_registration_otp_table()
+    with engine.begin() as connection:
+        existing = connection.execute(
+            text("SELECT id FROM users WHERE lower(email) = :email"), {"email": email}
+        ).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="This email is already registered. Please log in.")
+        pending = connection.execute(
+            text("SELECT last_sent_at FROM registration_otps WHERE email = :email"), {"email": email}
+        ).mappings().first()
+        now = datetime.now(timezone.utc)
+        if pending and (now - pending["last_sent_at"]).total_seconds() < 60:
+            raise HTTPException(status_code=429, detail="Please wait 60 seconds before requesting another OTP.")
+
+    otp = f"{secrets.randbelow(1_000_000):06d}"
+    otp_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+    # Send first; only save the pending registration if Mailjet accepts the email.
+    send_mailjet_otp(email, otp)
+    now = datetime.now(timezone.utc)
+    with engine.begin() as connection:
+        connection.execute(text("""
+            INSERT INTO registration_otps
+                (email, name, password_hash, otp_hash, expires_at, attempts, last_sent_at)
+            VALUES (:email, :name, :password_hash, :otp_hash, :expires_at, 0, :last_sent_at)
+            ON CONFLICT (email) DO UPDATE SET
+                name = EXCLUDED.name,
+                password_hash = EXCLUDED.password_hash,
+                otp_hash = EXCLUDED.otp_hash,
+                expires_at = EXCLUDED.expires_at,
+                attempts = 0,
+                last_sent_at = EXCLUDED.last_sent_at
+        """), {
+            "email": email,
+            "name": name,
+            "password_hash": password_hash.hash(user.password),
+            "otp_hash": otp_hash,
+            "expires_at": now + timedelta(minutes=10),
+            "last_sent_at": now
+        })
+    return {"success": True, "message": "OTP sent. Check your email and verify within 10 minutes."}
+
+
+@app.post("/api/register/verify-otp")
+def verify_registration_otp(data: RegistrationOTPVerify):
+    """Create the account only after the correct, unexpired OTP is verified."""
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    email = str(data.email).strip().lower()
+    otp = data.otp.strip()
+    if not re.fullmatch(r"\d{6}", otp):
+        raise HTTPException(status_code=400, detail="Enter the 6-digit OTP.")
+    ensure_registration_otp_table()
+    otp_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+    now = datetime.now(timezone.utc)
+    with engine.begin() as connection:
+        pending = connection.execute(text("""
+            SELECT name, password_hash, otp_hash, expires_at, attempts
+            FROM registration_otps WHERE email = :email FOR UPDATE
+        """), {"email": email}).mappings().first()
+        if not pending:
+            raise HTTPException(status_code=400, detail="No pending registration found. Request a new OTP.")
+        if pending["expires_at"] <= now:
+            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
+            raise HTTPException(status_code=400, detail="OTP expired. Please request a new OTP.")
+        if pending["attempts"] >= 5:
+            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
+            raise HTTPException(status_code=429, detail="Too many incorrect attempts. Request a new OTP.")
+        if not secrets.compare_digest(pending["otp_hash"], otp_hash):
+            connection.execute(text("UPDATE registration_otps SET attempts = attempts + 1 WHERE email = :email"), {"email": email})
+            raise HTTPException(status_code=400, detail="Incorrect OTP. Please try again.")
+        existing = connection.execute(text("SELECT id FROM users WHERE lower(email) = :email"), {"email": email}).first()
+        if existing:
+            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
+            raise HTTPException(status_code=409, detail="This email is already registered. Please log in.")
+        connection.execute(text("""
+            INSERT INTO users (name, email, password_hash, created_at)
+            VALUES (:name, :email, :password_hash, :created_at)
+        """), {
+            "name": pending["name"],
+            "email": email,
+            "password_hash": pending["password_hash"],
+            "created_at": now
+        })
+        connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
+    return {"success": True, "message": "Email verified and account created successfully. You can now log in."}
+
+
 @app.post("/api/users")
 def create_user(user: UserCreate):
+    # Block legacy direct account creation so OTP verification cannot be bypassed.
+    raise HTTPException(
+        status_code=410,
+        detail="Direct registration is disabled. Use /api/register/send-otp then /api/register/verify-otp."
+    )
+
+
+
+
+# =========================================================
+# ADMIN ACCOUNT MANAGEMENT
+# =========================================================
+
+class AdminUserUpdate(BaseModel):
+    name: str | None = None
+    email: EmailStr | None = None
+
+def ensure_admin_user_columns():
+    """Add account status column safely for existing PostgreSQL databases."""
     if engine is None:
-        return {
-            "success": False,
-            "message": "Database is not configured."
-        }
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    with engine.begin() as connection:
+        connection.execute(text("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE
+        """))
 
+@app.get("/api/admin/account-history")
+def get_admin_account_history(admin: bool = Depends(verify_admin_key)):
+    """Combine login and feature activity history for the admin dashboard."""
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
     try:
-        with engine.begin() as connection:
-            existing_user = connection.execute(
-                text("SELECT id FROM users WHERE email = :email"),
-                {"email": user.email}
-            ).first()
-
-            if existing_user:
-                return {
-                    "success": False,
-                    "message": "This email is already registered."
-                }
-
-            connection.execute(
-                text("""
-                    INSERT INTO users (name, email, password_hash, created_at)
-                    VALUES (:name, :email, :password_hash, :created_at)
-                """),
-                {
-                    "name": user.name,
-                    "email": user.email,
-                    "password_hash": password_hash.hash(user.password),
-                    "created_at": datetime.now(timezone.utc)
-                }
-            )
-
-        return {
-            "success": True,
-            "message": "User saved successfully."
-        }
-
+        ensure_admin_user_columns()
+        with engine.connect() as connection:
+            logins = connection.execute(text("""
+                SELECT id, user_id, email, login_at AS event_at, 'login' AS event_type,
+                       'Successful login' AS details
+                FROM login_history
+                ORDER BY login_at DESC
+                LIMIT 200
+            """)).mappings().all()
+            activities = connection.execute(text("""
+                SELECT id, user_id, email, created_at AS event_at, 'activity' AS event_type,
+                       action AS details
+                FROM activity_logs
+                ORDER BY created_at DESC
+                LIMIT 200
+            """)).mappings().all()
+        events = []
+        for row in list(logins) + list(activities):
+            events.append({
+                "id": row["id"],
+                "user_id": row["user_id"],
+                "email": row["email"],
+                "event_at": row["event_at"].isoformat() if row["event_at"] else None,
+                "event_type": row["event_type"],
+                "details": row["details"]
+            })
+        events.sort(key=lambda x: x["event_at"] or "", reverse=True)
+        return {"success": True, "total": len(events[:300]), "history": events[:300]}
     except SQLAlchemyError:
         import logging
-        logging.exception("Database error while saving user")
-        return {
-            "success": False,
-            "message": "Could not save user."
-        }
+        logging.exception("Could not retrieve admin account history")
+        raise HTTPException(status_code=500, detail="Could not retrieve account history.")
+
+@app.patch("/api/admin/users/{user_id}")
+def admin_update_user(
+    user_id: int,
+    data: AdminUserUpdate,
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    if data.name is None and data.email is None:
+        raise HTTPException(status_code=400, detail="Provide a name or email to update.")
+    try:
+        ensure_admin_user_columns()
+        updates = {}
+        if data.name is not None:
+            name = data.name.strip()
+            if not name:
+                raise HTTPException(status_code=400, detail="Name cannot be empty.")
+            if len(name) > 100:
+                raise HTTPException(status_code=400, detail="Name must be 100 characters or fewer.")
+            updates["name"] = name
+        if data.email is not None:
+            updates["email"] = str(data.email).strip().lower()
+        with engine.begin() as connection:
+            current = connection.execute(
+                text("SELECT id FROM users WHERE id = :id"), {"id": user_id}
+            ).first()
+            if not current:
+                raise HTTPException(status_code=404, detail="User not found.")
+            if "email" in updates:
+                duplicate = connection.execute(text(
+                    "SELECT id FROM users WHERE email = :email AND id <> :id"
+                ), {"email": updates["email"], "id": user_id}).first()
+                if duplicate:
+                    raise HTTPException(status_code=409, detail="Email is already used by another account.")
+            set_clause = ", ".join(f"{column} = :{column}" for column in updates)
+            updates["id"] = user_id
+            connection.execute(text(f"UPDATE users SET {set_clause} WHERE id = :id"), updates)
+            row = connection.execute(text(
+                "SELECT id, name, email, created_at, is_active FROM users WHERE id = :id"
+            ), {"id": user_id}).mappings().first()
+        return {"success": True, "message": "User updated.", "user": {
+            "id": row["id"], "name": row["name"], "email": row["email"],
+            "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+            "is_active": row["is_active"]
+        }}
+    except HTTPException:
+        raise
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not update user")
+        raise HTTPException(status_code=500, detail="Could not update user.")
+
+@app.patch("/api/admin/users/{user_id}/status")
+def admin_set_user_status(
+    user_id: int,
+    is_active: bool,
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    try:
+        ensure_admin_user_columns()
+        with engine.begin() as connection:
+            result = connection.execute(text("""
+                UPDATE users SET is_active = :is_active
+                WHERE id = :id
+            """), {"is_active": is_active, "id": user_id})
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="User not found.")
+        return {"success": True, "message": "Account activated." if is_active else "Account deactivated."}
+    except HTTPException:
+        raise
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not change account status")
+        raise HTTPException(status_code=500, detail="Could not change account status.")
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user(user_id: int, admin: bool = Depends(verify_admin_key)):
+    if engine is None:
+        raise HTTPException(status_code=503, detail="Database is not configured.")
+    try:
+        ensure_admin_user_columns()
+        with engine.begin() as connection:
+            row = connection.execute(text(
+                "SELECT id, email FROM users WHERE id = :id"
+            ), {"id": user_id}).mappings().first()
+            if not row:
+                raise HTTPException(status_code=404, detail="User not found.")
+            # Keep audit/history records, but remove the account itself.
+            connection.execute(text("DELETE FROM users WHERE id = :id"), {"id": user_id})
+        return {"success": True, "message": "User account deleted. Existing history records were retained."}
+    except HTTPException:
+        raise
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not delete user")
+        raise HTTPException(status_code=500, detail="Could not delete user.")
 
 
 # =========================================================
@@ -702,6 +987,11 @@ app.mount(
 
 
 from fastapi.responses import FileResponse
+
+@app.get("/admin.html")
+def admin_page():
+    return FileResponse(FRONTEND_DIR / "admin.html")
+
 
 @app.get("/register.html")
 def register_page():
