@@ -14,43 +14,322 @@
 <section class="card"><div class="row"><h2>Refresh All Data</h2><button id="refreshAll">↻ Refresh All</button></div><div id="allStatus" class="status">Reload users, login records and activity records together.</div></section>
 </div></main>
   
+
 <script>
-(()=>{const $=id=>document.getElementById(id);let key="",users=[];
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function msg(id,s,t=""){const e=$(id);e.textContent=s;e.className="status "+t}
-async function api(path,opt={}){const r=await fetch(path,{...opt,headers:{"X-Admin-Key":key,...(opt.body?{"Content-Type":"application/json"}:{}),...(opt.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.detail||d.message||`Request failed (${r.status})`);return d}
-function empty(id,n,s){$(id).innerHTML=`<tr><td colspan="${n}" class="empty">${esc(s)}</td></tr>`}
-function renderUsers(){const q=$("search").value.trim().toLowerCase(),list=users.filter(u=>`${u.id} ${u.name} ${u.email}`.toLowerCase().includes(q));if(!list.length)return empty("usersBody",6,"No users found.");$("usersBody").innerHTML=list.map(u=>`<tr><td>${esc(u.id)}</td><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${esc(u.created_at||"—")}</td><td><span class="pill ${u.is_active===false?"off":""}">${u.is_active===false?"Deactivated":"Active"}</span></td><td><div class="actions"><button class="secondary" data-a="edit" data-id="${u.id}">Edit</button><button class="secondary" data-a="toggle" data-id="${u.id}" data-active="${u.is_active===false?"false":"true"}">${u.is_active===false?"Activate":"Deactivate"}</button><button class="danger" data-a="delete" data-id="${u.id}">Delete</button></div></td></tr>`).join("")}
-async function loadUsers(){msg("usersStatus","Loading users…");try{const d=await api("/api/admin/users");users=d.users||[];$("usersCount").textContent=d.total??users.length;renderUsers();msg("usersStatus",`Loaded ${users.length} user(s).`,"success")}catch(e){msg("usersStatus",e.message,"error");throw e}}
-async function loadLogins(){msg("loginStatus","Loading login history…");try{const d=await api("/api/admin/login-history"),rows=d.login_history||[];$("loginCount").textContent=d.total??rows.length;if(rows.length)$("loginBody").innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.user_id)}</td><td>${esc(r.email)}</td><td>${esc(r.login_at||"—")}</td></tr>`).join("");else empty("loginBody",4,"No login records yet.");msg("loginStatus",`Loaded ${rows.length} login record(s).`,"success")}catch(e){msg("loginStatus",e.message,"error");throw e}}
-async function loadActivities(){msg("activityStatus","Loading activity history…");try{const d=await api("/api/admin/activity-logs"),rows=d.activities||[];$("activityCount").textContent=d.total??rows.length;if(rows.length)$("activityBody").innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.user_id)}</td><td>${esc(r.email)}</td><td>${esc(r.action)}</td><td>${esc(r.created_at||"—")}</td></tr>`).join("");else empty("activityBody",5,"No activity records yet.");msg("activityStatus",`Loaded ${rows.length} activity record(s).`,"success")}catch(e){msg("activityStatus",e.message,"error");throw e}}
-async function refreshAll(){ $("refreshAll").disabled=true;msg("allStatus","Refreshing all data…");const res=await Promise.allSettled([loadUsers(),loadLogins(),loadActivities()]);const bad=res.filter(x=>x.status==="rejected").length;msg("allStatus",bad?`${3-bad} section(s) refreshed; ${bad} failed. Check red errors above.`:"All dashboard data refreshed successfully.",bad?"error":"success");$("refreshAll").disabled=false}
-async function connect(){key=$("adminKey").value.trim();if(!key)return msg("accessStatus","Enter the Admin API Key.","error");$("load").disabled=true;msg("accessStatus","Checking key…");try{await api("/api/admin/users");$("dashboard").classList.remove("hidden");$("adminKey").value="";msg("accessStatus","Dashboard loaded successfully.","success");await refreshAll()}catch(e){key="";msg("accessStatus",e.message,"error")}finally{$("load").disabled=false}}
-$("load").addEventListener("click",connect);$("adminKey").addEventListener("keydown",e=>{if(e.key==="Enter")connect()});
-$("clear").addEventListener("click",()=>{key="";users=[];$("adminKey").value="";$("dashboard").classList.add("hidden");["usersBody","loginBody","activityBody"].forEach(x=>$(x).innerHTML="");["usersCount","loginCount","activityCount"].forEach(x=>$(x).textContent="—");msg("accessStatus","Admin key and data cleared.")});
-$("refreshUsers").addEventListener("click",()=>loadUsers().catch(()=>{}));$("refreshLogins").addEventListener("click",()=>loadLogins().catch(()=>{}));$("refreshActivities").addEventListener("click",()=>loadActivities().catch(()=>{}));$("refreshAll").addEventListener("click",refreshAll);$("search").addEventListener("input",renderUsers);
-$("usersBody").addEventListener("click",async e=>{const b=e.target.closest("button[data-a]");if(!b)return;const id=Number(b.dataset.id),u=users.find(x=>Number(x.id)===id);if(!u)return;try{if(b.dataset.a==="edit"){const name=prompt("Edit name:",u.name||"");if(name===null)return;const email=prompt("Edit email:",u.email||"");if(email===null)return;const body={};if(name.trim())body.name=name.trim();if(email.trim())body.email=email.trim();await api(`/api/admin/users/${id}`,{method:"PATCH",body:JSON.stringify(body)});await loadUsers()}else if(b.dataset.a==="toggle"){const active=b.dataset.active!=="false";if(!confirm(`${active?"Deactivate":"Activate"} ${u.email}?`))return;await api(`/api/admin/users/${id}/status?is_active=${active}`,{method:"PATCH"});await loadUsers()}else if(b.dataset.a==="delete"){if(!confirm(`Permanently delete ${u.email}? History rows are retained.`))return;await api(`/api/admin/users/${id}`,{method:"DELETE"});await refreshAll()}}catch(err){msg("usersStatus",err.message,"error")}});
+(() => {
+  const $ = id => document.getElementById(id);
+  let key = "", users = [];
+
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+
+  // Format all timestamps in India Standard Time (IST)
+  // Output: YYYY-MM-DD HH:mm:ss
+  function formatIST(dateString) {
+    if (!dateString) return "—";
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "—";
+
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23"
+    }).formatToParts(date);
+
+    const p = Object.fromEntries(
+      parts.map(x => [x.type, x.value])
+    );
+
+    return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+  }
+
+  function msg(id, s, t = "") {
+    const e = $(id);
+    e.textContent = s;
+    e.className = "status " + t;
+  }
+
+  async function api(path, opt = {}) {
+    const r = await fetch(path, {
+      ...opt,
+      headers: {
+        "X-Admin-Key": key,
+        ...(opt.body ? { "Content-Type": "application/json" } : {}),
+        ...(opt.headers || {})
+      }
+    });
+
+    const d = await r.json().catch(() => ({}));
+
+    if (!r.ok || d.success === false) {
+      throw Error(d.detail || d.message || `Request failed (${r.status})`);
+    }
+
+    return d;
+  }
+
+  function empty(id, n, s) {
+    $(id).innerHTML =
+      `<tr><td colspan="${n}" class="empty">${esc(s)}</td></tr>`;
+  }
+
+  function renderUsers() {
+    const q = $("search").value.trim().toLowerCase();
+
+    const list = users.filter(u =>
+      `${u.id} ${u.name} ${u.email}`.toLowerCase().includes(q)
+    );
+
+    if (!list.length) {
+      return empty("usersBody", 6, "No users found.");
+    }
+
+    $("usersBody").innerHTML = list.map(u => `
+      <tr>
+        <td>${esc(u.id)}</td>
+        <td>${esc(u.name)}</td>
+        <td>${esc(u.email)}</td>
+        <td>${esc(formatIST(u.created_at))}</td>
+        <td>
+          <span class="pill ${u.is_active === false ? "off" : ""}">
+            ${u.is_active === false ? "Deactivated" : "Active"}
+          </span>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="secondary" data-a="edit" data-id="${u.id}">Edit</button>
+            <button class="secondary" data-a="toggle" data-id="${u.id}"
+              data-active="${u.is_active === false ? "false" : "true"}">
+              ${u.is_active === false ? "Activate" : "Deactivate"}
+            </button>
+            <button class="danger" data-a="delete" data-id="${u.id}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  async function loadUsers() {
+    msg("usersStatus", "Loading users…");
+
+    try {
+      const d = await api("/api/admin/users");
+      users = d.users || [];
+      $("usersCount").textContent = d.total ?? users.length;
+      renderUsers();
+      msg("usersStatus", `Loaded ${users.length} user(s).`, "success");
+    } catch (e) {
+      msg("usersStatus", e.message, "error");
+      throw e;
+    }
+  }
+
+  async function loadLogins() {
+    msg("loginStatus", "Loading login history…");
+
+    try {
+      const d = await api("/api/admin/login-history");
+      const rows = d.login_history || [];
+
+      $("loginCount").textContent = d.total ?? rows.length;
+
+      if (rows.length) {
+        $("loginBody").innerHTML = rows.map(r => `
+          <tr>
+            <td>${esc(r.id)}</td>
+            <td>${esc(r.user_id)}</td>
+            <td>${esc(r.email)}</td>
+            <td>${esc(formatIST(r.login_at))}</td>
+          </tr>
+        `).join("");
+      } else {
+        empty("loginBody", 4, "No login records yet.");
+      }
+
+      msg("loginStatus", `Loaded ${rows.length} login record(s).`, "success");
+    } catch (e) {
+      msg("loginStatus", e.message, "error");
+      throw e;
+    }
+  }
+
+  async function loadActivities() {
+    msg("activityStatus", "Loading activity history…");
+
+    try {
+      const d = await api("/api/admin/activity-logs");
+      const rows = d.activities || [];
+
+      $("activityCount").textContent = d.total ?? rows.length;
+
+      if (rows.length) {
+        $("activityBody").innerHTML = rows.map(r => `
+          <tr>
+            <td>${esc(r.id)}</td>
+            <td>${esc(r.user_id)}</td>
+            <td>${esc(r.email)}</td>
+            <td>${esc(r.action)}</td>
+            <td>${esc(formatIST(r.created_at))}</td>
+          </tr>
+        `).join("");
+      } else {
+        empty("activityBody", 5, "No activity records yet.");
+      }
+
+      msg("activityStatus", `Loaded ${rows.length} activity record(s).`, "success");
+    } catch (e) {
+      msg("activityStatus", e.message, "error");
+      throw e;
+    }
+  }
+
+  async function refreshAll() {
+    $("refreshAll").disabled = true;
+    msg("allStatus", "Refreshing all data…");
+
+    try {
+      const res = await Promise.allSettled([
+        loadUsers(),
+        loadLogins(),
+        loadActivities()
+      ]);
+
+      const bad = res.filter(x => x.status === "rejected").length;
+
+      msg(
+        "allStatus",
+        bad
+          ? `${3 - bad} section(s) refreshed; ${bad} failed. Check red errors above.`
+          : "All dashboard data refreshed successfully.",
+        bad ? "error" : "success"
+      );
+    } finally {
+      $("refreshAll").disabled = false;
+    }
+  }
+
+  async function connect() {
+    key = $("adminKey").value.trim();
+
+    if (!key) {
+      return msg("accessStatus", "Enter the Admin API Key.", "error");
+    }
+
+    $("load").disabled = true;
+    msg("accessStatus", "Checking key…");
+
+    try {
+      await api("/api/admin/users");
+      $("dashboard").classList.remove("hidden");
+      $("adminKey").value = "";
+      msg("accessStatus", "Dashboard loaded successfully.", "success");
+      await refreshAll();
+    } catch (e) {
+      key = "";
+      msg("accessStatus", e.message, "error");
+    } finally {
+      $("load").disabled = false;
+    }
+  }
+
+  $("load").addEventListener("click", connect);
+
+  $("adminKey").addEventListener("keydown", e => {
+    if (e.key === "Enter") connect();
+  });
+
+  $("clear").addEventListener("click", () => {
+    key = "";
+    users = [];
+    $("adminKey").value = "";
+    $("dashboard").classList.add("hidden");
+
+    ["usersBody", "loginBody", "activityBody"].forEach(
+      x => $(x).innerHTML = ""
+    );
+
+    ["usersCount", "loginCount", "activityCount"].forEach(
+      x => $(x).textContent = "—"
+    );
+
+    msg("accessStatus", "Admin key and data cleared.");
+  });
+
+  $("refreshUsers").addEventListener("click", () => loadUsers().catch(() => {}));
+  $("refreshLogins").addEventListener("click", () => loadLogins().catch(() => {}));
+  $("refreshActivities").addEventListener("click", () => loadActivities().catch(() => {}));
+  $("refreshAll").addEventListener("click", refreshAll);
+  $("search").addEventListener("input", renderUsers);
+
+  $("usersBody").addEventListener("click", async e => {
+    const b = e.target.closest("button[data-a]");
+    if (!b) return;
+
+    const id = Number(b.dataset.id);
+    const u = users.find(x => Number(x.id) === id);
+    if (!u) return;
+
+    try {
+      if (b.dataset.a === "edit") {
+        const name = prompt("Edit name:", u.name || "");
+        if (name === null) return;
+
+        const email = prompt("Edit email:", u.email || "");
+        if (email === null) return;
+
+        const body = {};
+
+        if (name.trim()) body.name = name.trim();
+        if (email.trim()) body.email = email.trim();
+
+        await api(`/api/admin/users/${id}`, {
+          method: "PATCH",
+          body: JSON.stringify(body)
+        });
+
+        await loadUsers();
+
+      } else if (b.dataset.a === "toggle") {
+        const active = b.dataset.active !== "false";
+
+        if (!confirm(`${active ? "Deactivate" : "Activate"} ${u.email}?`)) {
+          return;
+        }
+
+        await api(`/api/admin/users/${id}/status?is_active=${active}`, {
+          method: "PATCH"
+        });
+
+        await loadUsers();
+
+      } else if (b.dataset.a === "delete") {
+        if (!confirm(`Permanently delete ${u.email}? History rows are retained.`)) {
+          return;
+        }
+
+        await api(`/api/admin/users/${id}`, {
+          method: "DELETE"
+        });
+
+        await refreshAll();
+      }
+    } catch (err) {
+      msg("usersStatus", err.message, "error");
+    }
+  });
 })();
-
-
-function formatIST(dateString) {
-  const date = new Date(dateString);
-
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
-  }).formatToParts(date);
-
-  const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
-
-  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
-}  
 </script>
+
 </body>
 </html>
