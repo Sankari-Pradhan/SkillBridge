@@ -1,173 +1,33 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SkillBridge Admin</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SkillBridge Admin Dashboard</title>
 <style>
-:root{font-family:Inter,system-ui,Arial,sans-serif;color:#172033;background:#f4f7fb}
-*{box-sizing:border-box}body{margin:0}.wrap{max-width:1180px;margin:0 auto;padding:24px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
-h1{margin:0;font-size:26px}h2{font-size:18px;margin-top:0}
-.card{background:#fff;border:1px solid #e3e8f0;border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 2px 10px #1c2b4a08}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}input,button{font:inherit;border-radius:8px;padding:10px 12px}input{border:1px solid #cbd5e1;min-width:180px;max-width:100%}button{border:0;background:#2458d3;color:white;cursor:pointer}button.secondary{background:#e8eefb;color:#173d8c}button.danger{background:#b42318}button:disabled{opacity:.5;cursor:not-allowed}
-.status{font-size:13px;color:#475569;margin:10px 0}.error{color:#b42318}.success{color:#087443}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:720px}th,td{text-align:left;border-bottom:1px solid #e5eaf2;padding:11px 8px;font-size:14px}th{background:#f8fafc}.pill{padding:4px 8px;border-radius:99px;font-size:12px;background:#dcfce7;color:#166534}.pill.off{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:6px;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 9px}.hidden{display:none}.muted{color:#64748b;font-size:13px}.grid{display:grid;grid-template-columns:1fr;gap:18px}@media(min-width:900px){.grid{grid-template-columns:1.3fr .7fr}}
-</style>
-</head>
-<body>
-<div class="wrap">
-<header><div><h1>SkillBridge Admin</h1><div class="muted">User accounts and activity history</div></div><button id="logout" class="secondary hidden">Lock admin panel</button></header>
-<section class="card" id="loginCard">
-<h2>Admin access</h2>
-<p class="muted">Enter the ADMIN_API_KEY configured in Render. This key is sent only in request headers and is not saved by this page.</p>
-<div class="row"><input id="adminKey" type="password" autocomplete="current-password" placeholder="Admin API key" style="flex:1"><button id="connect">Open dashboard</button></div>
-<div id="loginStatus" class="status" role="status"></div>
-</section>
+*{box-sizing:border-box}body{margin:0;background:#f3f6fc;color:#1f2937;font:16px Arial,sans-serif}.wrap{max-width:1200px;margin:auto;padding:18px}h1{color:#263f80;font-size:clamp(26px,4vw,36px);margin:0 0 8px}h2{font-size:clamp(21px,3vw,28px);margin:0 0 16px}p,.muted{color:#667085}.card,.stat{background:#fff;border-radius:14px;padding:18px;margin:0 0 18px;box-shadow:0 3px 12px #1725540c}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}input,button{font:inherit;border-radius:8px;padding:10px 12px}input{border:1px solid #cbd5e1;max-width:100%}button{border:0;background:#244fc1;color:white;cursor:pointer;font-weight:600}button.secondary{background:#e8eefc;color:#23418c}button.green{background:#16804a}button.danger{background:#b42318}.keyrow{display:flex;gap:8px;flex-wrap:wrap}.keyrow input{flex:1;min-width:200px;width:100%}.status{margin-top:10px;min-height:20px;font-size:14px;overflow-wrap:anywhere}.error{color:#b42318}.success{color:#087443}.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat span{display:block;color:#667085}.stat strong{display:block;font-size:30px;margin-top:8px}.search{width:min(100%,380px);margin-bottom:12px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid #e6eaf0;font-size:14px;vertical-align:top}th{background:#edf2ff;white-space:nowrap}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px}.off{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:5px;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 9px}.empty{text-align:center;color:#667085;padding:18px}@media(max-width:640px){.wrap{padding:12px}.card,.stat{padding:14px}.stats{grid-template-columns:1fr}.keyrow{display:block}.keyrow button{margin-top:8px;width:100%}th,td{font-size:12px;padding:8px 6px}}
+</style></head><body><main class="wrap">
+<header><h1>SkillBridge Admin Dashboard</h1><p>Manage registered users, login history and feature activity.</p></header>
+<section class="card"><h2>Admin Access</h2><label for="adminKey">Admin API Key</label><div class="keyrow" style="margin-top:6px"><input id="adminKey" type="password" autocomplete="current-password" placeholder="Enter Admin API Key"><button id="load">Load Dashboard</button><button id="clear" class="secondary">Clear Key &amp; Data</button></div><div id="accessStatus" class="status"></div><p>Your key stays in this page's memory and is not saved to local storage.</p></section>
 <div id="dashboard" class="hidden">
-<div class="grid">
-<section class="card">
-<div class="row" style="justify-content:space-between"><h2>Users</h2><button id="refresh" class="secondary">Refresh</button></div>
-<input id="search" placeholder="Search name or email" style="width:100%;margin-bottom:12px">
-<div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Created</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div>
-<div id="usersStatus" class="status"></div>
-</section>
-<section class="card">
-<h2>Edit selected account</h2>
-<p class="muted">Choose Edit in the user list. Leave a field empty to keep its current value.</p>
-<input id="editId" type="hidden">
-<label>Name<br><input id="editName" placeholder="User name" style="width:100%;margin:6px 0 12px"></label>
-<label>Email<br><input id="editEmail" type="email" placeholder="user@example.com" style="width:100%;margin:6px 0 12px"></label>
-<div class="row"><button id="saveEdit">Save changes</button><button id="clearEdit" class="secondary">Clear</button></div>
-<div id="editStatus" class="status"></div>
-</section>
-</div>
-<section class="card">
-<div class="row" style="justify-content:space-between"><h2>Login & activity history</h2><button id="refreshHistory" class="secondary">Refresh history</button></div>
-<div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>User ID</th><th>Email</th><th>Type</th><th>Details</th></tr></thead><tbody id="historyBody"></tbody></table></div>
-<div id="historyStatus" class="status"></div>
-</section>
-</div>
-</div>
+<div class="stats"><div class="stat"><span>Registered Users</span><strong id="usersCount">—</strong></div><div class="stat"><span>Login Records</span><strong id="loginCount">—</strong></div><div class="stat"><span>Activity Records</span><strong id="activityCount">—</strong></div></div>
+<section class="card"><div class="row"><h2>Registered Users</h2><button id="refreshUsers" class="secondary">↻ Refresh Users</button></div><input id="search" class="search" placeholder="Search by name, email or user ID"><div class="tablewrap"><table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Registered At</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersBody"></tbody></table></div><div id="usersStatus" class="status"></div></section>
+<section class="card"><div class="row"><h2>Login History</h2><button id="refreshLogins" class="secondary">↻ Refresh Login History</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Login Time</th></tr></thead><tbody id="loginBody"></tbody></table></div><div id="loginStatus" class="status"></div></section>
+<section class="card"><div class="row"><h2>Activity History</h2><button id="refreshActivities" class="secondary">↻ Refresh Activity History</button></div><div class="tablewrap"><table><thead><tr><th>ID</th><th>User ID</th><th>Email</th><th>Action</th><th>Time</th></tr></thead><tbody id="activityBody"></tbody></table></div><div id="activityStatus" class="status"></div></section>
+<section class="card"><div class="row"><h2>Refresh All Data</h2><button id="refreshAll">↻ Refresh All</button></div><div id="allStatus" class="status">Reload users, login records and activity records together.</div></section>
+</div></main>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  let adminKey = "";
-  let users = [];
-  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  function status(id, message, type="") { $(id).textContent = message; $(id).className = "status " + type; }
-  async function api(path, options={}) {
-    const response = await fetch(path, {
-      ...options,
-      headers: {"Content-Type":"application/json", "X-Admin-Key":adminKey, ...(options.headers||{})}
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.detail || data.message || `Request failed (${response.status})`);
-    return data;
-  }
-  async function loadUsers() {
-    status("usersStatus","Loading users…");
-    try {
-      const data = await api("/api/admin/users");
-      users = data.users || [];
-      renderUsers();
-      status("usersStatus",`${users.length} account(s) loaded.`, "success");
-    } catch(e) { status("usersStatus",e.message,"error"); }
-  }
-  function renderUsers() {
-    const q = $("search").value.trim().toLowerCase();
-    const filtered = users.filter(u => `${u.name} ${u.email} ${u.id}`.toLowerCase().includes(q));
-    $("usersBody").innerHTML = filtered.map(u => `<tr>
-      <td>${u.id}</td><td>${esc(u.name)}</td><td>${esc(u.email)}</td>
-      <td>${esc(u.created_at || "—")}</td>
-      <td><span class="pill ${u.is_active ? "" : "off"}">${u.is_active ? "Active" : "Deactivated"}</span></td>
-      <td><div class="actions">
-        <button class="secondary" data-action="edit" data-id="${u.id}">Edit</button>
-        <button class="secondary" data-action="toggle" data-id="${u.id}">${u.is_active ? "Deactivate" : "Activate"}</button>
-        <button class="danger" data-action="delete" data-id="${u.id}">Delete</button>
-      </div></td></tr>`).join("") || `<tr><td colspan="6">No users found.</td></tr>`;
-  }
-  async function loadHistory() {
-    status("historyStatus","Loading history…");
-    try {
-      const data = await api("/api/admin/account-history");
-      $("historyBody").innerHTML = (data.history || []).map(h => `<tr>
-        <td>${esc(h.event_at || "—")}</td><td>${esc(h.user_id)}</td><td>${esc(h.email)}</td>
-        <td>${esc(h.event_type)}</td><td>${esc(h.details)}</td></tr>`).join("") || `<tr><td colspan="5">No history yet.</td></tr>`;
-      status("historyStatus",`${data.total || 0} event(s) loaded.`, "success");
-    } catch(e) { status("historyStatus",e.message,"error"); }
-  }
-  async function connect() {
-    adminKey = $("adminKey").value.trim();
-    if (!adminKey) { status("loginStatus","Enter the admin key.","error"); return; }
-    try {
-      await api("/api/admin/users");
-      $("loginCard").classList.add("hidden");
-      $("dashboard").classList.remove("hidden");
-      $("logout").classList.remove("hidden");
-      $("adminKey").value = "";
-      await Promise.all([loadUsers(), loadHistory()]);
-    } catch(e) {
-      adminKey = "";
-      status("loginStatus",e.message,"error");
-    }
-  }
-  $("connect").addEventListener("click",connect);
-  $("adminKey").addEventListener("keydown",e => { if(e.key==="Enter") connect(); });
-  $("logout").addEventListener("click",() => {
-    adminKey = ""; users = [];
-    $("dashboard").classList.add("hidden"); $("loginCard").classList.remove("hidden"); $("logout").classList.add("hidden");
-    $("usersBody").innerHTML = ""; $("historyBody").innerHTML = "";
-  });
-  $("refresh").addEventListener("click",loadUsers);
-  $("refreshHistory").addEventListener("click",loadHistory);
-  $("search").addEventListener("input",renderUsers);
-  $("usersBody").addEventListener("click", async e => {
-    const button = e.target.closest("button[data-action]");
-    if (!button) return;
-    const user = users.find(u => u.id === Number(button.dataset.id));
-    if (!user) return;
-    const action = button.dataset.action;
-    if (action === "edit") {
-      $("editId").value = user.id; $("editName").value = user.name; $("editEmail").value = user.email;
-      status("editStatus",`Editing user #${user.id}.`);
-      return;
-    }
-    if (action === "toggle") {
-      const next = !user.is_active;
-      if (!confirm(`${next ? "Activate" : "Deactivate"} ${user.email}?`)) return;
-      try {
-        await api(`/api/admin/users/${user.id}/status?is_active=${next}`, {method:"PATCH"});
-        await loadUsers();
-      } catch(err) { status("usersStatus",err.message,"error"); }
-      return;
-    }
-    if (action === "delete") {
-      if (!confirm(`Permanently delete account ${user.email}? Existing history logs will be retained.`)) return;
-      try {
-        await api(`/api/admin/users/${user.id}`, {method:"DELETE"});
-        status("usersStatus","Account deleted.","success");
-        await loadUsers(); await loadHistory();
-      } catch(err) { status("usersStatus",err.message,"error"); }
-    }
-  });
-  $("saveEdit").addEventListener("click", async () => {
-    const id = $("editId").value;
-    if (!id) { status("editStatus","Choose a user from the list first.","error"); return; }
-    const payload = {};
-    const name = $("editName").value.trim(), email = $("editEmail").value.trim();
-    if (name) payload.name = name;
-    if (email) payload.email = email;
-    if (!Object.keys(payload).length) { status("editStatus","Enter a name or email to update.","error"); return; }
-    try {
-      await api(`/api/admin/users/${id}`, {method:"PATCH",body:JSON.stringify(payload)});
-      status("editStatus","Account updated.","success");
-      await loadUsers();
-    } catch(e) { status("editStatus",e.message,"error"); }
-  });
-  $("clearEdit").addEventListener("click",() => {
-    $("editId").value=""; $("editName").value=""; $("editEmail").value=""; status("editStatus","");
-  });
+(()=>{const $=id=>document.getElementById(id);let key="",users=[];
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function msg(id,s,t=""){const e=$(id);e.textContent=s;e.className="status "+t}
+async function api(path,opt={}){const r=await fetch(path,{...opt,headers:{"X-Admin-Key":key,...(opt.body?{"Content-Type":"application/json"}:{}),...(opt.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok||d.success===false)throw Error(d.detail||d.message||`Request failed (${r.status})`);return d}
+function empty(id,n,s){$(id).innerHTML=`<tr><td colspan="${n}" class="empty">${esc(s)}</td></tr>`}
+function renderUsers(){const q=$("search").value.trim().toLowerCase(),list=users.filter(u=>`${u.id} ${u.name} ${u.email}`.toLowerCase().includes(q));if(!list.length)return empty("usersBody",6,"No users found.");$("usersBody").innerHTML=list.map(u=>`<tr><td>${esc(u.id)}</td><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${esc(u.created_at||"—")}</td><td><span class="pill ${u.is_active===false?"off":""}">${u.is_active===false?"Deactivated":"Active"}</span></td><td><div class="actions"><button class="secondary" data-a="edit" data-id="${u.id}">Edit</button><button class="secondary" data-a="toggle" data-id="${u.id}" data-active="${u.is_active===false?"false":"true"}">${u.is_active===false?"Activate":"Deactivate"}</button><button class="danger" data-a="delete" data-id="${u.id}">Delete</button></div></td></tr>`).join("")}
+async function loadUsers(){msg("usersStatus","Loading users…");try{const d=await api("/api/admin/users");users=d.users||[];$("usersCount").textContent=d.total??users.length;renderUsers();msg("usersStatus",`Loaded ${users.length} user(s).`,"success")}catch(e){msg("usersStatus",e.message,"error");throw e}}
+async function loadLogins(){msg("loginStatus","Loading login history…");try{const d=await api("/api/admin/login-history"),rows=d.login_history||[];$("loginCount").textContent=d.total??rows.length;if(rows.length)$("loginBody").innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.user_id)}</td><td>${esc(r.email)}</td><td>${esc(r.login_at||"—")}</td></tr>`).join("");else empty("loginBody",4,"No login records yet.");msg("loginStatus",`Loaded ${rows.length} login record(s).`,"success")}catch(e){msg("loginStatus",e.message,"error");throw e}}
+async function loadActivities(){msg("activityStatus","Loading activity history…");try{const d=await api("/api/admin/activity-logs"),rows=d.activities||[];$("activityCount").textContent=d.total??rows.length;if(rows.length)$("activityBody").innerHTML=rows.map(r=>`<tr><td>${esc(r.id)}</td><td>${esc(r.user_id)}</td><td>${esc(r.email)}</td><td>${esc(r.action)}</td><td>${esc(r.created_at||"—")}</td></tr>`).join("");else empty("activityBody",5,"No activity records yet.");msg("activityStatus",`Loaded ${rows.length} activity record(s).`,"success")}catch(e){msg("activityStatus",e.message,"error");throw e}}
+async function refreshAll(){ $("refreshAll").disabled=true;msg("allStatus","Refreshing all data…");const res=await Promise.allSettled([loadUsers(),loadLogins(),loadActivities()]);const bad=res.filter(x=>x.status==="rejected").length;msg("allStatus",bad?`${3-bad} section(s) refreshed; ${bad} failed. Check red errors above.`:"All dashboard data refreshed successfully.",bad?"error":"success");$("refreshAll").disabled=false}
+async function connect(){key=$("adminKey").value.trim();if(!key)return msg("accessStatus","Enter the Admin API Key.","error");$("load").disabled=true;msg("accessStatus","Checking key…");try{await api("/api/admin/users");$("dashboard").classList.remove("hidden");$("adminKey").value="";msg("accessStatus","Dashboard loaded successfully.","success");await refreshAll()}catch(e){key="";msg("accessStatus",e.message,"error")}finally{$("load").disabled=false}}
+$("load").addEventListener("click",connect);$("adminKey").addEventListener("keydown",e=>{if(e.key==="Enter")connect()});
+$("clear").addEventListener("click",()=>{key="";users=[];$("adminKey").value="";$("dashboard").classList.add("hidden");["usersBody","loginBody","activityBody"].forEach(x=>$(x).innerHTML="");["usersCount","loginCount","activityCount"].forEach(x=>$(x).textContent="—");msg("accessStatus","Admin key and data cleared.")});
+$("refreshUsers").addEventListener("click",()=>loadUsers().catch(()=>{}));$("refreshLogins").addEventListener("click",()=>loadLogins().catch(()=>{}));$("refreshActivities").addEventListener("click",()=>loadActivities().catch(()=>{}));$("refreshAll").addEventListener("click",refreshAll);$("search").addEventListener("input",renderUsers);
+$("usersBody").addEventListener("click",async e=>{const b=e.target.closest("button[data-a]");if(!b)return;const id=Number(b.dataset.id),u=users.find(x=>Number(x.id)===id);if(!u)return;try{if(b.dataset.a==="edit"){const name=prompt("Edit name:",u.name||"");if(name===null)return;const email=prompt("Edit email:",u.email||"");if(email===null)return;const body={};if(name.trim())body.name=name.trim();if(email.trim())body.email=email.trim();await api(`/api/admin/users/${id}`,{method:"PATCH",body:JSON.stringify(body)});await loadUsers()}else if(b.dataset.a==="toggle"){const active=b.dataset.active!=="false";if(!confirm(`${active?"Deactivate":"Activate"} ${u.email}?`))return;await api(`/api/admin/users/${id}/status?is_active=${active}`,{method:"PATCH"});await loadUsers()}else if(b.dataset.a==="delete"){if(!confirm(`Permanently delete ${u.email}? History rows are retained.`))return;await api(`/api/admin/users/${id}`,{method:"DELETE"});await refreshAll()}}catch(err){msg("usersStatus",err.message,"error")}});
 })();
-</script>
-</body>
-</html>
+</script></body></html>
