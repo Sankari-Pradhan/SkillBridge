@@ -733,111 +733,287 @@ def send_mailjet_otp(recipient_email: str, otp: str):
         raise HTTPException(status_code=502, detail="Email service is temporarily unavailable.")
 
 
+
 @app.post("/api/register/send-otp")
 def send_registration_otp(user: RegistrationOTPRequest):
-    """Send an OTP; does not create a user account yet."""
+    """Send an OTP without creating the account yet."""
+
     if engine is None:
-        raise HTTPException(status_code=503, detail="Database is not configured.")
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
     name = user.name.strip()
     email = str(user.email).strip().lower()
+
     if not name or len(name) > 100:
-        raise HTTPException(status_code=400, detail="Enter a valid name (maximum 100 characters).")
+        raise HTTPException(
+            status_code=400,
+            detail="Enter a valid name (maximum 100 characters)."
+        )
+
     if len(user.password) < 8:
-        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be at least 8 characters long."
+        )
+
     ensure_registration_otp_table()
+
     with engine.begin() as connection:
         existing = connection.execute(
-            text("SELECT id FROM users WHERE lower(email) = :email"), {"email": email}
+            text("""
+                SELECT id
+                FROM users
+                WHERE lower(email) = :email
+            """),
+            {"email": email}
         ).first()
+
         if existing:
-            raise HTTPException(status_code=409, detail="This email is already registered. Please log in.")
+            raise HTTPException(
+                status_code=409,
+                detail="This email is already registered. Please log in."
+            )
+
         pending = connection.execute(
-            text("SELECT last_sent_at FROM registration_otps WHERE email = :email"), {"email": email}
+            text("""
+                SELECT last_sent_at
+                FROM registration_otps
+                WHERE email = :email
+            """),
+            {"email": email}
         ).mappings().first()
+
         now = datetime.now(timezone.utc)
-        if pending and (now - pending["last_sent_at"]).total_seconds() < 60:
-            raise HTTPException(status_code=429, detail="Please wait 60 seconds before requesting another OTP.")
+
+        if pending and (
+            now - pending["last_sent_at"]
+        ).total_seconds() < 60:
+            raise HTTPException(
+                status_code=429,
+                detail="Please wait 60 seconds before requesting another OTP."
+            )
 
     otp = f"{secrets.randbelow(1_000_000):06d}"
-    otp_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
-    # Send first; only save the pending registration if Mailjet accepts the email.
+    otp_hash = hashlib.sha256(
+        otp.encode("utf-8")
+    ).hexdigest()
+
+    # Send the email before saving the pending registration.
     send_mailjet_otp(email, otp)
+
     now = datetime.now(timezone.utc)
+
     with engine.begin() as connection:
-        connection.execute(text("""
-            INSERT INTO registration_otps
-                (email, name, password_hash, otp_hash, expires_at, attempts, last_sent_at)
-            VALUES (:email, :name, :password_hash, :otp_hash, :expires_at, 0, :last_sent_at)
-            ON CONFLICT (email) DO UPDATE SET
-                name = EXCLUDED.name,
-                password_hash = EXCLUDED.password_hash,
-                otp_hash = EXCLUDED.otp_hash,
-                expires_at = EXCLUDED.expires_at,
-                attempts = 0,
-                last_sent_at = EXCLUDED.last_sent_at
-        """), {
-            "email": email,
-            "name": name,
-            "password_hash": password_hash.hash(user.password),
-            "otp_hash": otp_hash,
-            "expires_at": now + timedelta(minutes=10),
-            "last_sent_at": now
-        })
-    return {"success": True, "message": "OTP sent. Check your email and verify within 10 minutes."}
+        connection.execute(
+            text("""
+                INSERT INTO registration_otps (
+                    email,
+                    name,
+                    password_hash,
+                    otp_hash,
+                    expires_at,
+                    attempts,
+                    last_sent_at
+                )
+                VALUES (
+                    :email,
+                    :name,
+                    :password_hash,
+                    :otp_hash,
+                    :expires_at,
+                    0,
+                    :last_sent_at
+                )
+                ON CONFLICT (email) DO UPDATE SET
+                    name = EXCLUDED.name,
+                    password_hash = EXCLUDED.password_hash,
+                    otp_hash = EXCLUDED.otp_hash,
+                    expires_at = EXCLUDED.expires_at,
+                    attempts = 0,
+                    last_sent_at = EXCLUDED.last_sent_at
+            """),
+            {
+                "email": email,
+                "name": name,
+                "password_hash": password_hash.hash(user.password),
+                "otp_hash": otp_hash,
+                "expires_at": now + timedelta(minutes=10),
+                "last_sent_at": now
+            }
+        )
+
+    return {
+        "success": True,
+        "message": "OTP sent. Check your email and verify within 10 minutes."
+    }
 
 
 @app.post("/api/register/verify-otp")
 def verify_registration_otp(data: RegistrationOTPVerify):
-    """Create the account only after the correct, unexpired OTP is verified."""
+    """Create the account only after successful OTP verification."""
+
     if engine is None:
-        raise HTTPException(status_code=503, detail="Database is not configured.")
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
     email = str(data.email).strip().lower()
     otp = data.otp.strip()
+
     if not re.fullmatch(r"\d{6}", otp):
-        raise HTTPException(status_code=400, detail="Enter the 6-digit OTP.")
+        raise HTTPException(
+            status_code=400,
+            detail="Enter the 6-digit OTP."
+        )
+
     ensure_registration_otp_table()
-    otp_hash = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+    otp_hash = hashlib.sha256(
+        otp.encode("utf-8")
+    ).hexdigest()
+
     now = datetime.now(timezone.utc)
+
     with engine.begin() as connection:
-        pending = connection.execute(text("""
-            SELECT name, password_hash, otp_hash, expires_at, attempts
-            FROM registration_otps WHERE email = :email FOR UPDATE
-        """), {"email": email}).mappings().first()
+        pending = connection.execute(
+            text("""
+                SELECT
+                    name,
+                    password_hash,
+                    otp_hash,
+                    expires_at,
+                    attempts
+                FROM registration_otps
+                WHERE email = :email
+                FOR UPDATE
+            """),
+            {"email": email}
+        ).mappings().first()
+
         if not pending:
-            raise HTTPException(status_code=400, detail="No pending registration found. Request a new OTP.")
+            raise HTTPException(
+                status_code=400,
+                detail="No pending registration found. Request a new OTP."
+            )
+
         if pending["expires_at"] <= now:
-            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
-            raise HTTPException(status_code=400, detail="OTP expired. Please request a new OTP.")
+            connection.execute(
+                text("""
+                    DELETE FROM registration_otps
+                    WHERE email = :email
+                """),
+                {"email": email}
+            )
+            raise HTTPException(
+                status_code=400,
+                detail="OTP expired. Please request a new OTP."
+            )
+
         if pending["attempts"] >= 5:
-            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
-            raise HTTPException(status_code=429, detail="Too many incorrect attempts. Request a new OTP.")
-        if not secrets.compare_digest(pending["otp_hash"], otp_hash):
-            connection.execute(text("UPDATE registration_otps SET attempts = attempts + 1 WHERE email = :email"), {"email": email})
-            raise HTTPException(status_code=400, detail="Incorrect OTP. Please try again.")
-        existing = connection.execute(text("SELECT id FROM users WHERE lower(email) = :email"), {"email": email}).first()
+            connection.execute(
+                text("""
+                    DELETE FROM registration_otps
+                    WHERE email = :email
+                """),
+                {"email": email}
+            )
+            raise HTTPException(
+                status_code=429,
+                detail="Too many incorrect attempts. Request a new OTP."
+            )
+
+        if not secrets.compare_digest(
+            pending["otp_hash"], otp_hash
+        ):
+            connection.execute(
+                text("""
+                    UPDATE registration_otps
+                    SET attempts = attempts + 1
+                    WHERE email = :email
+                """),
+                {"email": email}
+            )
+            raise HTTPException(
+                status_code=400,
+                detail="Incorrect OTP. Please try again."
+            )
+
+        existing = connection.execute(
+            text("""
+                SELECT id
+                FROM users
+                WHERE lower(email) = :email
+            """),
+            {"email": email}
+        ).first()
+
         if existing:
-            connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
-            raise HTTPException(status_code=409, detail="This email is already registered. Please log in.")
-        connection.execute(text("""
-            INSERT INTO users (name, email, password_hash, created_at)
-            VALUES (:name, :email, :password_hash, :created_at)
-        """), {
-            "name": pending["name"],
-            "email": email,
-            "password_hash": pending["password_hash"],
-            "created_at": now
-        })
-        connection.execute(text("DELETE FROM registration_otps WHERE email = :email"), {"email": email})
-    return {"success": True, "message": "Email verified and account created successfully. You can now log in."}
+            connection.execute(
+                text("""
+                    DELETE FROM registration_otps
+                    WHERE email = :email
+                """),
+                {"email": email}
+            )
+            raise HTTPException(
+                status_code=409,
+                detail="This email is already registered. Please log in."
+            )
+
+        connection.execute(
+            text("""
+                INSERT INTO users (
+                    name,
+                    email,
+                    password_hash,
+                    created_at
+                )
+                VALUES (
+                    :name,
+                    :email,
+                    :password_hash,
+                    :created_at
+                )
+            """),
+            {
+                "name": pending["name"],
+                "email": email,
+                "password_hash": pending["password_hash"],
+                "created_at": now
+            }
+        )
+
+        connection.execute(
+            text("""
+                DELETE FROM registration_otps
+                WHERE email = :email
+            """),
+            {"email": email}
+        )
+
+    return {
+        "success": True,
+        "message": "Email verified and account created successfully. You can now log in."
+    }
 
 
 @app.post("/api/users")
 def create_user(user: UserCreate):
-    # Block legacy direct account creation so OTP verification cannot be bypassed.
+    """Prevent account creation without OTP verification."""
+
     raise HTTPException(
         status_code=410,
-        detail="Direct registration is disabled. Use /api/register/send-otp then /api/register/verify-otp."
+        detail=(
+            "Direct registration is disabled. Use "
+            "/api/register/send-otp then "
+            "/api/register/verify-otp."
+        )
     )
+
 
 
 
