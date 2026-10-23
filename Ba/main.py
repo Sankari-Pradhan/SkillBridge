@@ -319,7 +319,10 @@ class ActivityLog(Base):
     user_id = Column(Integer, nullable=False, index=True)
     email = Column(String(255), nullable=False)
     action = Column(String(100), nullable=False)
+
+    # NEW: Store activity details
     details = Column(Text, nullable=True)
+
     created_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -384,6 +387,7 @@ def record_activity(
         )
 
 
+
 @app.post("/api/db-create-tables")
 def create_database_tables():
     if engine is None:
@@ -394,16 +398,24 @@ def create_database_tables():
 
     try:
         Base.metadata.create_all(bind=engine)
+
+        # Add details column to existing activity_logs table
+        with engine.begin() as conn:
+            conn.execute(text("""
+                ALTER TABLE activity_logs
+                ADD COLUMN IF NOT EXISTS details TEXT
+            """))
+
         return {
             "success": True,
-            "message": "Users table created successfully."
+            "message": "Database tables and activity details column created successfully."
         }
+
     except SQLAlchemyError:
         return {
             "success": False,
             "message": "Could not create database tables."
         }
-
 
 
 class UserCreate(BaseModel):
@@ -566,6 +578,7 @@ def get_login_history(
 
 
 
+
 @app.get("/api/admin/activity-logs")
 def get_activity_logs(
     admin: bool = Depends(verify_admin_key)
@@ -580,7 +593,13 @@ def get_activity_logs(
         with engine.connect() as connection:
             rows = connection.execute(
                 text("""
-                    SELECT id, user_id, email, action, created_at
+                    SELECT
+                        id,
+                        user_id,
+                        email,
+                        action,
+                        details,
+                        created_at
                     FROM activity_logs
                     ORDER BY created_at DESC
                     LIMIT 200
@@ -596,6 +615,7 @@ def get_activity_logs(
                     "user_id": row["user_id"],
                     "email": row["email"],
                     "action": row["action"],
+                    "details": row["details"],
                     "created_at": (
                         row["created_at"].isoformat()
                         if row["created_at"] else None
