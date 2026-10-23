@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,20 +13,58 @@
             <p>Create your account to get started.</p>
 
             <form id="registerForm">
-                <input type="text" id="registerName"
-                       placeholder="Full Name" required>
+                <input
+                    type="text"
+                    id="registerName"
+                    placeholder="Full Name"
+                    maxlength="100"
+                    required
+                >
 
-                <input type="email" id="registerEmail"
-                       placeholder="Email Address" required>
+                <input
+                    type="email"
+                    id="registerEmail"
+                    placeholder="Email Address"
+                    required
+                >
 
-                <input type="password" id="registerPassword"
-                       placeholder="Create Password"
-                       minlength="8" required>
+                <input
+                    type="password"
+                    id="registerPassword"
+                    placeholder="Create Password (minimum 8 characters)"
+                    minlength="8"
+                    required
+                >
 
-                <button type="submit">Create Account</button>
+                <button type="submit" id="sendOtpBtn">
+                    Send OTP
+                </button>
             </form>
 
-            <p id="registerMessage" role="status"></p>
+            <form id="verifyOtpForm" hidden>
+                <p>Enter the 6-digit OTP sent to your email.</p>
+
+                <input
+                    type="text"
+                    id="registerOTP"
+                    placeholder="Enter 6-digit OTP"
+                    inputmode="numeric"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    required
+                >
+
+                <button type="submit" id="verifyOtpBtn">
+                    Verify OTP & Create Account
+                </button>
+
+                <button type="button" id="resendOtpBtn">
+                    Resend OTP
+                </button>
+            </form>
+
+            <p id="registerMessage" role="status" aria-live="polite"></p>
 
             <p>Already have an account?
                 <a href="/">Login here</a>
