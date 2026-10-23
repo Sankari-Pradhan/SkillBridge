@@ -8,7 +8,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone, timedelta
 from pypdf import PdfReader
 
-
+from sqlalchemy import Text
 
 import secrets
 from fastapi import Depends, Header, HTTPException
@@ -319,13 +319,12 @@ class ActivityLog(Base):
     user_id = Column(Integer, nullable=False, index=True)
     email = Column(String(255), nullable=False)
     action = Column(String(100), nullable=False)
+    details = Column(Text, nullable=True)
     created_at = Column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
-
-
 
 @app.post("/api/activity")
 def record_activity(
