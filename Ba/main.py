@@ -585,6 +585,7 @@ def get_login_history(
 def get_activity_logs(
     admin: bool = Depends(verify_admin_key)
 ):
+    
     if engine is None:
         raise HTTPException(
             status_code=503,
@@ -634,6 +635,38 @@ def get_activity_logs(
         raise HTTPException(
             status_code=500,
             detail="Could not retrieve activity logs. Check Render logs."
+        )
+
+
+
+@app.post("/api/admin/fix-activity-details")
+def fix_activity_details(
+    admin: bool = Depends(verify_admin_key)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    try:
+        with engine.begin() as connection:
+            connection.execute(text("""
+                ALTER TABLE activity_logs
+                ADD COLUMN IF NOT EXISTS details TEXT
+            """))
+
+        return {
+            "success": True,
+            "message": "Activity details column is ready."
+        }
+
+    except SQLAlchemyError:
+        import logging
+        logging.exception("Could not add activity details column")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not fix activity details column."
         )
 
 # =========================================================
