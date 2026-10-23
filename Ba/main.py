@@ -329,6 +329,8 @@ class ActivityLog(Base):
         nullable=False
     )
 
+
+
 @app.post("/api/activity")
 def record_activity(
     action: str,
@@ -625,14 +627,14 @@ def get_activity_logs(
             ]
         }
 
+    
     except SQLAlchemyError:
         import logging
         logging.exception("Could not retrieve activity logs")
         raise HTTPException(
             status_code=500,
-            detail="Could not retrieve activity logs."
+            detail="Could not retrieve activity logs. Check Render logs."
         )
-
 
 # =========================================================
 # EMAIL OTP REGISTRATION (Mailjet)
