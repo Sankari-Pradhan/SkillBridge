@@ -585,7 +585,6 @@ def get_login_history(
 def get_activity_logs(
     admin: bool = Depends(verify_admin_key)
 ):
-    
     if engine is None:
         raise HTTPException(
             status_code=503,
@@ -596,13 +595,7 @@ def get_activity_logs(
         with engine.connect() as connection:
             rows = connection.execute(
                 text("""
-                    SELECT
-                        id,
-                        user_id,
-                        email,
-                        action,
-                        details,
-                        created_at
+                    SELECT id, user_id, email, action, created_at
                     FROM activity_logs
                     ORDER BY created_at DESC
                     LIMIT 200
@@ -618,7 +611,6 @@ def get_activity_logs(
                     "user_id": row["user_id"],
                     "email": row["email"],
                     "action": row["action"],
-                    "details": row["details"],
                     "created_at": (
                         row["created_at"].isoformat()
                         if row["created_at"] else None
@@ -628,13 +620,12 @@ def get_activity_logs(
             ]
         }
 
-    
     except SQLAlchemyError:
         import logging
         logging.exception("Could not retrieve activity logs")
         raise HTTPException(
             status_code=500,
-            detail="Could not retrieve activity logs. Check Render logs."
+            detail="Could not retrieve activity logs."
         )
 
 
