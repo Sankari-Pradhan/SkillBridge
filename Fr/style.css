@@ -136,23 +136,29 @@ button:hover {
     }
 }
 
+
 /* =========================================
-   HOME CARDS
+   SKILLBRIDGE - HOME CARDS
    ========================================= */
 
 .cards {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
+    width: 100%;
+    min-width: 0;
     margin-top: 30px;
 }
 
 .card {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
     padding: 25px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background: #fafafa;
-    transition: 0.2s;
+    border: 1px solid #dce8f7;
+    border-radius: 14px;
+    background: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
@@ -163,10 +169,25 @@ button:hover {
 .card h3 {
     color: #1f3c88;
     margin-bottom: 10px;
+    overflow-wrap: anywhere;
 }
 
 .card p {
     margin-bottom: 15px;
+    color: #52657d;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+    .cards {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 15px;
+    }
+
+    .card {
+        padding: 20px;
+    }
 }
 
 
@@ -1366,4 +1387,84 @@ nav {
         max-width: 100%;
     }
 }
+
+
+
+/* ===== SKILLBRIDGE HERO TEXT WIDTH FIX ===== */
+
+#home .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#home .hero-content {
+    width: 100%;
+    min-width: 0;
+    flex: initial;
+}
+
+#home .hero-content .hero-badge {
+    max-width: 100%;
+}
+
+#home .hero-content h2 {
+    width: 100%;
+    max-width: 100%;
+    font-size: clamp(30px, 3vw, 44px);
+    line-height: 1.2;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+#home .hero-content p {
+    width: 100%;
+    max-width: 520px;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+#home .hero-illustration {
+    width: 100%;
+    min-width: 0;
+    flex: initial;
+    height: auto;
+    background: transparent;
+    border-radius: 0;
+}
+
+#home .hero-illustration .hero-svg {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    flex-shrink: 1;
+}
+
+@media (max-width: 650px) {
+    #home .home-hero {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+        padding: 22px 16px;
+    }
+
+    #home .hero-content,
+    #home .hero-illustration {
+        width: 100%;
+    }
+
+    #home .hero-content h2 {
+        font-size: 30px;
+    }
+
+    #home .hero-illustration .hero-svg {
+        max-width: 100%;
+    }
+}
+
 
