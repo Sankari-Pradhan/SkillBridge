@@ -745,9 +745,9 @@ document.addEventListener("DOMContentLoaded", renderLearningHistory);
 
 
 
+
 /* =========================================
    HOME DASHBOARD DATA
-   Keeps the existing learning history format
    ========================================= */
 
 const HOME_ACTIVITY_KEY = "skillbridge_recent_activity";
@@ -794,7 +794,7 @@ function renderHomeDashboard() {
     const historyBox = document.getElementById("homeLearningHistory");
     const activityBox = document.getElementById("homeRecentActivity");
 
-    // Use the existing learning history, which stores topic strings.
+    // Reuse the existing learning history functions.
     const history = getLearningHistory();
     const activities = readHomeActivities();
 
@@ -833,5 +833,4 @@ function renderHomeDashboard() {
 }
 
 document.addEventListener("DOMContentLoaded", renderHomeDashboard);
-
 
