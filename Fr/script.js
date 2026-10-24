@@ -108,22 +108,29 @@ document.addEventListener("DOMContentLoaded", () => {
     checkLoginSession();
 });
 
+
 /* =========================================
    RESUME BUILDER
    ========================================= */
 
 function generateResume() {
-    const name = getValue("name");
-    const email = getValue("email");
-    const phone = getValue("phone");
-    const profile = getValue("profile");
-    const education = getValue("education");
-    const skills = getValue("skills");
-    const projects = getValue("projects");
-    const experience = getValue("experience");
-    const certifications = getValue("certifications");
+    const fields = {
+        name: getValue("name"),
+        email: getValue("email"),
+        phone: getValue("phone"),
+        location: getValue("location"),
+        linkedin: getValue("linkedin"),
+        profile: getValue("profile"),
+        education: getValue("education"),
+        skills: getValue("skills"),
+        experience: getValue("experience"),
+        projects: getValue("projects"),
+        certifications: getValue("certifications"),
+        achievements: getValue("achievements"),
+        additional: getValue("additional")
+    };
 
-    if (!name) {
+    if (!fields.name) {
         alert("Please enter your name.");
         document.getElementById("name")?.focus();
         return;
@@ -136,49 +143,85 @@ function generateResume() {
         return;
     }
 
-    function createSection(title, content) {
-        if (!content) return "";
+    const section = (title, value) => {
+        if (!value) return "";
 
         return `
             <section class="resume-section">
                 <h2>${escapeHTML(title)}</h2>
-                <p>${formatText(content)}</p>
+                <p>${formatText(value)}</p>
             </section>
         `;
-    }
+    };
 
+    const template =
+        document.getElementById("resumeTemplate")?.value || "modern";
+
+    const color =
+        document.getElementById("resumeColor")?.value || "#2563eb";
+
+    const font =
+        document.getElementById("resumeFont")?.value || "Arial";
+
+    const fontSize =
+        document.getElementById("resumeFontSize")?.value || "14px";
+
+    const allowedFonts = {
+        "Arial": "Arial, sans-serif",
+        "Georgia": "Georgia, serif",
+        "Verdana": "Verdana, sans-serif",
+        "Tahoma": "Tahoma, sans-serif",
+        "Roboto": "Roboto, Arial, sans-serif",
+        "Times New Roman": '"Times New Roman", serif'
+    };
+
+    const allowedSizes = ["12px", "14px", "16px"];
+
+    preview.className = `resume-document template-${template}`;
+    preview.style.setProperty("--resume-color", color);
+    preview.style.fontFamily = allowedFonts[font] || "Arial, sans-serif";
+    preview.style.fontSize = allowedSizes.includes(fontSize)
+        ? fontSize
+        : "14px";
+
+    const photo = document.getElementById("resumePhotoPreview");
     const photoHTML = resumePhotoData
-        ? `
-            <img
-                class="resume-photo"
+        ? `<img class="resume-photo"
                 src="${resumePhotoData}"
-                alt="Profile Photo"
-            >
-        `
-        : "";
+                alt="Profile photo">`
+        : (photo?.src && photo.style.display !== "none"
+            ? `<img class="resume-photo"
+                    src="${escapeHTML(photo.src)}"
+                    alt="Profile photo">`
+            : "");
 
     preview.innerHTML = `
         <article class="generated-resume">
-
             <header class="resume-header">
                 ${photoHTML}
-
-                <h1>${escapeHTML(name)}</h1>
-
-                <p class="resume-contact">
-                    ${escapeHTML(email)}
-                    ${email && phone ? " | " : ""}
-                    ${escapeHTML(phone)}
-                </p>
+                <div>
+                    <h1>${escapeHTML(fields.name)}</h1>
+                    <p class="resume-contact">
+                        ${[
+                            fields.email,
+                            fields.phone,
+                            fields.location
+                        ].filter(Boolean).map(escapeHTML).join(" | ")}
+                    </p>
+                    ${fields.linkedin
+                        ? `<p>${escapeHTML(fields.linkedin)}</p>`
+                        : ""}
+                </div>
             </header>
 
-            ${createSection("Professional Profile", profile)}
-            ${createSection("Education", education)}
-            ${createSection("Skills", skills)}
-            ${createSection("Work Experience / Internship", experience)}
-            ${createSection("Projects", projects)}
-            ${createSection("Certifications", certifications)}
-
+            ${section("Professional Profile", fields.profile)}
+            ${section("Education", fields.education)}
+            ${section("Skills", fields.skills)}
+            ${section("Work Experience / Internship", fields.experience)}
+            ${section("Projects", fields.projects)}
+            ${section("Certifications", fields.certifications)}
+            ${section("Achievements", fields.achievements)}
+            ${section("Additional Information", fields.additional)}
         </article>
     `;
 
@@ -191,6 +234,38 @@ function generateResume() {
         block: "start"
     });
 }
+
+/* Update preview when the profile photo changes */
+document.getElementById("resumePhoto")?.addEventListener("change", event => {
+    const file = event.target.files?.[0];
+    const image = document.getElementById("resumePhotoPreview");
+
+    if (!file || !image) return;
+
+    if (!file.type.startsWith("image/")) {
+        alert("Please select an image file.");
+        event.target.value = "";
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("Photo size must be less than 5 MB.");
+        event.target.value = "";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = event => {
+        resumePhotoData = event.target.result;
+        image.src = resumePhotoData;
+        image.style.display = "block";
+    };
+
+    reader.onerror = () => alert("Could not read the selected photo.");
+
+    reader.readAsDataURL(file);
+});
 
 /* =========================================
    RESUME TEMPLATES
@@ -265,17 +340,22 @@ function customizeResume() {
    SAVE AND LOAD RESUME DATA
    ========================================= */
 
+
 function saveResumeData(showMessage = true) {
     const ids = [
         "name",
         "email",
         "phone",
+        "location",
+        "linkedin",
         "profile",
         "education",
         "skills",
         "projects",
         "experience",
-        "certifications"
+        "certifications",
+        "achievements",
+        "additional"
     ];
 
     const resumeData = {};
@@ -288,6 +368,7 @@ function saveResumeData(showMessage = true) {
         }
     });
 
+    // Save resume photo
     if (resumePhotoData) {
         resumeData.resumePhotoData = resumePhotoData;
     }
@@ -313,6 +394,7 @@ function saveResumeData(showMessage = true) {
     }
 }
 
+
 function loadResumeData() {
     try {
         const saved = localStorage.getItem("skillbridge_resume_data");
@@ -322,25 +404,30 @@ function loadResumeData() {
         const resumeData = JSON.parse(saved);
 
         Object.entries(resumeData).forEach(([id, value]) => {
+            // Restore resume photo
             if (id === "resumePhotoData") {
-                resumePhotoData = typeof value === "string" ? value : "";
+                resumePhotoData =
+                    typeof value === "string" ? value : "";
 
-                const preview = document.getElementById("resumePhotoPreview");
+                const photoPreview =
+                    document.getElementById("resumePhotoPreview");
 
-                if (preview && resumePhotoData) {
-                    preview.src = resumePhotoData;
-                    preview.style.display = "block";
+                if (photoPreview && resumePhotoData) {
+                    photoPreview.src = resumePhotoData;
+                    photoPreview.style.display = "block";
                 }
 
                 return;
             }
 
+            // Restore all resume fields, including new fields
             const input = document.getElementById(id);
 
             if (input && typeof value === "string") {
                 input.value = value;
             }
         });
+
     } catch (error) {
         console.error("Could not load saved resume:", error);
     }
@@ -355,12 +442,16 @@ function resetResume() {
         "name",
         "email",
         "phone",
+        "location",
+        "linkedin",
         "profile",
         "education",
         "skills",
         "projects",
         "experience",
-        "certifications"
+        "certifications",
+        "achievements",
+        "additional"
     ];
 
     ids.forEach(id => {
@@ -371,6 +462,7 @@ function resetResume() {
         }
     });
 
+    // Reset resume photo
     resumePhotoData = "";
 
     const photoInput = document.getElementById("resumePhoto");
@@ -385,6 +477,7 @@ function resetResume() {
         photoPreview.style.display = "none";
     }
 
+    // Clear resume preview
     const preview = document.getElementById("resumePreview");
 
     if (preview) {
@@ -400,7 +493,20 @@ function resetResume() {
         preview.style.removeProperty("font-size");
     }
 
+    // Reset customization controls
+    ["resumeTemplate", "resumeColor", "resumeFont", "resumeFontSize"]
+        .forEach(id => {
+            const control = document.getElementById(id);
+
+            if (control) {
+                control.selectedIndex = 0;
+            }
+        });
+
+    // Remove saved resume data
     localStorage.removeItem("skillbridge_resume_data");
+
+    alert("Resume has been reset successfully!");
 }
 
 /* =========================================
