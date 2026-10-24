@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+
+
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone, timedelta
@@ -1219,6 +1221,34 @@ def register_page():
     return FileResponse(FRONTEND_DIR / "register.html")
 
 
+@app.get("/forgot-password.html")
+def forgot_password_page():
+    page = FRONTEND_DIR / "forgot-password.html"
+    if not page.is_file():
+        raise HTTPException(status_code=404, detail="Forgot Password page not found.")
+    return FileResponse(page)
+
+
+# Support links using the /Fr/ prefix
+@app.get("/Fr/index.html")
+def frontend_index_page():
+    return FileResponse(FRONTEND_DIR / "index.html")
+
+
+@app.get("/Fr/register.html")
+def frontend_register_page():
+    return FileResponse(FRONTEND_DIR / "register.html")
+
+
+@app.get("/Fr/forgot-password.html")
+def frontend_forgot_password_page():
+    page = FRONTEND_DIR / "forgot-password.html"
+    if not page.is_file():
+        raise HTTPException(status_code=404, detail="Forgot Password page not found.")
+    return FileResponse(page)
+
+
+
 # =========================================================
 # HOME PAGE
 # =========================================================
@@ -1227,6 +1257,9 @@ def register_page():
 def home():
 
     index_file = FRONTEND_DIR / "index.html"
+
+    print("FRONTEND_DIR:", FRONTEND_DIR)
+    print("INDEX EXISTS:", index_file.exists())
 
     if index_file.exists():
         return FileResponse(index_file)
