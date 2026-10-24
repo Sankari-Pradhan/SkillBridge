@@ -179,8 +179,15 @@ function findLearningResources() {
         `;
         return;
     }
-
+   
+    saveLearningTopic(skill);
     const q = encodeURIComponent(skill);
+
+    const continueList = document.getElementById("continueLearningList");
+    if (continueList) 
+    {
+     renderLearningHistory();
+    }
 
     result.innerHTML = `
         <h2>📚 Learning Resources for "${escapeHTML(skill)}"</h2>
@@ -611,3 +618,119 @@ async function checkLoginSession() {
    ========================================= */
 
 document.addEventListener("DOMContentLoaded", checkLoginSession);
+
+
+
+
+/* =========================================
+   LEARNING HISTORY & CONTINUE LEARNING
+   ========================================= */
+
+const LEARNING_HISTORY_KEY = "skillbridge_learning_history";
+
+function getLearningHistory() {
+    try {
+        const history = JSON.parse(
+            localStorage.getItem(LEARNING_HISTORY_KEY) || "[]"
+        );
+
+        return Array.isArray(history) ? history : [];
+    } catch (error) {
+        console.warn("Could not read learning history:", error);
+        return [];
+    }
+}
+
+function saveLearningTopic(topic) {
+    const skill = String(topic || "").trim();
+
+    if (!skill) return;
+
+    let history = getLearningHistory();
+
+    // Move an existing topic to the top.
+    history = history.filter(
+        item => item.toLowerCase() !== skill.toLowerCase()
+    );
+
+    history.unshift(skill);
+
+    // Keep the latest 20 topics.
+    history = history.slice(0, 20);
+
+    try {
+        localStorage.setItem(
+            LEARNING_HISTORY_KEY,
+            JSON.stringify(history)
+        );
+    } catch (error) {
+        console.warn("Could not save learning history:", error);
+    }
+
+    renderLearningHistory();
+}
+
+function renderLearningHistory() {
+    const history = getLearningHistory();
+
+    const continueList = document.getElementById(
+        "continueLearningList"
+    );
+
+    const historyList = document.getElementById(
+        "learningHistoryList"
+    );
+
+    if (continueList) {
+        continueList.innerHTML = history.length
+            ? history.slice(0, 3).map(topic => `
+                <button type="button"
+                    class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, '\\u003c')})">
+                    ▶️ Continue: ${escapeHTML(topic)}
+                </button>
+            `).join("")
+            : "<p>Search for a topic to start learning.</p>";
+    }
+
+    if (historyList) {
+        historyList.innerHTML = history.length
+            ? history.map(topic => `
+                <button type="button"
+                    class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, '\\u003c')})">
+                    🕘 ${escapeHTML(topic)}
+                </button>
+            `).join("")
+            : "<p>No learning history yet.</p>";
+    }
+}
+
+function openLearningTopic(topic) {
+    const input = document.getElementById("learningSkill");
+
+    if (!input) return;
+
+    input.value = topic;
+
+    showSection("learning");
+    findLearningResources();
+}
+
+function showLearningHistory() {
+    showSection("learning");
+
+    renderLearningHistory();
+
+    const history = document.getElementById("learningHistory");
+
+    if (history) {
+        history.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+}
+
+// Restore history when the page opens.
+document.addEventListener("DOMContentLoaded", renderLearningHistory);
