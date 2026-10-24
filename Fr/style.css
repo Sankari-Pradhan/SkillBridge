@@ -1298,3 +1298,33 @@ nav {
 .home-panel h2 {
     color: #174a9c;
 }
+
+
+
+/* SVG dashboard icons */
+.dashboard-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.dashboard-icon img {
+    display: block;
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+}
+
+/* Keep existing card layout and spacing */
+.home-shortcuts > button > .dashboard-icon {
+    margin-bottom: 8px;
+}
+
+.trending-item > .dashboard-icon {
+    margin-right: 0;
+}
