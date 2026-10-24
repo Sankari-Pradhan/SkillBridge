@@ -1,4 +1,3 @@
-```javascript
 const CACHE_NAME = "skillbridge-v3";
 
 const FILES_TO_CACHE = [
@@ -111,4 +110,3 @@ self.addEventListener("fetch", event => {
             })
     );
 });
-```
