@@ -121,43 +121,193 @@
             <button onclick="showSection('learning')">Get Started →</button>
             <button class="hero-secondary" onclick="showSection('career')">Explore Features</button>
         </div>
-        <div class="hero-illustration">
-            <div class="hero-icon">💻</div>
-            <div class="hero-book">📚</div>
-            <div class="hero-star">✨</div>
-        </div>
-    </div>
+       
+\<div class="hero-illustration">\
+&#x20;   \<svg class="hero-svg"\
+&#x20;        xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"\
+&#x20;        viewBox="0 0 640 400"\
+&#x20;        role="img"\
+&#x20;        aria-label="SkillBridge laptop, books, plants and coffee mug">
 
-    <!-- FEATURE CARDS -->
-    
+&#x20;       \<defs>\
+&#x20;           \<linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">\
+&#x20;               \<stop offset="0%" stop-color="#D9ECFF"/>\
+&#x20;               \<stop offset="100%" stop-color="#F4F9FF"/>\
+&#x20;           \</linearGradient>\
+&#x20;           \<linearGradient id="laptopScreen" x1="0" y1="0" x2="1" y2="1">\
+&#x20;               \<stop offset="0%" stop-color="#FFFFFF"/>\
+&#x20;               \<stop offset="100%" stop-color="#DCEBFF"/>\
+&#x20;           \</linearGradient>\
+&#x20;           \<linearGradient id="blueBook" x1="0" y1="0" x2="0" y2="1">\
+&#x20;               \<stop offset="0%" stop-color="#2585F5"/>\
+&#x20;               \<stop offset="100%" stop-color="#1452C7"/>\
+&#x20;           \</linearGradient>\
+&#x20;           \<linearGradient id="tealBook" x1="0" y1="0" x2="0" y2="1">\
+&#x20;               \<stop offset="0%" stop-color="#22B8C8"/>\
+&#x20;               \<stop offset="100%" stop-color="#087D9B"/>\
+&#x20;           \</linearGradient>\
+&#x20;           \<filter id="heroShadow" x="-30%" y="-30%" width="160%" height="180%">\
+&#x20;               \<feDropShadow dx="0" dy="7" stdDeviation="7"\
+&#x20;                             flood-color="#174A87" flood-opacity=".20"/>\
+&#x20;           \</filter>\
+&#x20;       \</defs>
+
+&#x20;       \<!-- Soft blue workspace -->\
+&#x20;       \<rect x="0" y="0" width="640" height="400" rx="22" fill="url(#heroBg)"/>\
+&#x20;       \<circle cx="530" cy="55" r="95" fill="#FFFFFF" opacity=".28"/>\
+&#x20;       \<path d="M0 300 Q170 270 330 310 T640 290 V400 H0Z"\
+&#x20;             fill="#FFFFFF" opacity=".72"/>
+
+&#x20;       \<!-- Background plant -->\
+&#x20;       \<g transform="translate(55 70)">\
+&#x20;           \<path d="M45 110 Q5 65 18 30 Q53 52 45 110"\
+&#x20;                 fill="#51B96D"/>\
+&#x20;           \<path d="M48 110 Q48 45 90 22 Q100 72 48 110"\
+&#x20;                 fill="#28A85D"/>\
+&#x20;           \<path d="M45 110 Q-5 92 0 62 Q37 72 45 110"\
+&#x20;                 fill="#78CF7B"/>\
+&#x20;           \<path d="M45 110 Q70 60 105 70 Q94 108 45 110"\
+&#x20;                 fill="#179B57"/>\
+&#x20;           \<path d="M12 112 H82 L72 160 H23Z" fill="#FFFFFF"/>\
+&#x20;           \<path d="M12 112 H82 L78 126 H16Z" fill="#D6E7FA"/>\
+&#x20;       \</g>
+
+&#x20;       \<!-- Books -->\
+&#x20;       \<g filter="url(#heroShadow)">\
+&#x20;           \<path d="M55 286 L235 275 L245 313 L65 325Z"\
+&#x20;                 fill="url(#blueBook)"/>\
+&#x20;           \<path d="M65 325 L245 313 L245 323 L65 336Z"\
+&#x20;                 fill="#FFFFFF"/>\
+&#x20;           \<path d="M62 336 L242 324 L249 357 L70 370Z"\
+&#x20;                 fill="url(#tealBook)"/>\
+&#x20;           \<path d="M70 370 L249 357 L250 366 L71 380Z"\
+&#x20;                 fill="#FFFFFF"/>\
+&#x20;           \<path d="M73 380 L250 367 L256 395 L78 399Z"\
+&#x20;                 fill="#174DB8"/>\
+&#x20;           \<g fill="#FFFFFF" font-family="Arial, sans-serif"\
+&#x20;              font-size="15" font-weight="bold" text-anchor="middle">\
+&#x20;               \<text x="150" y="306">LEARN\</text>\
+&#x20;               \<text x="155" y="350">PRACTICE\</text>\
+&#x20;               \<text x="165" y="389">GROW\</text>\
+&#x20;           \</g>\
+&#x20;       \</g>
+
+&#x20;       \<!-- Plant behind laptop -->\
+&#x20;       \<g transform="translate(220 45)">\
+&#x20;           \<path d="M45 110 Q0 73 12 35 Q49 55 45 110"\
+&#x20;                 fill="#35B96A"/>\
+&#x20;           \<path d="M48 110 Q35 48 72 10 Q94 57 48 110"\
+&#x20;                 fill="#63C94E"/>\
+&#x20;           \<path d="M47 110 Q70 45 110 43 Q103 83 47 110"\
+&#x20;                 fill="#1BA65B"/>\
+&#x20;           \<path d="M44 110 Q-5 96 0 62 Q32 70 44 110"\
+&#x20;                 fill="#81D76B"/>\
+&#x20;           \<path d="M20 108 H85 L77 145 H28Z" fill="#FFFFFF"/>\
+&#x20;           \<path d="M20 108 H85 L82 119 H22Z" fill="#B9D8F6"/>\
+&#x20;       \</g>
+
+&#x20;       \<!-- Laptop screen -->\
+&#x20;       \<g filter="url(#heroShadow)">\
+&#x20;           \<path d="M300 85 Q301 76 312 76 H558 Q569 76 569 88\
+&#x20;                    L555 300 H273Z"\
+&#x20;                 fill="#14233D"/>\
+&#x20;           \<path d="M312 88 H556 L543 283 H290Z"\
+&#x20;                 fill="url(#laptopScreen)"/>
+
+&#x20;           \<!-- Graduation cap -->\
+&#x20;           \<path d="M367 143 L418 122 L469 143 L418 164Z"\
+&#x20;                 fill="#1677F2"/>\
+&#x20;           \<path d="M382 150 V169 Q418 189 454 169 V150 L418 165Z"\
+&#x20;                 fill="#0E5ACB"/>\
+&#x20;           \<path d="M468 144 V168" stroke="#1677F2"\
+&#x20;                 stroke-width="3" stroke-linecap="round"/>\
+&#x20;           \<circle cx="468" cy="171" r="4" fill="#1677F2"/>
+
+&#x20;           \<text x="418" y="214" text-anchor="middle"\
+&#x20;                 font-family="Arial, sans-serif"\
+&#x20;                 font-size="26" font-weight="bold" fill="#15366F">\
+&#x20;               SkillBridge\
+&#x20;           \</text>\
+&#x20;           \<text x="418" y="237" text-anchor="middle"\
+&#x20;                 font-family="Arial, sans-serif"\
+&#x20;                 font-size="12" fill="#315784">\
+&#x20;               Learn · Build · Grow\
+&#x20;           \</text>
+
+&#x20;           \<!-- Laptop base -->\
+&#x20;           \<path d="M273 300 L555 300 L595 330\
+&#x20;                    Q598 336 586 338 H240 Q229 336 235 330Z"\
+&#x20;                 fill="#B7C9DF"/>\
+&#x20;           \<path d="M300 304 H530 L548 325 H282Z"\
+&#x20;                 fill="#EAF2FC"/>\
+&#x20;           \<path d="M373 307 H448 L440 315 H381Z"\
+&#x20;                 fill="#91A9C7"/>\
+&#x20;       \</g>
+
+&#x20;       \<!-- Coffee mug -->\
+&#x20;       \<g filter="url(#heroShadow)">\
+&#x20;           \<path d="M558 218 H613 V282 Q611 302 586 302\
+&#x20;                    Q560 301 558 282Z"\
+&#x20;                 fill="#FFFFFF"/>\
+&#x20;           \<path d="M612 231 Q640 226 635 255\
+&#x20;                    Q632 274 612 273"\
+&#x20;                 fill="none" stroke="#D8E6F7" stroke-width="9"/>\
+&#x20;           \<path d="M558 218 H613 V229 H558Z" fill="#DCEBFA"/>\
+&#x20;           \<g fill="#28518A" font-family="Arial, sans-serif"\
+&#x20;              font-size="10" font-weight="bold" text-anchor="middle">\
+&#x20;               \<text x="585" y="247">Better\</text>\
+&#x20;               \<text x="585" y="260">Skills\</text>\
+&#x20;               \<text x="585" y="273">Brighter\</text>\
+&#x20;               \<text x="585" y="286">Future\</text>\
+&#x20;           \</g>\
+&#x20;       \</g>
+
+&#x20;       \<!-- Notebook and pen -->\
+&#x20;       \<g filter="url(#heroShadow)">\
+&#x20;           \<path d="M470 344 L620 329 L633 365 L483 382Z"\
+&#x20;                 fill="#246DE0"/>\
+&#x20;           \<path d="M482 382 L633 365 L629 375 L479 392Z"\
+&#x20;                 fill="#1649AC"/>\
+&#x20;           \<path d="M493 342 L596 332"\
+&#x20;                 stroke="#FFFFFF" stroke-width="3" opacity=".65"/>\
+&#x20;           \<path d="M500 334 L589 324"\
+&#x20;                 stroke="#153A76" stroke-width="5" stroke-linecap="round"/>\
+&#x20;           \<path d="M589 324 L600 323 L594 331Z" fill="#D7E8FF"/>\
+&#x20;       \</g>\
+&#x20;   \</svg>\
+\</div>
+
+
+
+   
 <!-- FEATURE CARDS -->
 <div class="home-shortcuts">
     <button onclick="showSection('learning')">
-        <span class="dashboard-icon"><img src="/assets/icons/learning.svg" alt="" width="42" height="42"></span>
+        <span class="dashboard-icon"><img src="/Fr/assets/icons/learning.svg" alt="" width="42" height="42"></span>
         <b>Learning Hub</b>
         <small>Explore courses and resources</small>
     </button>
 
     <button onclick="showSection('career')">
-        <span class="dashboard-icon"><img src="/assets/icons/career.svg" alt="" width="42" height="42"></span>
+        <span class="dashboard-icon"><img src="/Fr/assets/icons/career.svg" alt="" width="42" height="42"></span>
         <b>Career Opportunities</b>
         <small>Jobs and internships</small>
     </button>
 
     <button onclick="showSection('resume')">
-        <span class="dashboard-icon"><img src="/assets/icons/resume.svg" alt="" width="42" height="42"></span>
+        <span class="dashboard-icon"><img src="/Fr/assets/icons/resume.svg" alt="" width="42" height="42"></span>
         <b>Resume Builder</b>
         <small>Create your resume</small>
     </button>
 
     <button onclick="showSection('analyzer')">
-        <span class="dashboard-icon"><img src="/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
+        <span class="dashboard-icon"><img src="/Fr/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
         <b>Resume Analyzer</b>
         <small>Improve your resume</small>
     </button>
 
     <button onclick="showSection('profile')">
-        <span class="dashboard-icon"><img src="/assets/icons/profile.svg" alt="" width="42" height="42"></span>
+        <span class="dashboard-icon"><img src="/Fr/assets/icons/profile.svg" alt="" width="42" height="42"></span>
         <b>Profile</b>
         <small>Manage your account</small>
     </button>
@@ -165,25 +315,25 @@
 
 
 <div class="trending-item">
-    <span class="dashboard-icon"><img src="/assets/icons/learning.svg" alt="" width="42" height="42"></span>
+    <span class="dashboard-icon"><img src="/Fr/assets/icons/learning.svg" alt="" width="42" height="42"></span>
     <div><h3>Python for Beginners</h3><p>Start learning Python.</p></div>
     <button onclick="openLearningTopic('Python')">Explore</button>
 </div>
 
 <div class="trending-item">
-    <span class="dashboard-icon"><img src="/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
+    <span class="dashboard-icon"><img src="/Fr/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
     <div><h3>Data Science</h3><p>Learn data analysis.</p></div>
     <button onclick="openLearningTopic('Data Science')">Explore</button>
 </div>
 
 <div class="trending-item">
-    <span class="dashboard-icon"><img src="/assets/icons/career.svg" alt="" width="42" height="42"></span>
+    <span class="dashboard-icon"><img src="/Fr/assets/icons/career.svg" alt="" width="42" height="42"></span>
     <div><h3>Web Development</h3><p>Build websites.</p></div>
     <button onclick="openLearningTopic('Web Development')">Explore</button>
 </div>
 
 <div class="trending-item">
-    <span class="dashboard-icon"><img src="/assets/icons/resume.svg" alt="" width="42" height="42"></span>
+    <span class="dashboard-icon"><img src="/Fr/assets/icons/resume.svg" alt="" width="42" height="42"></span>
     <div><h3>Machine Learning</h3><p>Discover AI fundamentals.</p></div>
     <button onclick="openLearningTopic('Machine Learning')">Explore</button>
 </div>
