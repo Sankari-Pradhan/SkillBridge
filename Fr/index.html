@@ -111,8 +111,8 @@
 
 
 <!-- =====================================================
-     HOME SECTION
-     ===================================================== -->
+                    HOME SECTION
+ ============================================================ -->
 
 <section id="home" class="section active">
 
@@ -184,7 +184,7 @@
 
     
 <!-- =====================================================
-     LEARNING HUB
+                   LEARNING HUB
      ===================================================== -->
 
 <section id="learning" class="section">
@@ -232,7 +232,9 @@
 
 
 
-<!-- CAREER OPPORTUNITIES -->
+<!-- ========================================
+            CAREER OPPORTUNITIES 
+==================================================-->
 
 <section id="career" class="section">
 
@@ -445,6 +447,39 @@
 
     <p id="resumeMessage" role="status"></p>
 </section>
+
+
+    
+<section id="analyzer" class="section">
+    <h2>📄 Resume Analyzer</h2>
+    <p>Analyze your resume and discover areas to improve.</p>
+
+    <div class="card">
+        <label for="analyzerFile">Upload Resume (.txt)</label>
+        <input
+            type="file"
+            id="analyzerFile"
+            accept=".txt,text/plain"
+        >
+
+        <label for="jobDescription">Job Description (optional)</label>
+        <textarea
+            id="jobDescription"
+            placeholder="Paste the job description here..."
+        ></textarea>
+
+        <button type="button" onclick="analyzeResume()">
+            Analyze Resume
+        </button>
+
+        <button type="button" onclick="clearAnalyzer()">
+            Clear
+        </button>
+    </div>
+
+    <div id="analyzerResult" class="card" aria-live="polite"></div>
+</section>
+
 
 
 <!-- ====================================================
