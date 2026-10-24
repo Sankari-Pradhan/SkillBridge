@@ -677,6 +677,216 @@ class RegistrationOTPVerify(BaseModel):
     otp: str
 
 
+```python
+# ================= FORGOT PASSWORD OTP =================
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+
+
+def ensure_forgot_password_table():
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    with engine.begin() as connection:
+        connection.execute(text("""
+            CREATE TABLE IF NOT EXISTS forgot_password_otps (
+                email VARCHAR(255) PRIMARY KEY,
+                otp_hash VARCHAR(64) NOT NULL,
+                expires_at TIMESTAMPTZ NOT NULL,
+                attempts INTEGER NOT NULL DEFAULT 0,
+                last_sent_at TIMESTAMPTZ NOT NULL
+            )
+        """))
+
+
+@app.post("/api/forgot-password/send-otp")
+def send_forgot_password_otp(data: ForgotPasswordRequest):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    email = str(data.email).strip().lower()
+    ensure_forgot_password_table()
+
+    with engine.begin() as connection:
+        user = connection.execute(
+            text("""
+                SELECT id
+                FROM users
+                WHERE lower(email) = :email
+            """),
+            {"email": email}
+        ).first()
+
+        if not user:
+            # Avoid revealing whether an account exists.
+            return {
+                "success": True,
+                "message": "If the account exists, an OTP may be sent."
+            }
+
+        previous = connection.execute(
+            text("""
+                SELECT last_sent_at
+                FROM forgot_password_otps
+                WHERE email = :email
+            """),
+            {"email": email}
+        ).mappings().first()
+
+        now = datetime.now(timezone.utc)
+
+        if previous and (
+            now - previous["last_sent_at"]
+        ).total_seconds() < 60:
+            raise HTTPException(
+                status_code=429,
+                detail="Please wait 60 seconds before requesting another OTP."
+            )
+
+    otp = f"{secrets.randbelow(1_000_000):06d}"
+    otp_digest = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+    # Uses the Mailjet helper already present in main.py.
+    send_mailjet_otp(email, otp)
+
+    now = datetime.now(timezone.utc)
+
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO forgot_password_otps
+                    (email, otp_hash, expires_at, attempts, last_sent_at)
+                VALUES
+                    (:email, :otp_hash, :expires_at, 0, :last_sent_at)
+                ON CONFLICT (email) DO UPDATE SET
+                    otp_hash = EXCLUDED.otp_hash,
+                    expires_at = EXCLUDED.expires_at,
+                    attempts = 0,
+                    last_sent_at = EXCLUDED.last_sent_at
+            """),
+            {
+                "email": email,
+                "otp_hash": otp_digest,
+                "expires_at": now + timedelta(minutes=10),
+                "last_sent_at": now
+            }
+        )
+
+    return {
+        "success": True,
+        "message": "If the account exists, an OTP may be sent."
+    }
+
+
+@app.post("/api/forgot-password/reset")
+def reset_forgotten_password(data: ResetPasswordRequest):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    email = str(data.email).strip().lower()
+    otp = data.otp.strip()
+
+    if not otp.isdigit() or len(otp) != 6:
+        raise HTTPException(status_code=400, detail="Invalid OTP.")
+
+    if len(data.new_password) < 8:
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be at least 8 characters long."
+        )
+
+    ensure_forgot_password_table()
+
+    now = datetime.now(timezone.utc)
+    otp_digest = hashlib.sha256(otp.encode("utf-8")).hexdigest()
+
+    with engine.begin() as connection:
+        record = connection.execute(
+            text("""
+                SELECT otp_hash, expires_at, attempts
+                FROM forgot_password_otps
+                WHERE email = :email
+                FOR UPDATE
+            """),
+            {"email": email}
+        ).mappings().first()
+
+        if not record:
+            raise HTTPException(
+                status_code=400,
+                detail="Request a new OTP first."
+            )
+
+        if record["expires_at"] <= now:
+            connection.execute(
+                text("DELETE FROM forgot_password_otps WHERE email = :email"),
+                {"email": email}
+            )
+            raise HTTPException(
+                status_code=400,
+                detail="OTP expired. Please request a new one."
+            )
+
+        if record["attempts"] >= 5:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many attempts. Request a new OTP."
+            )
+
+        if not secrets.compare_digest(record["otp_hash"], otp_digest):
+            connection.execute(
+                text("""
+                    UPDATE forgot_password_otps
+                    SET attempts = attempts + 1
+                    WHERE email = :email
+                """),
+                {"email": email}
+            )
+            raise HTTPException(status_code=400, detail="Invalid OTP.")
+
+        result = connection.execute(
+            text("""
+                UPDATE users
+                SET password_hash = :password_hash
+                WHERE lower(email) = :email
+            """),
+            {
+                "email": email,
+                "password_hash": password_hash.hash(data.new_password)
+            }
+        )
+
+        if result.rowcount == 0:
+            raise HTTPException(status_code=400, detail="Account not found.")
+
+        connection.execute(
+            text("DELETE FROM forgot_password_otps WHERE email = :email"),
+            {"email": email}
+        )
+
+    return {
+        "success": True,
+        "message": "Password reset successfully. Please log in."
+    }
+
+
+
 def ensure_registration_otp_table():
     """Create a table for pending registrations; OTPs are stored hashed."""
     if engine is None:
