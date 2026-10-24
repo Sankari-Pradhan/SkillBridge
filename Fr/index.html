@@ -98,157 +98,90 @@
 
 
 
-<!--
-==============================================
-HOME SECTION 
-=============================================
--->
+<!-- ====================================================
+                  HOME SECTION 
+========================================================-->
 
 
-<section id="home" class="section active"><div class="home-hero">
 
+<section id="home" class="section active">
 
-    <div class="hero-content">
-        <span class="hero-badge">🚀 YOUR CAREER PARTNER</span>
-
-        <h2>Learn Today,<br>Build Tomorrow!</h2>
-
-        <p>
-            Build your skills, create a professional resume,
-            explore career opportunities and take the next
-            step towards your dream career.
-        </p>
-
-        <button onclick="showSection('learning')">
-            Start Learning →
-        </button>
-
-    </div>
-
-    <div class="hero-illustration">
-        <div class="hero-icon">💻</div>
-        <div class="hero-book">📚</div>
-        <div class="hero-star">✨</div>
-    </div>
-</div>
-
-
-<div class="home-heading">
-    <div>
-        <h2>Explore SkillBridge</h2>
-        <p>Everything you need to build your career.</p>
-    </div>
-</div>
-
-<div class="cards home-feature-cards">
-
-    <div class="card home-card">
-        <div class="feature-icon">📚</div>
-        <h3>Learning Hub</h3>
-        <p>Discover courses, books, tutorials and practical projects.</p>
-        <button onclick="showSection('learning')">Explore Resources →</button>
-    </div>
-
-    <div class="card home-card">
-        <div class="feature-icon">💼</div>
-        <h3>Career Opportunities</h3>
-        <p>Explore job opportunities, internships and career guidance.</p>
-        <button onclick="showSection('career')">Explore Careers →</button>
-    </div>
-
-    <div class="card home-card">
-        <div class="feature-icon">📄</div>
-        <h3>Resume Builder</h3>
-        <p>Create a professional resume using your information.</p>
-        <button onclick="showSection('resume')">Build Resume →</button>
-    </div>
-
-    <div class="card home-card">
-        <div class="feature-icon">🔍</div>
-        <h3>Resume Analyzer</h3>
-        <p>Check your resume and discover areas for improvement.</p>
-        <button onclick="showSection('analyzer')">Analyze Resume →</button>
-    </div>
-
-    <div class="card home-card">
-        <div class="feature-icon">✉️</div>
-        <h3>Cover Letter</h3>
-        <p>Prepare a cover letter for your job applications.</p>
-        <button onclick="showSection('cover')">Create Cover Letter →</button>
-    </div>
-
-    <div class="card home-card">
-        <div class="feature-icon">👤</div>
-        <h3>My Profile</h3>
-        <p>View your profile, skills and learning progress.</p>
-        <button onclick="showSection('profile')">View Profile →</button>
-    </div>
-
-</div>
-
-<div class="home-bottom-grid">
-
-    <div class="home-panel">
-        <h2>🔥 Trending Now</h2>
-        <p class="panel-subtitle">Popular topics to explore.</p>
-
-        <div class="trending-item">
-            <span>🐍</span>
-            <div>
-                <h3>Python for Beginners</h3>
-                <p>Start learning Python programming.</p>
-            </div>
-            <button onclick="openLearningTopic('Python')">Explore</button>
+    <!-- HERO BANNER -->
+    <div class="home-hero">
+        <div class="hero-content">
+            <span class="hero-badge">🚀 YOUR CAREER JOURNEY STARTS HERE</span>
+            <h2>Learn Today,<br>Build Tomorrow</h2>
+            <p>Explore courses, find career opportunities, build your resume and grow your skills — all in one place.</p>
+            <button onclick="showSection('learning')">Get Started →</button>
+            <button class="hero-secondary" onclick="showSection('career')">Explore Features</button>
         </div>
-
-        <div class="trending-item">
-            <span>📊</span>
-            <div>
-                <h3>Data Science</h3>
-                <p>Discover data analysis and visualization.</p>
-            </div>
-            <button onclick="openLearningTopic('Data Science')">Explore</button>
-        </div>
-
-        <div class="trending-item">
-            <span>🤖</span>
-            <div>
-                <h3>Machine Learning</h3>
-                <p>Explore machine learning fundamentals.</p>
-            </div>
-            <button onclick="openLearningTopic('Machine Learning')">Explore</button>
+        <div class="hero-illustration">
+            <div class="hero-icon">💻</div>
+            <div class="hero-book">📚</div>
+            <div class="hero-star">✨</div>
         </div>
     </div>
 
-    <div class="home-panel">
-        <h2>⚡ Quick Access</h2>
-        <p class="panel-subtitle">Get started with one click.</p>
-
-        <button class="quick-access-btn"
-                onclick="showSection('resume')">
-            📄 Build Your Resume
-        </button>
-
-        <button class="quick-access-btn"
-                onclick="showSection('analyzer')">
-            🔍 Analyze Your Resume
-        </button>
-
-        <button class="quick-access-btn"
-                onclick="showSection('learning')">
-            📚 Find Learning Resources
-        </button>
-
-        <button class="quick-access-btn"
-                onclick="showSection('career')">
-            💼 Explore Career Opportunities
-        </button>
+    <!-- FEATURE CARDS -->
+    <div class="home-shortcuts">
+        <button onclick="showSection('learning')"><span>📘</span><b>Learning Hub</b><small>Explore courses and resources</small></button>
+        <button onclick="showSection('career')"><span>💼</span><b>Career Opportunities</b><small>Jobs and internships</small></button>
+        <button onclick="showSection('resume')"><span>📄</span><b>Resume Builder</b><small>Create your resume</small></button>
+        <button onclick="showSection('analyzer')"><span>🔍</span><b>Resume Analyzer</b><small>Improve your resume</small></button>
+        <button onclick="showSection('profile')"><span>👤</span><b>Profile</b><small>Manage your account</small></button>
     </div>
 
-</div>
+    <!-- TRENDING + QUICK ACCESS -->
+    <div class="home-reference-grid">
+        <div class="home-panel">
+            <h2>🔥 Trending Now</h2>
+            <p class="panel-subtitle">Explore popular skills and technologies.</p>
+
+            <div class="trending-item"><span>🐍</span><div><h3>Python for Beginners</h3><p>Start learning Python.</p></div><button onclick="openLearningTopic('Python')">Explore</button></div>
+            <div class="trending-item"><span>📊</span><div><h3>Data Science</h3><p>Learn data analysis.</p></div><button onclick="openLearningTopic('Data Science')">Explore</button></div>
+            <div class="trending-item"><span>🌐</span><div><h3>Web Development</h3><p>Build websites.</p></div><button onclick="openLearningTopic('Web Development')">Explore</button></div>
+            <div class="trending-item"><span>🤖</span><div><h3>Machine Learning</h3><p>Discover AI fundamentals.</p></div><button onclick="openLearningTopic('Machine Learning')">Explore</button></div>
+        </div>
+
+        <div class="home-panel">
+            <h2>⚡ Quick Access</h2>
+            <p class="panel-subtitle">Get started with useful tools.</p>
+            <button class="quick-access-btn" onclick="showSection('resume')">📄 Build Your Resume →</button>
+            <button class="quick-access-btn" onclick="showSection('analyzer')">🔍 Analyze Your Resume →</button>
+            <button class="quick-access-btn" onclick="showSection('learning')">📚 Find Learning Resources →</button>
+            <button class="quick-access-btn" onclick="showSection('career')">💼 Explore Career Opportunities →</button>
+        </div>
+    </div>
+
+    <!-- BOTTOM DASHBOARD -->
+    <div class="home-activity-grid">
+        <div class="home-panel">
+            <h2>▶️ Continue Learning</h2>
+            <p class="panel-subtitle">Your recently searched topics.</p>
+            <div id="homeContinueList">
+                <p>Search a topic in Learning Hub to get started.</p>
+            </div>
+        </div>
+
+        <div class="home-panel">
+            <h2>🕘 Recent Activity</h2>
+            <p class="panel-subtitle">Your recent learning activity.</p>
+            <div id="homeRecentActivity">
+                <p>Your recent activities will appear here.</p>
+            </div>
+        </div>
+
+        <div class="home-panel">
+            <h2>📚 Learning History</h2>
+            <p class="panel-subtitle">Topics you have explored.</p>
+            <div id="homeLearningHistory">
+                <p>Your learning history will appear here.</p>
+            </div>
+            <button onclick="showSection('learning')">View Learning Hub →</button>
+        </div>
+    </div>
 
 </section>
-
 
 
 <!-- =====================================================
