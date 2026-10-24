@@ -677,7 +677,7 @@ class RegistrationOTPVerify(BaseModel):
     otp: str
 
 
-```python
+
 # ================= FORGOT PASSWORD OTP =================
 
 class ForgotPasswordRequest(BaseModel):
