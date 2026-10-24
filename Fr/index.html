@@ -103,129 +103,152 @@
 
 
 
-<!-- =====================================================
-     HOME SECTION
-     ===================================================== -->
-
-<section id="home" class="section active">
-
-    <h2>
-        Welcome to SkillBridge 👋
-    </h2>
+<!==============================================
+-- HOME SECTION --
+==============================================>
 
 
-    <p>
-        SkillBridge is your personal career and learning
-        assistant. Create resumes, analyze your resume,
-        discover learning resources and generate
-        professional cover letters.
-    </p>
+<section id="home" class="section active"><div class="home-hero">
 
 
-    <!-- HOME CARDS -->
+    <div class="hero-content">
+        <span class="hero-badge">🚀 YOUR CAREER PARTNER</span>
 
-    <div class="cards">
+        <h2>Learn Today,<br>Build Tomorrow!</h2>
 
+        <p>
+            Build your skills, create a professional resume,
+            explore career opportunities and take the next
+            step towards your dream career.
+        </p>
 
-        <!-- RESUME -->
-
-        <div class="card">
-
-            <h3>
-                📄 Create Resume
-            </h3>
-
-            <p>
-                Create a simple and professional resume
-                using your personal, educational and
-                professional information.
-            </p>
-
-            <button
-                onclick="showSection('resume')">
-
-                Start
-
-            </button>
-
-        </div>
-
-
-
-        <!-- ANALYZER -->
-
-        <div class="card">
-
-            <h3>
-                🔍 Resume Analyzer
-            </h3>
-
-            <p>
-                Upload your PDF or TXT resume and check
-                important sections, detected skills,
-                resume score and suggestions.
-            </p>
-
-            <button
-                onclick="showSection('analyzer')">
-
-                Analyze
-
-            </button>
-
-        </div>
-
-
-
-        <!-- LEARNING -->
-
-        <div class="card">
-
-            <h3>
-                📚 Learning Hub
-            </h3>
-
-            <p>
-                Search for books, eBooks, YouTube lectures,
-                NPTEL courses, free courses, GitHub projects,
-                Kaggle resources and more.
-            </p>
-
-            <button
-                onclick="showSection('learning')">
-
-                Start Learning
-
-            </button>
-
-        </div>
-
-
-
-        <!-- COVER LETTER -->
-
-        <div class="card">
-
-            <h3>
-                ✉️ Cover Letter
-            </h3>
-
-            <p>
-                Generate a professional cover letter
-                based on your job role, company and skills.
-            </p>
-
-            <button
-                onclick="showSection('cover')">
-
-                Generate
-
-            </button>
-
-        </div>
-
+        <button onclick="showSection('learning')">
+            Start Learning →
+        </button>
 
     </div>
+
+    <div class="hero-illustration">
+        <div class="hero-icon">💻</div>
+        <div class="hero-book">📚</div>
+        <div class="hero-star">✨</div>
+    </div>
+</div>
+
+
+<div class="home-heading">
+    <div>
+        <h2>Explore SkillBridge</h2>
+        <p>Everything you need to build your career.</p>
+    </div>
+</div>
+
+<div class="cards home-feature-cards">
+
+    <div class="card home-card">
+        <div class="feature-icon">📚</div>
+        <h3>Learning Hub</h3>
+        <p>Discover courses, books, tutorials and practical projects.</p>
+        <button onclick="showSection('learning')">Explore Resources →</button>
+    </div>
+
+    <div class="card home-card">
+        <div class="feature-icon">💼</div>
+        <h3>Career Opportunities</h3>
+        <p>Explore job opportunities, internships and career guidance.</p>
+        <button onclick="showSection('career')">Explore Careers →</button>
+    </div>
+
+    <div class="card home-card">
+        <div class="feature-icon">📄</div>
+        <h3>Resume Builder</h3>
+        <p>Create a professional resume using your information.</p>
+        <button onclick="showSection('resume')">Build Resume →</button>
+    </div>
+
+    <div class="card home-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Resume Analyzer</h3>
+        <p>Check your resume and discover areas for improvement.</p>
+        <button onclick="showSection('analyzer')">Analyze Resume →</button>
+    </div>
+
+    <div class="card home-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Cover Letter</h3>
+        <p>Prepare a cover letter for your job applications.</p>
+        <button onclick="showSection('cover')">Create Cover Letter →</button>
+    </div>
+
+    <div class="card home-card">
+        <div class="feature-icon">👤</div>
+        <h3>My Profile</h3>
+        <p>View your profile, skills and learning progress.</p>
+        <button onclick="showSection('profile')">View Profile →</button>
+    </div>
+
+</div>
+
+<div class="home-bottom-grid">
+
+    <div class="home-panel">
+        <h2>🔥 Trending Now</h2>
+        <p class="panel-subtitle">Popular topics to explore.</p>
+
+        <div class="trending-item">
+            <span>🐍</span>
+            <div>
+                <h3>Python for Beginners</h3>
+                <p>Start learning Python programming.</p>
+            </div>
+            <button onclick="openLearningTopic('Python')">Explore</button>
+        </div>
+
+        <div class="trending-item">
+            <span>📊</span>
+            <div>
+                <h3>Data Science</h3>
+                <p>Discover data analysis and visualization.</p>
+            </div>
+            <button onclick="openLearningTopic('Data Science')">Explore</button>
+        </div>
+
+        <div class="trending-item">
+            <span>🤖</span>
+            <div>
+                <h3>Machine Learning</h3>
+                <p>Explore machine learning fundamentals.</p>
+            </div>
+            <button onclick="openLearningTopic('Machine Learning')">Explore</button>
+        </div>
+    </div>
+
+    <div class="home-panel">
+        <h2>⚡ Quick Access</h2>
+        <p class="panel-subtitle">Get started with one click.</p>
+
+        <button class="quick-access-btn"
+                onclick="showSection('resume')">
+            📄 Build Your Resume
+        </button>
+
+        <button class="quick-access-btn"
+                onclick="showSection('analyzer')">
+            🔍 Analyze Your Resume
+        </button>
+
+        <button class="quick-access-btn"
+                onclick="showSection('learning')">
+            📚 Find Learning Resources
+        </button>
+
+        <button class="quick-access-btn"
+                onclick="showSection('career')">
+            💼 Explore Career Opportunities
+        </button>
+    </div>
+
+</div>
 
 </section>
 
