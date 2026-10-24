@@ -70,34 +70,41 @@
 
     <!-- NAVIGATION -->
 
-    <nav>
+  
+<nav>
+    <button onclick="showSection('home')">
+        🏠 Home
+    </button>
 
-        <button onclick="showSection('home')">
-            🏠 Home
-        </button>
+    <button onclick="showSection('career')">
+        💼 Career Opportunities
+    </button>
 
+    <button onclick="showSection('learning')">
+        📚 Learning Hub
+    </button>
 
-        <button onclick="showSection('resume')">
-            📄 Create Resume
-        </button>
+    <button onclick="showSection('resume')">
+        📄 Resume Builder
+    </button>
 
+    <button onclick="showSection('analyzer')">
+        🔍 Resume Analyzer
+    </button>
 
-        <button onclick="showSection('analyzer')">
-            🔍 Resume Analyzer
-        </button>
+    <button onclick="showSection('cover')">
+        ✉️ Cover Letter
+    </button>
 
+    <button onclick="showSection('profile')">
+        👤 Profile
+    </button>
 
-        <button onclick="showSection('learning')">
-            📚 Learning Hub
-        </button>
+    <button onclick="logoutUser()">
+        🚪 Logout
+    </button>
+</nav>
 
-
-        <button onclick="showSection('cover')">
-            ✉️ Cover Letter
-        </button>
-
-        <button onclick="logoutUser()">🚪 Logout</button>
-    </nav>
 
 </header>
 
@@ -536,6 +543,22 @@ HOME SECTION
 
     </div>
 
+        <div class="learning-panel" id="learningHistory">
+            <h2>🕘 History</h2>
+            <p>Your learning searches will appear here.</p>
+            <div id="learningHistoryList">
+                <p>No learning history yet.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="learningResult"></div>
+
+        <!-- SEARCH RESULTS -->
+    <div id="learningResult"></div>
+
+    <!-- CONTINUE LEARNING & HISTORY -->
     <div class="learning-bottom-grid">
 
         <div class="learning-panel">
@@ -555,8 +578,6 @@ HOME SECTION
         </div>
 
     </div>
-
-    <div id="learningResult"></div>
 
 </section>
 
