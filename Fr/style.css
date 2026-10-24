@@ -1328,3 +1328,20 @@ nav {
 .trending-item > .dashboard-icon {
     margin-right: 0;
 }
+
+
+/* Hero SVG Illustration */
+.hero-illustration {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+.hero-illustration .hero-svg {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    height: auto;
+}
