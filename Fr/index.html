@@ -61,290 +61,174 @@
      HEADER
  ================================================================ -->
 
-
 <header>
-    <div class="brand-logo">
-        <span class="brand-icon">🎓</span>
-        <div class="brand-text">
-            <h1>SkillBridge</h1>
-            <small>Learn · Build · Grow</small>
-        </div>
-    </div>
+
+    <h1>SkillBridge 🚀</h1>
 
     <p>Your Personal Career & Learning Assistant</p>
-    
+
 
     <!-- NAVIGATION -->
 
-  
-<nav>
-    <button onclick="showSection('home')">
-        🏠 Home
-    </button>
+    <nav>
 
-     <button onclick="showSection('learning')">
-        📚 Learning Hub
-    </button>
+        <button onclick="showSection('home')">
+            🏠 Home
+        </button>
 
-    <button onclick="showSection('career')">
-        💼 Career Opportunities
-    </button>
 
-    <button onclick="showSection('resume')">
-        📄 Resume Builder
-    </button>
+        <button onclick="showSection('resume')">
+            📄 Create Resume
+        </button>
 
-    <button onclick="showSection('profile')">
-        👤 Profile
-    </button>
-</nav>
 
+        <button onclick="showSection('analyzer')">
+            🔍 Resume Analyzer
+        </button>
+
+
+        <button onclick="showSection('learning')">
+            📚 Learning Hub
+        </button>
+
+
+        <button onclick="showSection('cover')">
+            ✉️ Cover Letter
+        </button>
+
+        <button onclick="logoutUser()">🚪 Logout</button>
+    </nav>
 
 </header>
 
 
 
-<!-- ====================================================
-                  HOME SECTION 
-========================================================-->
-
-
+<!-- =====================================================
+     HOME SECTION
+     ===================================================== -->
 
 <section id="home" class="section active">
 
-    <!-- HERO BANNER -->
-    <div class="home-hero">
-        <div class="hero-content">
-            <span class="hero-badge">🚀 YOUR CAREER JOURNEY STARTS HERE</span>
-            <h2>Learn Today,<br>Build Tomorrow</h2>
-            <p>Explore courses, find career opportunities, build your resume and grow your skills — all in one place.</p>
-            <button onclick="showSection('learning')">Get Started →</button>
-            <button class="hero-secondary" onclick="showSection('career')">Explore Features</button>
-        </div>
-       
-
-<div class="hero-illustration">
-    <svg class="hero-svg"
-         xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 0 640 400"
-         role="img"
-         aria-label="SkillBridge learning workspace">
-
-        <defs>
-            <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#D9ECFF"/>
-                <stop offset="100%" stop-color="#F4F9FF"/>
-            </linearGradient>
-            <linearGradient id="screenBg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="100%" stop-color="#DCEBFF"/>
-            </linearGradient>
-            <linearGradient id="bookBlue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#2585F5"/>
-                <stop offset="100%" stop-color="#1452C7"/>
-            </linearGradient>
-            <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
-                <feDropShadow dx="0" dy="6" stdDeviation="6"
-                              flood-color="#174A87" flood-opacity=".2"/>
-            </filter>
-        </defs>
-
-        <rect width="640" height="400" rx="22" fill="url(#heroBg)"/>
-        <circle cx="530" cy="55" r="95" fill="#FFFFFF" opacity=".35"/>
-        <path d="M0 300 Q170 270 330 310 T640 290 V400 H0Z"
-              fill="#FFFFFF" opacity=".75"/>
-
-        <!-- Left plant -->
-        <g transform="translate(35 95)">
-            <path d="M45 110 Q5 65 18 30 Q53 52 45 110"
-                  fill="#51B96D"/>
-            <path d="M48 110 Q48 45 90 22 Q100 72 48 110"
-                  fill="#28A85D"/>
-            <path d="M45 110 Q-5 92 0 62 Q37 72 45 110"
-                  fill="#78CF7B"/>
-            <path d="M12 112 H82 L72 160 H23Z" fill="#FFFFFF"/>
-            <path d="M12 112 H82 L78 126 H16Z" fill="#D6E7FA"/>
-        </g>
-
-        <!-- Books -->
-        <g filter="url(#shadow)">
-            <path d="M40 285 L225 274 L235 311 L50 324Z"
-                  fill="url(#bookBlue)"/>
-            <path d="M50 324 L235 311 L235 322 L50 335Z"
-                  fill="#FFFFFF"/>
-            <path d="M50 335 L235 322 L242 355 L57 368Z"
-                  fill="#159BB4"/>
-            <path d="M57 368 L242 355 L248 366 L60 380Z"
-                  fill="#FFFFFF"/>
-            <path d="M60 380 L248 366 L255 397 L65 399Z"
-                  fill="#174DB8"/>
-            <g fill="#FFFFFF" font-family="Arial,sans-serif"
-               font-size="15" font-weight="bold" text-anchor="middle">
-                <text x="140" y="306">LEARN</text>
-                <text x="145" y="350">PRACTICE</text>
-                <text x="155" y="389">GROW</text>
-            </g>
-        </g>
-
-        <!-- Plant behind laptop -->
-        <g transform="translate(220 45)">
-            <path d="M45 110 Q0 73 12 35 Q49 55 45 110" fill="#35B96A"/>
-            <path d="M48 110 Q35 48 72 10 Q94 57 48 110" fill="#63C94E"/>
-            <path d="M47 110 Q70 45 110 43 Q103 83 47 110" fill="#1BA65B"/>
-            <path d="M20 108 H85 L77 145 H28Z" fill="#FFFFFF"/>
-            <path d="M20 108 H85 L82 119 H22Z" fill="#B9D8F6"/>
-        </g>
-
-        <!-- Laptop -->
-        <g filter="url(#shadow)">
-            <path d="M300 85 Q301 76 312 76 H558 Q569 76 569 88
-                     L555 300 H273Z" fill="#14233D"/>
-            <path d="M312 88 H556 L543 283 H290Z" fill="url(#screenBg)"/>
-
-            <!-- Graduation cap -->
-            <path d="M367 143 L418 122 L469 143 L418 164Z"
-                  fill="#1677F2"/>
-            <path d="M382 150 V169 Q418 189 454 169 V150 L418 165Z"
-                  fill="#0E5ACB"/>
-            <path d="M468 144 V168" stroke="#1677F2" stroke-width="3"
-                  stroke-linecap="round"/>
-            <circle cx="468" cy="171" r="4" fill="#1677F2"/>
-
-            <text x="418" y="214" text-anchor="middle"
-                  font-family="Arial,sans-serif" font-size="26"
-                  font-weight="bold" fill="#15366F">SkillBridge</text>
-            <text x="418" y="237" text-anchor="middle"
-                  font-family="Arial,sans-serif" font-size="12"
-                  fill="#315784">Learn · Build · Grow</text>
-
-            <path d="M273 300 L555 300 L595 330
-                     Q598 336 586 338 H240 Q229 336 235 330Z"
-                  fill="#B7C9DF"/>
-            <path d="M300 304 H530 L548 325 H282Z" fill="#EAF2FC"/>
-            <path d="M373 307 H448 L440 315 H381Z" fill="#91A9C7"/>
-        </g>
-
-        <!-- Coffee mug -->
-        <g filter="url(#shadow)">
-            <path d="M558 218 H613 V282 Q611 302 586 302
-                     Q560 301 558 282Z" fill="#FFFFFF"/>
-            <path d="M612 231 Q640 226 635 255 Q632 274 612 273"
-                  fill="none" stroke="#D8E6F7" stroke-width="9"/>
-            <path d="M558 218 H613 V229 H558Z" fill="#DCEBFA"/>
-            <g fill="#28518A" font-family="Arial,sans-serif"
-               font-size="10" font-weight="bold" text-anchor="middle">
-                <text x="585" y="247">Better</text>
-                <text x="585" y="260">Skills</text>
-                <text x="585" y="273">Brighter</text>
-                <text x="585" y="286">Future</text>
-            </g>
-        </g>
-
-        <!-- Notebook and pen -->
-        <g filter="url(#shadow)">
-            <path d="M470 344 L620 329 L633 365 L483 382Z"
-                  fill="#246DE0"/>
-            <path d="M482 382 L633 365 L629 375 L479 392Z"
-                  fill="#1649AC"/>
-            <path d="M493 342 L596 332" stroke="#FFFFFF"
-                  stroke-width="3" opacity=".65"/>
-            <path d="M500 334 L589 324" stroke="#153A76"
-                  stroke-width="5" stroke-linecap="round"/>
-            <path d="M589 324 L600 323 L594 331Z" fill="#D7E8FF"/>
-        </g>
-    </svg>
-</div>
+    <h2>
+        Welcome to SkillBridge 👋
+    </h2>
 
 
-   
-<!-- FEATURE CARDS -->
-<div class="home-shortcuts">
-    <button onclick="showSection('learning')">
-        <span class="dashboard-icon"><img src="/Fr/assets/icons/learning.svg" alt="" width="42" height="42"></span>
-        <b>Learning Hub</b>
-        <small>Explore courses and resources</small>
-    </button>
-
-    <button onclick="showSection('career')">
-        <span class="dashboard-icon"><img src="/Fr/assets/icons/career.svg" alt="" width="42" height="42"></span>
-        <b>Career Opportunities</b>
-        <small>Jobs and internships</small>
-    </button>
-
-    <button onclick="showSection('resume')">
-        <span class="dashboard-icon"><img src="/Fr/assets/icons/resume.svg" alt="" width="42" height="42"></span>
-        <b>Resume Builder</b>
-        <small>Create your resume</small>
-    </button>
-
-    <button onclick="showSection('analyzer')">
-        <span class="dashboard-icon"><img src="/Fr/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
-        <b>Resume Analyzer</b>
-        <small>Improve your resume</small>
-    </button>
-
-    <button onclick="showSection('profile')">
-        <span class="dashboard-icon"><img src="/Fr/assets/icons/profile.svg" alt="" width="42" height="42"></span>
-        <b>Profile</b>
-        <small>Manage your account</small>
-    </button>
-</div>
+    <p>
+        SkillBridge is your personal career and learning
+        assistant. Create resumes, analyze your resume,
+        discover learning resources and generate
+        professional cover letters.
+    </p>
 
 
-<div class="trending-item">
-    <span class="dashboard-icon"><img src="/Fr/assets/icons/learning.svg" alt="" width="42" height="42"></span>
-    <div><h3>Python for Beginners</h3><p>Start learning Python.</p></div>
-    <button onclick="openLearningTopic('Python')">Explore</button>
-</div>
+    <!-- HOME CARDS -->
 
-<div class="trending-item">
-    <span class="dashboard-icon"><img src="/Fr/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
-    <div><h3>Data Science</h3><p>Learn data analysis.</p></div>
-    <button onclick="openLearningTopic('Data Science')">Explore</button>
-</div>
-
-<div class="trending-item">
-    <span class="dashboard-icon"><img src="/Fr/assets/icons/career.svg" alt="" width="42" height="42"></span>
-    <div><h3>Web Development</h3><p>Build websites.</p></div>
-    <button onclick="openLearningTopic('Web Development')">Explore</button>
-</div>
-
-<div class="trending-item">
-    <span class="dashboard-icon"><img src="/Fr/assets/icons/resume.svg" alt="" width="42" height="42"></span>
-    <div><h3>Machine Learning</h3><p>Discover AI fundamentals.</p></div>
-    <button onclick="openLearningTopic('Machine Learning')">Explore</button>
-</div>
+    <div class="cards">
 
 
-    <!-- BOTTOM DASHBOARD -->
-    <div class="home-activity-grid">
-        <div class="home-panel">
-            <h2>▶️ Continue Learning</h2>
-            <p class="panel-subtitle">Your recently searched topics.</p>
-            <div id="homeContinueList">
-                <p>Search a topic in Learning Hub to get started.</p>
-            </div>
+        <!-- RESUME -->
+
+        <div class="card">
+
+            <h3>
+                📄 Create Resume
+            </h3>
+
+            <p>
+                Create a simple and professional resume
+                using your personal, educational and
+                professional information.
+            </p>
+
+            <button
+                onclick="showSection('resume')">
+
+                Start
+
+            </button>
+
         </div>
 
-        <div class="home-panel">
-            <h2>🕘 Recent Activity</h2>
-            <p class="panel-subtitle">Your recent learning activity.</p>
-            <div id="homeRecentActivity">
-                <p>Your recent activities will appear here.</p>
-            </div>
+
+
+        <!-- ANALYZER -->
+
+        <div class="card">
+
+            <h3>
+                🔍 Resume Analyzer
+            </h3>
+
+            <p>
+                Upload your PDF or TXT resume and check
+                important sections, detected skills,
+                resume score and suggestions.
+            </p>
+
+            <button
+                onclick="showSection('analyzer')">
+
+                Analyze
+
+            </button>
+
         </div>
 
-        <div class="home-panel">
-            <h2>📚 Learning History</h2>
-            <p class="panel-subtitle">Topics you have explored.</p>
-            <div id="homeLearningHistory">
-                <p>Your learning history will appear here.</p>
-            </div>
-            <button onclick="showSection('learning')">View Learning Hub →</button>
+
+
+        <!-- LEARNING -->
+
+        <div class="card">
+
+            <h3>
+                📚 Learning Hub
+            </h3>
+
+            <p>
+                Search for books, eBooks, YouTube lectures,
+                NPTEL courses, free courses, GitHub projects,
+                Kaggle resources and more.
+            </p>
+
+            <button
+                onclick="showSection('learning')">
+
+                Start Learning
+
+            </button>
+
         </div>
+
+
+
+        <!-- COVER LETTER -->
+
+        <div class="card">
+
+            <h3>
+                ✉️ Cover Letter
+            </h3>
+
+            <p>
+                Generate a professional cover letter
+                based on your job role, company and skills.
+            </p>
+
+            <button
+                onclick="showSection('cover')">
+
+                Generate
+
+            </button>
+
+        </div>
+
+
     </div>
 
 </section>
+
 
 
 <!-- =====================================================
@@ -496,160 +380,50 @@
 
 
 
+<!-- =====================================================
+     LEARNING HUB
+     ===================================================== -->
 
-<!-- LEARNING HUB -->
 <section id="learning" class="section">
 
-    <div class="learning-hero">
-        <span class="hero-badge">📚 LEARN • PRACTICE • GROW</span>
-        <h2>Learning Hub</h2>
-        <p>Discover resources, build new skills and move closer to your career goals.</p>
+    <h2>
+        📚 Learning Hub
+    </h2>
 
-        <div class="learning-search">
-            <input
-                type="text"
-                id="learningSkill"
-                placeholder="🔍 Search Python, Java, Data Science..."
-                onkeydown="if(event.key==='Enter') findLearningResources()"
-            >
-            <button onclick="findLearningResources()">Find Resources →</button>
-        </div>
-    </div>
 
-    <div class="learning-resource-heading">
-        <h2>Explore Learning Resources</h2>
-        <p>Choose a resource to start learning.</p>
-    </div>
+    <p>
+        What do you want to learn?
+    </p>
 
-    <div class="resource-grid learning-resource-grid">
 
-        <div class="resource-card">
-            <h3>📚 Books & eBooks</h3>
-            <p>Find books and eBooks for your subject.</p>
-            <a href="https://books.google.com/" target="_blank" rel="noopener noreferrer">Explore Books →</a>
-        </div>
+    <p>
+        You can search for any topic, skill or subject.
+        For example: Python, Java, Machine Learning,
+        Photography, Digital Marketing, Mathematics, etc.
+    </p>
 
-        <div class="resource-card">
-            <h3>🎥 YouTube Lectures</h3>
-            <p>Learn from video lectures and tutorials.</p>
-            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Watch Videos →</a>
-        </div>
 
-        <div class="resource-card">
-            <h3>🎓 NPTEL</h3>
-            <p>Explore academic courses and lectures.</p>
-            <a href="https://nptel.ac.in/" target="_blank" rel="noopener noreferrer">Explore NPTEL →</a>
-        </div>
+    <!-- SEARCH -->
 
-        <div class="resource-card">
-            <h3>🆓 Free Courses</h3>
-            <p>Discover free online learning opportunities.</p>
-            <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer">Start Learning →</a>
-        </div>
+    <input
+        type="text"
+        id="learningSkill"
+        placeholder="Example: Python, Java, AI, Photography, Mathematics..."
+    >
 
-        <div class="resource-card">
-            <h3>🎓 Coursera</h3>
-            <p>Explore courses from universities and companies.</p>
-            <a href="https://www.coursera.org/" target="_blank" rel="noopener noreferrer">Explore Courses →</a>
-        </div>
 
-        <div class="resource-card">
-            <h3>🎓 edX</h3>
-            <p>Discover university-level online courses.</p>
-            <a href="https://www.edx.org/" target="_blank" rel="noopener noreferrer">Explore edX →</a>
-        </div>
+    <!-- SEARCH BUTTON -->
 
-        <div class="resource-card">
-            <h3>💻 freeCodeCamp</h3>
-            <p>Practice coding with free tutorials.</p>
-            <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer">Learn Coding →</a>
-        </div>
+    <button onclick="findLearningResources()">
 
-        <div class="resource-card">
-            <h3>📖 GeeksforGeeks</h3>
-            <p>Explore programming tutorials and questions.</p>
-            <a href="https://www.geeksforgeeks.org/" target="_blank" rel="noopener noreferrer">Explore GFG →</a>
-        </div>
+        🔍 Find Resources
 
-        <div class="resource-card">
-            <h3>🐙 GitHub Projects</h3>
-            <p>Explore code repositories and projects.</p>
-            <a href="https://github.com/" target="_blank" rel="noopener noreferrer">Find Projects →</a>
-        </div>
+    </button>
 
-        <div class="resource-card">
-            <h3>🧪 Kaggle</h3>
-            <p>Practice with datasets and notebooks.</p>
-            <a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer">Explore Kaggle →</a>
-        </div>
 
-        <div class="resource-card">
-            <h3>📘 Official Documentation</h3>
-            <p>Learn directly from official documentation.</p>
-            <a href="https://developer.mozilla.org/" target="_blank" rel="noopener noreferrer">Read Documentation →</a>
-        </div>
+    <!-- RESULTS -->
 
-        <div class="resource-card">
-            <h3>✍️ Practice</h3>
-            <p>Improve your skills through coding exercises.</p>
-            <a href="https://leetcode.com/" target="_blank" rel="noopener noreferrer">Practice Now →</a>
-        </div>
-
-        <div class="resource-card">
-            <h3>🌐 Web Resources</h3>
-            <p>Find tutorials, articles and learning guides.</p>
-            <a href="https://www.google.com/" target="_blank" rel="noopener noreferrer">Search Web →</a>
-        </div>
-
-        <div class="resource-card">
-            <h3>💡 Project Ideas</h3>
-            <p>Find ideas for hands-on projects.</p>
-            <a href="https://github.com/topics" target="_blank" rel="noopener noreferrer">Explore Ideas →</a>
-        </div>
-
-        <div class="resource-card">
-            <h3>📝 Study Notes & PDFs</h3>
-            <p>Search for notes and study materials.</p>
-            <a href="https://www.google.com/search?q=study+notes+PDF" target="_blank" rel="noopener noreferrer">Find Notes →</a>
-        </div>
-
-        <div class="resource-card">
-            <h3>❓ MCQ Quiz</h3>
-            <p>Test your knowledge with practice quizzes.</p>
-            <a href="https://www.google.com/search?q=programming+MCQ+quiz" target="_blank" rel="noopener noreferrer">Take a Quiz →</a>
-        </div>
-
-        <div class="resource-card">
-            <h3>📈 Learning Progress</h3>
-            <p>Review your learning goals and progress.</p>
-            <button onclick="showLearningHistory()">View History →</button>
-        </div>
-
-    </div>
-
-    <!-- SEARCH RESULTS: keep only one result container -->
     <div id="learningResult"></div>
-
-    <!-- CONTINUE LEARNING & HISTORY -->
-    <div class="learning-bottom-grid">
-
-        <div class="learning-panel">
-            <h2>▶️ Continue Learning</h2>
-            <p>Your recently searched topics will appear here.</p>
-            <div id="continueLearningList">
-                <p>Search for a topic above to get started.</p>
-            </div>
-        </div>
-
-        <div class="learning-panel" id="learningHistory">
-            <h2>🕘 History</h2>
-            <p>Your learning searches will appear here.</p>
-            <div id="learningHistoryList">
-                <p>No learning history yet.</p>
-            </div>
-        </div>
-
-    </div>
 
 </section>
 
