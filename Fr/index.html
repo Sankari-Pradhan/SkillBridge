@@ -302,7 +302,9 @@
 
 
 
-    <!-- RESUME HUB -->
+    <!-- =========================================
+                  RESUME HUB 
+    ============================================-->
 
 <section id="resumeHub" class="section">
 
@@ -348,128 +350,106 @@
 </section>
 
 
-<!-- =====================================================
-     CREATE RESUME
-     ===================================================== -->
 
-<section id="resume" class="section">
+<!--===============================================
+    CREATE RESUME / RESUME BUILDER 
+==============================================-->
 
-    <h2>
-        📄 Create Resume
-    </h2>
+    <section id="resume" class="section">
+    <h2>📄 Resume Builder</h2>
+    <p>Create, customize and download your professional resume.</p>
 
+    <div class="cards">
+        <div class="card">
+            <h3>1. Personal Information</h3>
 
-    <p>
-        Enter your information to create your resume.
-    </p>
+            <label for="resumePhoto">Profile Photo</label>
+            <input type="file" id="resumePhoto" accept="image/*">
+            <img id="resumePhotoPreview" alt="Profile preview"
+                 style="display:none;width:100px;height:120px;object-fit:cover">
 
+            <input id="name" placeholder="Full Name">
+            <input id="email" type="email" placeholder="Email Address">
+            <input id="phone" type="tel" placeholder="Phone Number">
+            <input id="location" placeholder="Location">
+            <input id="linkedin" type="url" placeholder="LinkedIn URL">
+            <textarea id="profile" placeholder="Professional Summary / Career Objective"></textarea>
+        </div>
 
-     <label for="resumePhoto">📷 Upload Profile Photo</label>
-<input
-    type="file"
-    id="resumePhoto"
-    accept="image/*"
->
+        <div class="card">
+            <h3>2. Education</h3>
+            <textarea id="education" placeholder="Degree, College, Year, Marks / CGPA"></textarea>
 
-<img
-    id="resumePhotoPreview"
-    alt="Resume Profile Photo"
-    style="display:none; width:120px; height:140px;
-           object-fit:cover; border-radius:8px;"
->
-    
-    <!-- NAME -->
+            <h3>3. Skills</h3>
+            <textarea id="skills" placeholder="Python, Java, SQL, Communication..."></textarea>
 
-    <input
-        type="text"
-        id="name"
-        placeholder="Full Name"
-    >
+            <h3>4. Work Experience</h3>
+            <textarea id="experience" placeholder="Job / Internship, Company, Duration, Responsibilities"></textarea>
 
+            <h3>5. Projects</h3>
+            <textarea id="projects" placeholder="Project name, technologies and description"></textarea>
 
-    <!-- EMAIL -->
+            <h3>6. Certifications</h3>
+            <textarea id="certifications" placeholder="Course / Certificate name and issuer"></textarea>
 
-    <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-    >
+            <h3>7. Achievements</h3>
+            <textarea id="achievements" placeholder="Awards, achievements and accomplishments"></textarea>
 
+            <h3>8. Additional Information</h3>
+            <textarea id="additional" placeholder="Languages, interests, activities"></textarea>
+        </div>
+    </div>
 
-    <!-- PHONE -->
+    <div class="card">
+        <h3>🎨 Choose a Template</h3>
+        <select id="resumeTemplate">
+            <option value="modern">Modern</option>
+            <option value="professional">Professional</option>
+            <option value="classic">Classic</option>
+            <option value="creative">Creative</option>
+            <option value="elegant">Elegant</option>
+        </select>
 
-    <input
-        type="text"
-        id="phone"
-        placeholder="Phone Number"
-    >
+        <label for="resumeColor">Primary Color</label>
+        <input type="color" id="resumeColor" value="#2563eb">
 
+        <label for="resumeFont">Font</label>
+        <select id="resumeFont">
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Tahoma">Tahoma</option>
+        </select>
 
-    <!-- PROFILE -->
+        <label for="resumeFontSize">Font Size</label>
+        <select id="resumeFontSize">
+            <option value="12px">Small</option>
+            <option value="14px" selected>Medium</option>
+            <option value="16px">Large</option>
+        </select>
+    </div>
 
-    <textarea
-        id="profile"
-        placeholder="Professional Profile / Career Objective"
-    ></textarea>
+    <div class="cards">
+        <button type="button" onclick="generateResume()">👁️ Generate / Update Preview</button>
+        <button type="button" onclick="printResume()">⬇️ Download as PDF</button>
+        <button type="button" onclick="saveResume()">💾 Save Resume</button>
+        <button type="button" onclick="resetResume()">↺ Reset</button>
+    </div>
 
+    <div class="card">
+        <h3>Resume Preview</h3>
+        <div id="resumePreview">
+            <p>Your resume preview will appear here.</p>
+        </div>
+    </div>
 
-    <!-- EDUCATION -->
-
-    <textarea
-        id="education"
-        placeholder="Education"
-    ></textarea>
-
-
-    <!-- SKILLS -->
-
-    <textarea
-        id="skills"
-        placeholder="Skills"
-    ></textarea>
-
-
-    <!-- PROJECTS -->
-
-    <textarea
-        id="projects"
-        placeholder="Projects"
-    ></textarea>
-
-
-    <!-- EXPERIENCE -->
-
-    <textarea
-        id="experience"
-        placeholder="Experience / Internship"
-    ></textarea>
-
-
-    <!-- BUTTONS -->
-
-    <button onclick="generateResume()">
-
-        Generate Resume
-
-    </button>
-
-
-    <button onclick="printResume()">
-
-        Print / Save PDF
-
-    </button>
-
-
-    <!-- PREVIEW -->
-
-    <div id="resumePreview"></div>
-
+    <p id="resumeMessage" role="status"></p>
 </section>
 
 
-
-<!-- PROFILE -->
+<!-- ====================================================
+                  PROFILE 
+    =====================================================-->
 
 <section id="profileSection" class="section">
 
