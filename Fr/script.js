@@ -538,6 +538,51 @@ function printResume() {
    ========================================= */
 
 
+
+async function extractResumeText(file) {
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    if (extension === "txt") {
+        return await file.text();
+    }
+
+    if (extension === "pdf") {
+        if (typeof pdfjsLib === "undefined") {
+            throw new Error("PDF reader load হয়নি। Internet connection পরীক্ষা করো।");
+        }
+
+        const buffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({
+            data: new Uint8Array(buffer)
+        }).promise;
+
+        let fullText = "";
+
+        for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+            const page = await pdf.getPage(pageNumber);
+            const content = await page.getTextContent();
+
+            fullText += content.items
+                .map(item => item.str || "")
+                .join(" ") + "\n";
+        }
+
+        if (!fullText.trim()) {
+            throw new Error(
+                "PDF থেকে text পাওয়া যায়নি। এটি scanned PDF হলে OCR প্রয়োজন।"
+            );
+        }
+
+        return fullText;
+    }
+
+    throw new Error("শুধুমাত্র PDF অথবা TXT file upload করো।");
+}
+
+
+
+
+
 async function analyzeResume() {
     const fileInput = document.getElementById("analyzerFile");
     const result = document.getElementById("analyzerResult");
@@ -569,7 +614,7 @@ async function analyzeResume() {
     result.textContent = "Analyzing your resume...";
 
     try {
-        const text = await file.text();
+         const text = await extractResumeText(file);
         const content = text.toLowerCase();
 
         if (!content.trim()) {
@@ -1304,4 +1349,32 @@ function togglePassword(inputId, button) {
             isHidden ? "Hide password" : "Show password"
         );
     }
+}
+
+
+
+function logout() {
+    // Remove the login token
+    sessionStorage.removeItem(TOKEN_KEY);
+
+    // Hide all app content and navigation inside appContent
+    const appContent = document.getElementById("appContent");
+    if (appContent) {
+        appContent.style.display = "none";
+    }
+
+    // Show the login section
+    const authSection = document.getElementById("authSection");
+    if (authSection) {
+        authSection.style.display = "block";
+    }
+
+    // Display logout message
+    const message = document.getElementById("authMessage");
+    if (message) {
+        message.textContent = "You have logged out.";
+        message.className = "";
+    }
+
+    window.scrollTo(0, 0);
 }
