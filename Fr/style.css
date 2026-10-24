@@ -1330,18 +1330,40 @@ nav {
 }
 
 
+
 /* Hero SVG Illustration */
 .hero-illustration {
-    flex: 1;
+    flex: 0 0 48%;
+    width: 48%;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 0;
+    overflow: hidden;
 }
 
 .hero-illustration .hero-svg {
     display: block;
     width: 100%;
-    max-width: 640px;
+    max-width: 520px;
     height: auto;
+    flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+    .home-hero {
+        flex-direction: column;
+        padding: 24px;
+    }
+
+    .hero-content,
+    .hero-illustration {
+        width: 100%;
+        flex: 0 0 100%;
+    }
+
+    .hero-illustration .hero-svg {
+        max-width: 100%;
+    }
+}
+
