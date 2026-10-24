@@ -922,3 +922,44 @@ gap: 20px;
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+
+.learning-topic-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 8px 0;
+    padding: 12px 14px;
+    color: #2459a9;
+    background: #edf5ff;
+    border: 1px solid #d6e7ff;
+    border-radius: 10px;
+    overflow-wrap: anywhere;
+}
+
+.learning-topic-btn:hover {
+    background: #dcecff;
+}
+
+
+/* Separate searched resources from the main resource cards */
+#learningResult {
+    margin-top: 30px;
+    padding: 24px 0;
+    background: transparent;
+}
+
+#learningResult > h2 {
+    color: #17478e;
+    font-size: 24px;
+    margin-bottom: 12px;
+}
+
+#learningResult .resource-grid {
+    margin-top: 20px;
+}
+
+#learningResult .resource-card {
+    background: #f8fbff;
+}
