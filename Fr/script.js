@@ -1,8 +1,9 @@
-/* ========================================= 
+/* =========================================
    SKILLBRIDGE - COMPLETE JAVASCRIPT
    ========================================= */
 
 const API = "https://skillbridge-dka3.onrender.com";
+const TOKEN_KEY = "skillbridge_access_token";
 
 /* =========================================
    NAVIGATION
@@ -17,24 +18,101 @@ function showSection(sectionId) {
 
     if (selected) {
         selected.classList.add("active");
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    } else {
+        console.warn("Section not found:", sectionId);
     }
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* =========================================
-   CREATE RESUME
+   HTML SAFETY HELPERS
    ========================================= */
 
+function escapeHTML(text) {
+    if (text === null || text === undefined) {
+        return "";
+    }
+
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function formatText(text) {
+    if (!text) return "Not provided";
+
+    return escapeHTML(text).replace(/\r?\n/g, "<br>");
+}
+
+function getValue(id) {
+    return document.getElementById(id)?.value?.trim() || "";
+}
+
+/* =========================================
+   RESUME PHOTO UPLOAD AND PREVIEW
+   ========================================= */
+
+let resumePhotoData = "";
+
+document.addEventListener("DOMContentLoaded", () => {
+    const photoInput = document.getElementById("resumePhoto");
+    const photoPreview = document.getElementById("resumePhotoPreview");
+
+    if (photoInput && photoPreview) {
+        photoInput.addEventListener("change", function () {
+            const file = this.files && this.files[0];
+
+            if (!file) {
+                resumePhotoData = "";
+                photoPreview.removeAttribute("src");
+                photoPreview.style.display = "none";
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+                alert("Please select an image file.");
+                this.value = "";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert("Photo size must be less than 5 MB.");
+                this.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = event => {
+                resumePhotoData = event.target.result;
+                photoPreview.src = resumePhotoData;
+                photoPreview.style.display = "block";
+            };
+
+            reader.onerror = () => {
+                alert("Could not read the selected photo.");
+            };
+
+            reader.readAsDataURL(file);
+        });
+    }
+
+    loadResumeData();
+    loadProfile();
+    checkLoginSession();
+});
 
 /* =========================================
    RESUME BUILDER
    ========================================= */
 
 function generateResume() {
-    const getValue = id =>
-        document.getElementById(id)?.value?.trim() || "";
-
     const name = getValue("name");
     const email = getValue("email");
     const phone = getValue("phone");
@@ -47,6 +125,7 @@ function generateResume() {
 
     if (!name) {
         alert("Please enter your name.");
+        document.getElementById("name")?.focus();
         return;
     }
 
@@ -57,7 +136,7 @@ function generateResume() {
         return;
     }
 
-    const section = (title, content) => {
+    function createSection(title, content) {
         if (!content) return "";
 
         return `
@@ -66,12 +145,26 @@ function generateResume() {
                 <p>${formatText(content)}</p>
             </section>
         `;
-    };
+    }
+
+    const photoHTML = resumePhotoData
+        ? `
+            <img
+                class="resume-photo"
+                src="${resumePhotoData}"
+                alt="Profile Photo"
+            >
+        `
+        : "";
 
     preview.innerHTML = `
         <article class="generated-resume">
+
             <header class="resume-header">
+                ${photoHTML}
+
                 <h1>${escapeHTML(name)}</h1>
+
                 <p class="resume-contact">
                     ${escapeHTML(email)}
                     ${email && phone ? " | " : ""}
@@ -79,19 +172,24 @@ function generateResume() {
                 </p>
             </header>
 
-            ${section("Professional Profile", profile)}
-            ${section("Education", education)}
-            ${section("Skills", skills)}
-            ${section("Work Experience", experience)}
-            ${section("Projects", projects)}
-            ${section("Certifications", certifications)}
+            ${createSection("Professional Profile", profile)}
+            ${createSection("Education", education)}
+            ${createSection("Skills", skills)}
+            ${createSection("Work Experience / Internship", experience)}
+            ${createSection("Projects", projects)}
+            ${createSection("Certifications", certifications)}
+
         </article>
     `;
 
     applyResumeTemplate();
+    customizeResume();
     saveResumeData(false);
 
-    alert("Resume generated successfully!");
+    preview.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 }
 
 /* =========================================
@@ -119,9 +217,11 @@ function applyResumeTemplate() {
         preview.classList.remove(`template-${template}`);
     });
 
-    preview.classList.add(
-        `template-${templates.includes(selected) ? selected : "modern"}`
-    );
+    const validTemplate = templates.includes(selected)
+        ? selected
+        : "modern";
+
+    preview.classList.add(`template-${validTemplate}`);
 }
 
 /* =========================================
@@ -142,9 +242,9 @@ function customizeResume() {
     }
 
     const allowedFonts = {
-        Arial: "Arial, sans-serif",
-        Georgia: "Georgia, serif",
-        Roboto: "Roboto, Arial, sans-serif",
+        "Arial": "Arial, sans-serif",
+        "Georgia": "Georgia, serif",
+        "Roboto": "Roboto, Arial, sans-serif",
         "Times New Roman": '"Times New Roman", serif'
     };
 
@@ -162,7 +262,7 @@ function customizeResume() {
 }
 
 /* =========================================
-   SAVE RESUME
+   SAVE AND LOAD RESUME DATA
    ========================================= */
 
 function saveResumeData(showMessage = true) {
@@ -188,6 +288,10 @@ function saveResumeData(showMessage = true) {
         }
     });
 
+    if (resumePhotoData) {
+        resumeData.resumePhotoData = resumePhotoData;
+    }
+
     try {
         localStorage.setItem(
             "skillbridge_resume_data",
@@ -195,20 +299,19 @@ function saveResumeData(showMessage = true) {
         );
 
         if (showMessage) {
-            alert("Resume saved on this device!");
+            alert("Resume saved on this device.");
         }
     } catch (error) {
         console.error("Could not save resume:", error);
 
         if (showMessage) {
-            alert("Could not save resume in this browser.");
+            alert(
+                "Could not save resume. The photo may be too large " +
+                "for browser storage."
+            );
         }
     }
 }
-
-/* =========================================
-   LOAD SAVED RESUME
-   ========================================= */
 
 function loadResumeData() {
     try {
@@ -219,6 +322,19 @@ function loadResumeData() {
         const resumeData = JSON.parse(saved);
 
         Object.entries(resumeData).forEach(([id, value]) => {
+            if (id === "resumePhotoData") {
+                resumePhotoData = typeof value === "string" ? value : "";
+
+                const preview = document.getElementById("resumePhotoPreview");
+
+                if (preview && resumePhotoData) {
+                    preview.src = resumePhotoData;
+                    preview.style.display = "block";
+                }
+
+                return;
+            }
+
             const input = document.getElementById(id);
 
             if (input && typeof value === "string") {
@@ -229,10 +345,6 @@ function loadResumeData() {
         console.error("Could not load saved resume:", error);
     }
 }
-
-/* =========================================
-   RESET RESUME
-   ========================================= */
 
 function resetResume() {
     if (!confirm("Are you sure you want to reset your resume?")) {
@@ -254,31 +366,45 @@ function resetResume() {
     ids.forEach(id => {
         const input = document.getElementById(id);
 
-        if (input) input.value = "";
+        if (input) {
+            input.value = "";
+        }
     });
+
+    resumePhotoData = "";
+
+    const photoInput = document.getElementById("resumePhoto");
+    const photoPreview = document.getElementById("resumePhotoPreview");
+
+    if (photoInput) {
+        photoInput.value = "";
+    }
+
+    if (photoPreview) {
+        photoPreview.removeAttribute("src");
+        photoPreview.style.display = "none";
+    }
 
     const preview = document.getElementById("resumePreview");
 
     if (preview) {
         preview.innerHTML = "";
+
         preview.className = preview.className
             .split(/\s+/)
             .filter(name => !name.startsWith("template-"))
             .join(" ");
+
         preview.style.removeProperty("--resume-color");
         preview.style.removeProperty("font-family");
         preview.style.removeProperty("font-size");
     }
 
-    try {
-        localStorage.removeItem("skillbridge_resume_data");
-    } catch (error) {
-        console.error("Could not clear saved resume:", error);
-    }
+    localStorage.removeItem("skillbridge_resume_data");
 }
 
 /* =========================================
-   PRINT / SAVE AS PDF
+   PRINT / SAVE RESUME AS PDF
    ========================================= */
 
 function printResume() {
@@ -289,11 +415,224 @@ function printResume() {
         return;
     }
 
+    const photo = preview.querySelector(".resume-photo");
+
+    if (photo && !photo.complete) {
+        photo.onload = () => window.print();
+        photo.onerror = () => window.print();
+        return;
+    }
+
     window.print();
 }
 
+/* =========================================
+   RESUME ANALYZER
+   TXT ANALYSIS
+   ========================================= */
 
+async function analyzeResume() {
+    const fileInput = document.getElementById("resumeFile");
+    const result = document.getElementById("analysisResult");
 
+    if (!fileInput || !fileInput.files.length) {
+        alert("Please upload your resume first.");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const extension = file.name.split(".").pop().toLowerCase();
+
+    if (!["txt", "pdf"].includes(extension)) {
+        alert("Please upload a PDF or TXT file.");
+        return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+        alert("Please upload a file smaller than 10 MB.");
+        return;
+    }
+
+    result.textContent = "Analyzing your resume...";
+
+    try {
+        if (extension === "pdf") {
+            result.innerHTML = `
+                <div class="result-box">
+                    <h3>PDF Resume</h3>
+                    <p>
+                        PDF text extraction requires a PDF parser
+                        or backend analyzer. This JavaScript version
+                        can analyze TXT files.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        const text = await file.text();
+        const content = text.toLowerCase();
+
+        const sections = {
+            "Education": /\beducation\b/.test(content),
+            "Skills": /\bskills?\b/.test(content),
+            "Projects": /\bprojects?\b/.test(content),
+            "Experience": /\bexperience\b|\binternship\b/.test(content),
+            "Contact Information": /@/.test(content)
+        };
+
+        const skillList = [
+            "python",
+            "java",
+            "javascript",
+            "html",
+            "css",
+            "sql",
+            "c++",
+            "machine learning",
+            "data science",
+            "excel",
+            "react",
+            "node.js",
+            "git",
+            "aws"
+        ];
+
+        const detectedSkills = skillList.filter(skill =>
+            content.includes(skill)
+        );
+
+        const total = Object.keys(sections).length;
+
+        const present = Object.values(sections)
+            .filter(Boolean).length;
+
+        const score = Math.round((present / total) * 100);
+
+        const sectionHTML = Object.entries(sections)
+            .map(([name, found]) => `
+                <li>
+                    ${escapeHTML(name)}:
+                    <strong>${found ? "Found" : "Missing"}</strong>
+                </li>
+            `)
+            .join("");
+
+        result.innerHTML = `
+            <div class="result-box">
+
+                <h3>Resume Analysis Report</h3>
+
+                <p>
+                    <strong>Basic Section Score:</strong>
+                    ${score}/100
+                </p>
+
+                <p>
+                    This checks basic section presence only.
+                    It is not an ATS score.
+                </p>
+
+                <h3>Section Check</h3>
+                <ul>${sectionHTML}</ul>
+
+                <h3>Detected Skills</h3>
+
+                <p>
+                    ${
+                        detectedSkills.length
+                            ? detectedSkills.map(escapeHTML).join(", ")
+                            : "No matching skills detected."
+                    }
+                </p>
+
+                <h3>Suggestions</h3>
+
+                <ul>
+                    ${
+                        Object.entries(sections)
+                            .filter(([, found]) => !found)
+                            .map(([name]) =>
+                                `<li>Consider adding ${escapeHTML(name)}.</li>`
+                            )
+                            .join("")
+                    }
+
+                    <li>Use clear headings and consistent formatting.</li>
+                    <li>Check spelling, dates and contact details.</li>
+                    <li>Tailor your resume to the job description.</li>
+                </ul>
+
+                <button onclick="downloadAnalysisReport()">
+                    Download Analysis Report
+                </button>
+
+            </div>
+        `;
+
+        window.lastResumeAnalysis = {
+            filename: file.name,
+            score,
+            sections,
+            detectedSkills
+        };
+
+        void logActivity("resume_analyzer");
+
+    } catch (error) {
+        result.textContent =
+            "Unable to analyze the file. Please try again.";
+
+        console.error(error);
+    }
+}
+
+/* =========================================
+   DOWNLOAD ANALYSIS REPORT
+   ========================================= */
+
+function downloadAnalysisReport() {
+    const report = window.lastResumeAnalysis;
+
+    if (!report) {
+        alert("Analyze a TXT resume first.");
+        return;
+    }
+
+    const lines = [
+        "SkillBridge - Resume Analysis Report",
+        `Filename: ${report.filename}`,
+        `Basic Section Score: ${report.score}/100`,
+        "",
+        "Sections:"
+    ];
+
+    Object.entries(report.sections).forEach(([name, found]) => {
+        lines.push(`${name}: ${found ? "Found" : "Missing"}`);
+    });
+
+    lines.push(
+        "",
+        "Detected Skills:",
+        report.detectedSkills.join(", ") || "None detected",
+        "",
+        "Note: This is a basic section-presence score, not an ATS score."
+    );
+
+    const blob = new Blob(
+        [lines.join("\n")],
+        { type: "text/plain;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "skillbridge-resume-analysis.txt";
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
 
 /* =========================================
    LEARNING HUB
@@ -309,228 +648,205 @@ function findLearningResources() {
 
     if (!skill) {
         result.innerHTML = `
-            <p class="warning">Please enter something you want to learn.</p>
+            <p class="warning">
+                Please enter something you want to learn.
+            </p>
         `;
         return;
     }
 
     const q = encodeURIComponent(skill);
 
+    const resources = [
+        [
+            "📚 Books & eBooks",
+            "Find books and eBooks related to this topic.",
+            `https://books.google.com/books?q=${q}`,
+            "Find Books"
+        ],
+        [
+            "🎥 YouTube Lectures",
+            "Find lectures and complete video courses.",
+            `https://www.youtube.com/results?search_query=${q}+lecture+tutorial`,
+            "Watch Lectures"
+        ],
+        [
+            "🎓 NPTEL",
+            "Search NPTEL courses and university lectures.",
+            `https://www.google.com/search?q=site%3Anptel.ac.in+${q}`,
+            "Find NPTEL Courses"
+        ],
+        [
+            "🆓 Free Courses",
+            "Find free courses and learning materials.",
+            `https://www.google.com/search?q=${q}+free+course`,
+            "Find Free Courses"
+        ],
+        [
+            "🎓 Coursera",
+            "Find structured courses and professional learning.",
+            `https://www.google.com/search?q=site%3Acoursera.org+${q}+course`,
+            "Find Courses"
+        ],
+        [
+            "🎓 edX",
+            "Find university and professional courses.",
+            `https://www.google.com/search?q=site%3Aedx.org+${q}+course`,
+            "Find Courses"
+        ],
+        [
+            "🆓 freeCodeCamp",
+            "Find free tutorials and technology courses.",
+            `https://www.google.com/search?q=site%3Afreecodecamp.org+${q}`,
+            "Find Resources"
+        ],
+        [
+            "📖 GeeksforGeeks",
+            "Find tutorials and practice resources.",
+            `https://www.google.com/search?q=site%3Ageeksforgeeks.org+${q}`,
+            "Learn on GFG"
+        ],
+        [
+            "💻 GitHub Projects",
+            "Find projects and source code.",
+            `https://github.com/search?q=${q}&type=repositories`,
+            "Find Projects"
+        ],
+        [
+            "🧪 Kaggle",
+            "Find datasets and practical projects.",
+            `https://www.google.com/search?q=site%3Akaggle.com+${q}`,
+            "Explore Kaggle"
+        ],
+        [
+            "📘 Documentation",
+            "Find official documentation and references.",
+            `https://www.google.com/search?q=${q}+official+documentation`,
+            "Find Documentation"
+        ],
+        [
+            "📝 Practice",
+            "Find exercises and practice problems.",
+            `https://www.google.com/search?q=${q}+practice+questions`,
+            "Find Practice"
+        ],
+        [
+            "🌐 Web Resources",
+            "Find articles, tutorials, notes and guides.",
+            `https://www.google.com/search?q=${q}+tutorial+notes`,
+            "Search Web"
+        ]
+    ];
+
     result.innerHTML = `
-        <h2>📚 Learning Resources for "${escapeHTML(skill)}"</h2>
-        <p>Explore books, lectures, courses, projects and practice resources.</p>
+        <h2>
+            📚 Learning Resources for "${escapeHTML(skill)}"
+        </h2>
+
+        <p>
+            Explore books, lectures, courses, projects and practice resources.
+        </p>
 
         <div class="resource-grid">
-            <div class="resource-card">
-                <h3>📚 Books & eBooks</h3>
-                <p>Find books and eBooks related to ${escapeHTML(skill)}.</p>
-                <a href="https://books.google.com/books?q=${q}" target="_blank" rel="noopener noreferrer">Find Books</a>
-            </div>
 
-            <div class="resource-card">
-                <h3>🎥 YouTube Lectures</h3>
-                <p>Find lectures, tutorials and complete video courses.</p>
-                <a href="https://www.youtube.com/results?search_query=${q}+lecture+tutorial" target="_blank" rel="noopener noreferrer">Watch Lectures</a>
-            </div>
+            ${resources.map(([title, description, url, label]) => `
+                <div class="resource-card">
+                    <h3>${escapeHTML(title)}</h3>
 
-            <div class="resource-card">
-                <h3>🎓 NPTEL</h3>
-                <p>Search NPTEL courses and university lectures.</p>
-                <a href="https://www.google.com/search?q=site%3Anptel.ac.in+${q}" target="_blank" rel="noopener noreferrer">Find NPTEL Courses</a>
-            </div>
+                    <p>${escapeHTML(description)}</p>
 
-            <div class="resource-card">
-                <h3>🆓 Free Courses</h3>
-                <p>Find free courses and learning materials.</p>
-                <a href="https://www.google.com/search?q=${q}+free+course" target="_blank" rel="noopener noreferrer">Find Free Courses</a>
-            </div>
+                    <a
+                        href="${url}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        ${escapeHTML(label)}
+                    </a>
+                </div>
+            `).join("")}
 
-            <div class="resource-card">
-                <h3>🎓 Coursera</h3>
-                <p>Find structured courses and professional learning.</p>
-                <a href="https://www.google.com/search?q=site%3Acoursera.org+${q}+course" target="_blank" rel="noopener noreferrer">Find Courses</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>🎓 edX</h3>
-                <p>Find university and professional courses.</p>
-                <a href="https://www.google.com/search?q=site%3Aedx.org+${q}+course" target="_blank" rel="noopener noreferrer">Find Courses</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>🆓 freeCodeCamp</h3>
-                <p>Find free tutorials and technology courses.</p>
-                <a href="https://www.google.com/search?q=site%3Afreecodecamp.org+${q}" target="_blank" rel="noopener noreferrer">Find Resources</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>📖 GeeksforGeeks</h3>
-                <p>Find tutorials, explanations and practice.</p>
-                <a href="https://www.google.com/search?q=site%3Ageeksforgeeks.org+${q}" target="_blank" rel="noopener noreferrer">Learn on GFG</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>💻 GitHub Projects</h3>
-                <p>Find projects, source code and practical examples.</p>
-                <a href="https://github.com/search?q=${q}&type=repositories" target="_blank" rel="noopener noreferrer">Find Projects</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>🧪 Kaggle</h3>
-                <p>Find datasets, notebooks and practical projects.</p>
-                <a href="https://www.google.com/search?q=site%3Akaggle.com+${q}" target="_blank" rel="noopener noreferrer">Explore Kaggle</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>📘 Official Documentation</h3>
-                <p>Find official documentation and references.</p>
-                <a href="https://www.google.com/search?q=${q}+official+documentation" target="_blank" rel="noopener noreferrer">Find Documentation</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>📝 Practice</h3>
-                <p>Find exercises, questions and practice problems.</p>
-                <a href="https://www.google.com/search?q=${q}+practice+questions" target="_blank" rel="noopener noreferrer">Find Practice</a>
-            </div>
-
-            <div class="resource-card">
-                <h3>🌐 Web Resources</h3>
-                <p>Find articles, tutorials, notes and guides.</p>
-                <a href="https://www.google.com/search?q=${q}+tutorial+notes" target="_blank" rel="noopener noreferrer">Search Web</a>
-            </div>
         </div>
     `;
 
     void logActivity("learning_hub");
 }
 
-
-
 /* =========================================
-   COVER LETTER
+   PROFILE
+   Saves data in this browser
    ========================================= */
 
-async function generateCoverLetter() {
-    const name = document.getElementById("coverName").value.trim();
-    const role = document.getElementById("coverRole").value.trim();
-    const company = document.getElementById("coverCompany").value.trim();
-    const skills = document.getElementById("coverSkills").value.trim();
-    const result = document.getElementById("coverResult");
+function saveProfile() {
+    const profile = {
+        name: getValue("profileName"),
+        email: getValue("profileEmail"),
+        education: getValue("profileEducation"),
+        skills: getValue("profileSkills")
+    };
 
-    if (!name || !role || !company) {
-        result.innerHTML = `
-            <p class="warning">
-                Please enter your name, job role and company.
-            </p>
-        `;
+    if (!profile.name) {
+        alert("Please enter your name.");
         return;
     }
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("role", role);
-    formData.append("company", company);
-    formData.append("skills", skills);
-
-    result.innerHTML = "<p>Generating cover letter... ⏳</p>";
-
     try {
-        const response = await fetch(`${API}/api/cover-letter`, {
-            method: "POST",
-            body: formData
-        });
+        localStorage.setItem(
+            "skillbridge_profile",
+            JSON.stringify(profile)
+        );
 
-        const data = await response.json();
+        const message = document.getElementById("profileMessage");
 
-        if (!response.ok || !data.cover_letter) {
-            throw new Error(data.error || data.detail || "Could not generate cover letter.");
+        if (message) {
+            message.textContent = "Profile saved in this browser.";
+            message.className = "success";
         }
 
-        result.innerHTML = `
-            <div class="result-box">
-                <h3>Your Cover Letter</h3>
-                <pre>${escapeHTML(data.cover_letter)}</pre>
-            </div>
-
-            <button onclick="copyCoverLetter()">
-                📋 Copy Cover Letter
-            </button>
-        `;
-
-        void logActivity("cover_letter");
     } catch (error) {
-        result.innerHTML = `
-            <p class="error">${escapeHTML(error.message || "Could not connect to SkillBridge server.")}</p>
-        `;
+        alert("Unable to save your profile in this browser.");
         console.error(error);
     }
 }
 
-/* =========================================
-   COPY COVER LETTER
-   ========================================= */
+function loadProfile() {
+    try {
+        const stored = localStorage.getItem("skillbridge_profile");
 
-function copyCoverLetter() {
-    const text = document.querySelector("#coverResult pre");
+        if (!stored) return;
 
-    if (!text) return;
+        const profile = JSON.parse(stored);
 
-    navigator.clipboard.writeText(text.innerText)
-        .then(() => alert("Cover letter copied! ✅"))
-        .catch(() => alert("Could not copy. Please select and copy the text manually."));
+        const fields = {
+            profileName: profile.name,
+            profileEmail: profile.email,
+            profileEducation: profile.education,
+            profileSkills: profile.skills
+        };
+
+        Object.entries(fields).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+
+            if (element && typeof value === "string") {
+                element.value = value;
+            }
+        });
+
+    } catch (error) {
+        console.error("Could not load profile:", error);
+    }
 }
 
 /* =========================================
-   HTML SAFETY
+   ACTIVITY TRACKING
    ========================================= */
-
-
-
-function escapeHTML(text) {
-    if (text === null || text === undefined) return "";
-
-    return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-/* =========================================
-   TEXT FORMATTING
-   ========================================= */
-
-function formatText(text) {
-    if (!text) return "Not provided";
-
-    return escapeHTML(text).replace(/\n/g, "<br>");
-}
-
-/* =========================================
-   AUTHENTICATION & ACTIVITY TRACKING
-   ========================================= */
-
-const TOKEN_KEY = "skillbridge_access_token";
-
-/*
- * Record feature usage for the Admin Dashboard.
- * Requires a logged-in user.
- * If logging fails, the main feature continues working.
- */
 
 async function logActivity(action) {
     const token = sessionStorage.getItem(TOKEN_KEY);
 
-    if (!token) {
-        console.warn("Activity not recorded: user is not logged in.");
-        return;
-    }
+    if (!token) return;
 
     const allowedActions = [
         "resume_analyzer",
-        "cover_letter",
         "learning_hub"
     ];
 
@@ -554,24 +870,32 @@ async function logActivity(action) {
                 response.status
             );
         }
+
     } catch (error) {
         console.warn("Activity tracking unavailable:", error);
     }
 }
 
 /* =========================================
-   REGISTER USER
+   REGISTRATION
+   Requires matching backend endpoint
    ========================================= */
 
 async function registerUser(event) {
     event.preventDefault();
 
-    const name = document.getElementById("registerName").value.trim();
-    const email = document.getElementById("registerEmail").value.trim();
-    const password = document.getElementById("registerPassword").value;
+    const name = getValue("registerName");
+    const email = getValue("registerEmail");
+
+    const password =
+        document.getElementById("registerPassword")?.value || "";
+
     const message = document.getElementById("authMessage");
 
-    message.textContent = "Creating account...";
+    if (message) {
+        message.textContent = "Creating account...";
+        message.className = "";
+    }
 
     try {
         const response = await fetch(`${API}/api/users`, {
@@ -586,39 +910,58 @@ async function registerUser(event) {
             })
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok || data.success === false) {
             throw new Error(
                 typeof data.detail === "string"
                     ? data.detail
-                    : (data.message || "Registration failed. Please check your details.")
+                    : (
+                        data.message ||
+                        "Registration failed. Please check your details."
+                    )
             );
         }
 
-        message.textContent = "Account created successfully! Please log in.";
+        if (message) {
+            message.textContent =
+                "Account created successfully! Please log in.";
 
-        const form = document.getElementById("registerForm");
-        if (form) form.reset();
+            message.className = "success";
+        }
+
+        document.getElementById("registerForm")?.reset();
 
     } catch (error) {
-        message.textContent =
-            error.message || "Could not connect to SkillBridge server.";
+        if (message) {
+            message.textContent =
+                error.message ||
+                "Could not connect to SkillBridge server.";
+
+            message.className = "error";
+        }
     }
 }
 
 /* =========================================
-   LOGIN USER
+   LOGIN
+   Requires /api/login and /api/me
    ========================================= */
 
 async function loginUser(event) {
     event.preventDefault();
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
+    const email = getValue("loginEmail");
+
+    const password =
+        document.getElementById("loginPassword")?.value || "";
+
     const message = document.getElementById("authMessage");
 
-    message.textContent = "Logging in...";
+    if (message) {
+        message.textContent = "Logging in...";
+        message.className = "";
+    }
 
     try {
         const response = await fetch(`${API}/api/login`, {
@@ -632,7 +975,7 @@ async function loginUser(event) {
             })
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
             throw new Error(
@@ -643,10 +986,15 @@ async function loginUser(event) {
         }
 
         if (!data.access_token) {
-            throw new Error("The server did not return an access token.");
+            throw new Error(
+                "The server did not return an access token."
+            );
         }
 
-        sessionStorage.setItem(TOKEN_KEY, data.access_token);
+        sessionStorage.setItem(
+            TOKEN_KEY,
+            data.access_token
+        );
 
         const meResponse = await fetch(`${API}/api/me`, {
             headers: {
@@ -656,36 +1004,54 @@ async function loginUser(event) {
 
         if (!meResponse.ok) {
             sessionStorage.removeItem(TOKEN_KEY);
-            throw new Error("Could not verify your login. Please try again.");
+
+            throw new Error(
+                "Could not verify your login. Please try again."
+            );
         }
 
         showAppContent();
 
-        const loginForm = document.getElementById("loginForm");
-        if (loginForm) loginForm.reset();
+        document.getElementById("loginForm")?.reset();
 
-        message.textContent = "";
+        if (message) {
+            message.textContent = "";
+        }
+
+        showSection("home");
+        loadProfile();
+        loadResumeData();
 
     } catch (error) {
-        message.textContent =
-            error.message || "Could not connect to SkillBridge server.";
+        if (message) {
+            message.textContent =
+                error.message ||
+                "Could not connect to SkillBridge server.";
+
+            message.className = "error";
+        }
     }
 }
 
 /* =========================================
-   SHOW APP AFTER LOGIN
+   SHOW APP CONTENT
    ========================================= */
 
 function showAppContent() {
     const authSection = document.getElementById("authSection");
     const appContent = document.getElementById("appContent");
 
-    if (authSection) authSection.style.display = "none";
-    if (appContent) appContent.style.display = "block";
+    if (authSection) {
+        authSection.style.display = "none";
+    }
+
+    if (appContent) {
+        appContent.style.display = "block";
+    }
 }
 
 /* =========================================
-   LOGOUT USER
+   LOGOUT
    ========================================= */
 
 function logoutUser() {
@@ -695,9 +1061,29 @@ function logoutUser() {
     const authSection = document.getElementById("authSection");
     const message = document.getElementById("authMessage");
 
-    if (appContent) appContent.style.display = "none";
-    if (authSection) authSection.style.display = "block";
-    if (message) message.textContent = "You have logged out.";
+    if (appContent) {
+        appContent.style.display = "none";
+    }
+
+    if (authSection) {
+        authSection.style.display = "block";
+    }
+
+    if (message) {
+        message.textContent = "You have logged out.";
+        message.className = "success";
+    }
+
+    const passwordInput = document.getElementById("loginPassword");
+
+    if (passwordInput) {
+        passwordInput.value = "";
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 }
 
 /* =========================================
@@ -712,8 +1098,14 @@ async function checkLoginSession() {
     const message = document.getElementById("authMessage");
 
     if (!token) {
-        if (authSection) authSection.style.display = "block";
-        if (appContent) appContent.style.display = "none";
+        if (authSection) {
+            authSection.style.display = "block";
+        }
+
+        if (appContent) {
+            appContent.style.display = "none";
+        }
+
         return;
     }
 
@@ -726,29 +1118,43 @@ async function checkLoginSession() {
 
         if (response.ok) {
             showAppContent();
+            loadProfile();
+            loadResumeData();
+
         } else {
             sessionStorage.removeItem(TOKEN_KEY);
 
-            if (authSection) authSection.style.display = "block";
-            if (appContent) appContent.style.display = "none";
+            if (authSection) {
+                authSection.style.display = "block";
+            }
+
+            if (appContent) {
+                appContent.style.display = "none";
+            }
         }
+
     } catch (error) {
-        if (authSection) authSection.style.display = "block";
-        if (appContent) appContent.style.display = "none";
+        if (authSection) {
+            authSection.style.display = "block";
+        }
+
+        if (appContent) {
+            appContent.style.display = "none";
+        }
 
         if (message) {
             message.textContent =
                 "Could not connect to SkillBridge. Please try again.";
+
+            message.className = "error";
         }
     }
 }
 
 /* =========================================
-   INITIALIZE
+   PASSWORD VISIBILITY
+   Optional helper
    ========================================= */
-
-document.addEventListener("DOMContentLoaded", checkLoginSession);
-
 
 function togglePassword(inputId, button) {
     const passwordInput = document.getElementById(inputId);
@@ -756,9 +1162,13 @@ function togglePassword(inputId, button) {
     if (!passwordInput) return;
 
     const isHidden = passwordInput.type === "password";
+
     passwordInput.type = isHidden ? "text" : "password";
-    button.setAttribute(
-        "aria-label",
-        isHidden ? "Hide password" : "Show password"
-    );
+
+    if (button) {
+        button.setAttribute(
+            "aria-label",
+            isHidden ? "Hide password" : "Show password"
+        );
+    }
 }
