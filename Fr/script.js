@@ -1,4 +1,4 @@
-/* =========================================
+/. Script ========================================= 
    SKILLBRIDGE - COMPLETE JAVASCRIPT
    ========================================= */
 
@@ -179,15 +179,8 @@ function findLearningResources() {
         `;
         return;
     }
-   
-    saveLearningTopic(skill);
-    const q = encodeURIComponent(skill);
 
-    const continueList = document.getElementById("continueLearningList");
-    if (continueList) 
-    {
-     renderLearningHistory();
-    }
+    const q = encodeURIComponent(skill);
 
     result.innerHTML = `
         <h2>📚 Learning Resources for "${escapeHTML(skill)}"</h2>
@@ -361,11 +354,11 @@ function escapeHTML(text) {
     if (text === null || text === undefined) return "";
 
     return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/&/g, "&")
+        .replace(/</g, "<")
+        .replace(/>/g, ">")
+        .replace(/"/g, """)
+        .replace(/'/g, "'");
 }
 
 /* =========================================
@@ -391,7 +384,6 @@ const TOKEN_KEY = "skillbridge_access_token";
  */
 
 async function logActivity(action) {
-    recordHomeActivity(action);
     const token = sessionStorage.getItem(TOKEN_KEY);
 
     if (!token) {
@@ -619,218 +611,3 @@ async function checkLoginSession() {
    ========================================= */
 
 document.addEventListener("DOMContentLoaded", checkLoginSession);
-
-
-
-
-/* =========================================
-   LEARNING HISTORY & CONTINUE LEARNING
-   ========================================= */
-
-const LEARNING_HISTORY_KEY = "skillbridge_learning_history";
-
-function getLearningHistory() {
-    try {
-        const history = JSON.parse(
-            localStorage.getItem(LEARNING_HISTORY_KEY) || "[]"
-        );
-
-        return Array.isArray(history) ? history : [];
-    } catch (error) {
-        console.warn("Could not read learning history:", error);
-        return [];
-    }
-}
-
-
-function saveLearningTopic(topic) {
-    const skill = String(topic || "").trim();
-
-    if (!skill) return;
-
-    let history = getLearningHistory();
-
-    // Move an existing topic to the top.
-    history = history.filter(
-        item => item.toLowerCase() !== skill.toLowerCase()
-    );
-
-    history.unshift(skill);
-
-    // Keep the latest 20 topics.
-    history = history.slice(0, 20);
-
-    try {
-        localStorage.setItem(
-            LEARNING_HISTORY_KEY,
-            JSON.stringify(history)
-        );
-    } catch (error) {
-        console.warn("Could not save learning history:", error);
-    }
-
-    renderLearningHistory();
-    renderHomeDashboard();
-}
-
-function renderLearningHistory() {
-    const history = getLearningHistory();
-
-    const continueList = document.getElementById(
-        "continueLearningList"
-    );
-
-    const historyList = document.getElementById(
-        "learningHistoryList"
-    );
-
-    if (continueList) {
-        continueList.innerHTML = history.length
-            ? history.slice(0, 3).map(topic => `
-                <button type="button"
-                    class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, '\\u003c')})">
-                    ▶️ Continue: ${escapeHTML(topic)}
-                </button>
-            `).join("")
-            : "<p>Search for a topic to start learning.</p>";
-    }
-
-    if (historyList) {
-        historyList.innerHTML = history.length
-            ? history.map(topic => `
-                <button type="button"
-                    class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, '\\u003c')})">
-                    🕘 ${escapeHTML(topic)}
-                </button>
-            `).join("")
-            : "<p>No learning history yet.</p>";
-    }
-}
-
-/* HOME PAGE - TRENDING TOPICS */
-
-function openLearningTopic(topic) {
-    const input = document.getElementById("learningSkill");
-
-    if (!input) {
-        alert("Learning Hub is not available.");
-        return;
-    }
-
-    input.value = topic;
-
-    showSection("learning");
-    findLearningResources();
-}
-
-function showLearningHistory() {
-    showSection("learning");
-
-    renderLearningHistory();
-
-    const history = document.getElementById("learningHistory");
-
-    if (history) {
-        history.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-    }
-}
-
-// Restore history when the page opens.
-document.addEventListener("DOMContentLoaded", renderLearningHistory);
-
-
-
-
-/* =========================================
-   HOME DASHBOARD DATA
-   ========================================= */
-
-const HOME_ACTIVITY_KEY = "skillbridge_recent_activity";
-
-function readHomeActivities() {
-    try {
-        const data = JSON.parse(
-            localStorage.getItem(HOME_ACTIVITY_KEY) || "[]"
-        );
-        return Array.isArray(data) ? data : [];
-    } catch (error) {
-        return [];
-    }
-}
-
-function recordHomeActivity(action) {
-    const labels = {
-        learning_hub: "Searched learning resources",
-        resume_analyzer: "Analyzed a resume",
-        cover_letter: "Generated a cover letter"
-    };
-
-    const activities = readHomeActivities();
-
-    activities.unshift({
-        label: labels[action] || action,
-        date: new Date().toLocaleString()
-    });
-
-    try {
-        localStorage.setItem(
-            HOME_ACTIVITY_KEY,
-            JSON.stringify(activities.slice(0, 10))
-        );
-    } catch (error) {
-        console.warn("Could not save recent activity:", error);
-    }
-
-    renderHomeDashboard();
-}
-
-function renderHomeDashboard() {
-    const continueBox = document.getElementById("homeContinueList");
-    const historyBox = document.getElementById("homeLearningHistory");
-    const activityBox = document.getElementById("homeRecentActivity");
-
-    // Reuse the existing learning history functions.
-    const history = getLearningHistory();
-    const activities = readHomeActivities();
-
-    if (continueBox) {
-        continueBox.innerHTML = history.length
-            ? history.slice(0, 3).map(topic => `
-                <button type="button"
-                    class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, "\\u003c")})">
-                    📘 ${escapeHTML(topic)}
-                </button>
-            `).join("")
-            : "<p>Search a topic in Learning Hub to get started.</p>";
-    }
-
-    if (historyBox) {
-        historyBox.innerHTML = history.length
-            ? history.slice(0, 5).map(topic => `
-                <button type="button"
-                    class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, "\\u003c")})">
-                    📚 ${escapeHTML(topic)}
-                </button>
-            `).join("")
-            : "<p>Your learning history will appear here.</p>";
-    }
-
-    if (activityBox) {
-        activityBox.innerHTML = activities.length
-            ? activities.slice(0, 5).map(item => `
-                <p>• ${escapeHTML(item.label)}
-                <small> — ${escapeHTML(item.date || "")}</small></p>
-            `).join("")
-            : "<p>Your recent activities will appear here.</p>";
-    }
-}
-
-document.addEventListener("DOMContentLoaded", renderHomeDashboard);
-
