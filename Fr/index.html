@@ -122,161 +122,138 @@
             <button class="hero-secondary" onclick="showSection('career')">Explore Features</button>
         </div>
        
-\<div class="hero-illustration">\
-&#x20;   \<svg class="hero-svg"\
-&#x20;        xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"\
-&#x20;        viewBox="0 0 640 400"\
-&#x20;        role="img"\
-&#x20;        aria-label="SkillBridge laptop, books, plants and coffee mug">
 
-&#x20;       \<defs>\
-&#x20;           \<linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">\
-&#x20;               \<stop offset="0%" stop-color="#D9ECFF"/>\
-&#x20;               \<stop offset="100%" stop-color="#F4F9FF"/>\
-&#x20;           \</linearGradient>\
-&#x20;           \<linearGradient id="laptopScreen" x1="0" y1="0" x2="1" y2="1">\
-&#x20;               \<stop offset="0%" stop-color="#FFFFFF"/>\
-&#x20;               \<stop offset="100%" stop-color="#DCEBFF"/>\
-&#x20;           \</linearGradient>\
-&#x20;           \<linearGradient id="blueBook" x1="0" y1="0" x2="0" y2="1">\
-&#x20;               \<stop offset="0%" stop-color="#2585F5"/>\
-&#x20;               \<stop offset="100%" stop-color="#1452C7"/>\
-&#x20;           \</linearGradient>\
-&#x20;           \<linearGradient id="tealBook" x1="0" y1="0" x2="0" y2="1">\
-&#x20;               \<stop offset="0%" stop-color="#22B8C8"/>\
-&#x20;               \<stop offset="100%" stop-color="#087D9B"/>\
-&#x20;           \</linearGradient>\
-&#x20;           \<filter id="heroShadow" x="-30%" y="-30%" width="160%" height="180%">\
-&#x20;               \<feDropShadow dx="0" dy="7" stdDeviation="7"\
-&#x20;                             flood-color="#174A87" flood-opacity=".20"/>\
-&#x20;           \</filter>\
-&#x20;       \</defs>
+<div class="hero-illustration">
+    <svg class="hero-svg"
+         xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 640 400"
+         role="img"
+         aria-label="SkillBridge learning workspace">
 
-&#x20;       \<!-- Soft blue workspace -->\
-&#x20;       \<rect x="0" y="0" width="640" height="400" rx="22" fill="url(#heroBg)"/>\
-&#x20;       \<circle cx="530" cy="55" r="95" fill="#FFFFFF" opacity=".28"/>\
-&#x20;       \<path d="M0 300 Q170 270 330 310 T640 290 V400 H0Z"\
-&#x20;             fill="#FFFFFF" opacity=".72"/>
+        <defs>
+            <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#D9ECFF"/>
+                <stop offset="100%" stop-color="#F4F9FF"/>
+            </linearGradient>
+            <linearGradient id="screenBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="100%" stop-color="#DCEBFF"/>
+            </linearGradient>
+            <linearGradient id="bookBlue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2585F5"/>
+                <stop offset="100%" stop-color="#1452C7"/>
+            </linearGradient>
+            <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+                <feDropShadow dx="0" dy="6" stdDeviation="6"
+                              flood-color="#174A87" flood-opacity=".2"/>
+            </filter>
+        </defs>
 
-&#x20;       \<!-- Background plant -->\
-&#x20;       \<g transform="translate(55 70)">\
-&#x20;           \<path d="M45 110 Q5 65 18 30 Q53 52 45 110"\
-&#x20;                 fill="#51B96D"/>\
-&#x20;           \<path d="M48 110 Q48 45 90 22 Q100 72 48 110"\
-&#x20;                 fill="#28A85D"/>\
-&#x20;           \<path d="M45 110 Q-5 92 0 62 Q37 72 45 110"\
-&#x20;                 fill="#78CF7B"/>\
-&#x20;           \<path d="M45 110 Q70 60 105 70 Q94 108 45 110"\
-&#x20;                 fill="#179B57"/>\
-&#x20;           \<path d="M12 112 H82 L72 160 H23Z" fill="#FFFFFF"/>\
-&#x20;           \<path d="M12 112 H82 L78 126 H16Z" fill="#D6E7FA"/>\
-&#x20;       \</g>
+        <rect width="640" height="400" rx="22" fill="url(#heroBg)"/>
+        <circle cx="530" cy="55" r="95" fill="#FFFFFF" opacity=".35"/>
+        <path d="M0 300 Q170 270 330 310 T640 290 V400 H0Z"
+              fill="#FFFFFF" opacity=".75"/>
 
-&#x20;       \<!-- Books -->\
-&#x20;       \<g filter="url(#heroShadow)">\
-&#x20;           \<path d="M55 286 L235 275 L245 313 L65 325Z"\
-&#x20;                 fill="url(#blueBook)"/>\
-&#x20;           \<path d="M65 325 L245 313 L245 323 L65 336Z"\
-&#x20;                 fill="#FFFFFF"/>\
-&#x20;           \<path d="M62 336 L242 324 L249 357 L70 370Z"\
-&#x20;                 fill="url(#tealBook)"/>\
-&#x20;           \<path d="M70 370 L249 357 L250 366 L71 380Z"\
-&#x20;                 fill="#FFFFFF"/>\
-&#x20;           \<path d="M73 380 L250 367 L256 395 L78 399Z"\
-&#x20;                 fill="#174DB8"/>\
-&#x20;           \<g fill="#FFFFFF" font-family="Arial, sans-serif"\
-&#x20;              font-size="15" font-weight="bold" text-anchor="middle">\
-&#x20;               \<text x="150" y="306">LEARN\</text>\
-&#x20;               \<text x="155" y="350">PRACTICE\</text>\
-&#x20;               \<text x="165" y="389">GROW\</text>\
-&#x20;           \</g>\
-&#x20;       \</g>
+        <!-- Left plant -->
+        <g transform="translate(35 95)">
+            <path d="M45 110 Q5 65 18 30 Q53 52 45 110"
+                  fill="#51B96D"/>
+            <path d="M48 110 Q48 45 90 22 Q100 72 48 110"
+                  fill="#28A85D"/>
+            <path d="M45 110 Q-5 92 0 62 Q37 72 45 110"
+                  fill="#78CF7B"/>
+            <path d="M12 112 H82 L72 160 H23Z" fill="#FFFFFF"/>
+            <path d="M12 112 H82 L78 126 H16Z" fill="#D6E7FA"/>
+        </g>
 
-&#x20;       \<!-- Plant behind laptop -->\
-&#x20;       \<g transform="translate(220 45)">\
-&#x20;           \<path d="M45 110 Q0 73 12 35 Q49 55 45 110"\
-&#x20;                 fill="#35B96A"/>\
-&#x20;           \<path d="M48 110 Q35 48 72 10 Q94 57 48 110"\
-&#x20;                 fill="#63C94E"/>\
-&#x20;           \<path d="M47 110 Q70 45 110 43 Q103 83 47 110"\
-&#x20;                 fill="#1BA65B"/>\
-&#x20;           \<path d="M44 110 Q-5 96 0 62 Q32 70 44 110"\
-&#x20;                 fill="#81D76B"/>\
-&#x20;           \<path d="M20 108 H85 L77 145 H28Z" fill="#FFFFFF"/>\
-&#x20;           \<path d="M20 108 H85 L82 119 H22Z" fill="#B9D8F6"/>\
-&#x20;       \</g>
+        <!-- Books -->
+        <g filter="url(#shadow)">
+            <path d="M40 285 L225 274 L235 311 L50 324Z"
+                  fill="url(#bookBlue)"/>
+            <path d="M50 324 L235 311 L235 322 L50 335Z"
+                  fill="#FFFFFF"/>
+            <path d="M50 335 L235 322 L242 355 L57 368Z"
+                  fill="#159BB4"/>
+            <path d="M57 368 L242 355 L248 366 L60 380Z"
+                  fill="#FFFFFF"/>
+            <path d="M60 380 L248 366 L255 397 L65 399Z"
+                  fill="#174DB8"/>
+            <g fill="#FFFFFF" font-family="Arial,sans-serif"
+               font-size="15" font-weight="bold" text-anchor="middle">
+                <text x="140" y="306">LEARN</text>
+                <text x="145" y="350">PRACTICE</text>
+                <text x="155" y="389">GROW</text>
+            </g>
+        </g>
 
-&#x20;       \<!-- Laptop screen -->\
-&#x20;       \<g filter="url(#heroShadow)">\
-&#x20;           \<path d="M300 85 Q301 76 312 76 H558 Q569 76 569 88\
-&#x20;                    L555 300 H273Z"\
-&#x20;                 fill="#14233D"/>\
-&#x20;           \<path d="M312 88 H556 L543 283 H290Z"\
-&#x20;                 fill="url(#laptopScreen)"/>
+        <!-- Plant behind laptop -->
+        <g transform="translate(220 45)">
+            <path d="M45 110 Q0 73 12 35 Q49 55 45 110" fill="#35B96A"/>
+            <path d="M48 110 Q35 48 72 10 Q94 57 48 110" fill="#63C94E"/>
+            <path d="M47 110 Q70 45 110 43 Q103 83 47 110" fill="#1BA65B"/>
+            <path d="M20 108 H85 L77 145 H28Z" fill="#FFFFFF"/>
+            <path d="M20 108 H85 L82 119 H22Z" fill="#B9D8F6"/>
+        </g>
 
-&#x20;           \<!-- Graduation cap -->\
-&#x20;           \<path d="M367 143 L418 122 L469 143 L418 164Z"\
-&#x20;                 fill="#1677F2"/>\
-&#x20;           \<path d="M382 150 V169 Q418 189 454 169 V150 L418 165Z"\
-&#x20;                 fill="#0E5ACB"/>\
-&#x20;           \<path d="M468 144 V168" stroke="#1677F2"\
-&#x20;                 stroke-width="3" stroke-linecap="round"/>\
-&#x20;           \<circle cx="468" cy="171" r="4" fill="#1677F2"/>
+        <!-- Laptop -->
+        <g filter="url(#shadow)">
+            <path d="M300 85 Q301 76 312 76 H558 Q569 76 569 88
+                     L555 300 H273Z" fill="#14233D"/>
+            <path d="M312 88 H556 L543 283 H290Z" fill="url(#screenBg)"/>
 
-&#x20;           \<text x="418" y="214" text-anchor="middle"\
-&#x20;                 font-family="Arial, sans-serif"\
-&#x20;                 font-size="26" font-weight="bold" fill="#15366F">\
-&#x20;               SkillBridge\
-&#x20;           \</text>\
-&#x20;           \<text x="418" y="237" text-anchor="middle"\
-&#x20;                 font-family="Arial, sans-serif"\
-&#x20;                 font-size="12" fill="#315784">\
-&#x20;               Learn · Build · Grow\
-&#x20;           \</text>
+            <!-- Graduation cap -->
+            <path d="M367 143 L418 122 L469 143 L418 164Z"
+                  fill="#1677F2"/>
+            <path d="M382 150 V169 Q418 189 454 169 V150 L418 165Z"
+                  fill="#0E5ACB"/>
+            <path d="M468 144 V168" stroke="#1677F2" stroke-width="3"
+                  stroke-linecap="round"/>
+            <circle cx="468" cy="171" r="4" fill="#1677F2"/>
 
-&#x20;           \<!-- Laptop base -->\
-&#x20;           \<path d="M273 300 L555 300 L595 330\
-&#x20;                    Q598 336 586 338 H240 Q229 336 235 330Z"\
-&#x20;                 fill="#B7C9DF"/>\
-&#x20;           \<path d="M300 304 H530 L548 325 H282Z"\
-&#x20;                 fill="#EAF2FC"/>\
-&#x20;           \<path d="M373 307 H448 L440 315 H381Z"\
-&#x20;                 fill="#91A9C7"/>\
-&#x20;       \</g>
+            <text x="418" y="214" text-anchor="middle"
+                  font-family="Arial,sans-serif" font-size="26"
+                  font-weight="bold" fill="#15366F">SkillBridge</text>
+            <text x="418" y="237" text-anchor="middle"
+                  font-family="Arial,sans-serif" font-size="12"
+                  fill="#315784">Learn · Build · Grow</text>
 
-&#x20;       \<!-- Coffee mug -->\
-&#x20;       \<g filter="url(#heroShadow)">\
-&#x20;           \<path d="M558 218 H613 V282 Q611 302 586 302\
-&#x20;                    Q560 301 558 282Z"\
-&#x20;                 fill="#FFFFFF"/>\
-&#x20;           \<path d="M612 231 Q640 226 635 255\
-&#x20;                    Q632 274 612 273"\
-&#x20;                 fill="none" stroke="#D8E6F7" stroke-width="9"/>\
-&#x20;           \<path d="M558 218 H613 V229 H558Z" fill="#DCEBFA"/>\
-&#x20;           \<g fill="#28518A" font-family="Arial, sans-serif"\
-&#x20;              font-size="10" font-weight="bold" text-anchor="middle">\
-&#x20;               \<text x="585" y="247">Better\</text>\
-&#x20;               \<text x="585" y="260">Skills\</text>\
-&#x20;               \<text x="585" y="273">Brighter\</text>\
-&#x20;               \<text x="585" y="286">Future\</text>\
-&#x20;           \</g>\
-&#x20;       \</g>
+            <path d="M273 300 L555 300 L595 330
+                     Q598 336 586 338 H240 Q229 336 235 330Z"
+                  fill="#B7C9DF"/>
+            <path d="M300 304 H530 L548 325 H282Z" fill="#EAF2FC"/>
+            <path d="M373 307 H448 L440 315 H381Z" fill="#91A9C7"/>
+        </g>
 
-&#x20;       \<!-- Notebook and pen -->\
-&#x20;       \<g filter="url(#heroShadow)">\
-&#x20;           \<path d="M470 344 L620 329 L633 365 L483 382Z"\
-&#x20;                 fill="#246DE0"/>\
-&#x20;           \<path d="M482 382 L633 365 L629 375 L479 392Z"\
-&#x20;                 fill="#1649AC"/>\
-&#x20;           \<path d="M493 342 L596 332"\
-&#x20;                 stroke="#FFFFFF" stroke-width="3" opacity=".65"/>\
-&#x20;           \<path d="M500 334 L589 324"\
-&#x20;                 stroke="#153A76" stroke-width="5" stroke-linecap="round"/>\
-&#x20;           \<path d="M589 324 L600 323 L594 331Z" fill="#D7E8FF"/>\
-&#x20;       \</g>\
-&#x20;   \</svg>\
-\</div>
+        <!-- Coffee mug -->
+        <g filter="url(#shadow)">
+            <path d="M558 218 H613 V282 Q611 302 586 302
+                     Q560 301 558 282Z" fill="#FFFFFF"/>
+            <path d="M612 231 Q640 226 635 255 Q632 274 612 273"
+                  fill="none" stroke="#D8E6F7" stroke-width="9"/>
+            <path d="M558 218 H613 V229 H558Z" fill="#DCEBFA"/>
+            <g fill="#28518A" font-family="Arial,sans-serif"
+               font-size="10" font-weight="bold" text-anchor="middle">
+                <text x="585" y="247">Better</text>
+                <text x="585" y="260">Skills</text>
+                <text x="585" y="273">Brighter</text>
+                <text x="585" y="286">Future</text>
+            </g>
+        </g>
 
+        <!-- Notebook and pen -->
+        <g filter="url(#shadow)">
+            <path d="M470 344 L620 329 L633 365 L483 382Z"
+                  fill="#246DE0"/>
+            <path d="M482 382 L633 365 L629 375 L479 392Z"
+                  fill="#1649AC"/>
+            <path d="M493 342 L596 332" stroke="#FFFFFF"
+                  stroke-width="3" opacity=".65"/>
+            <path d="M500 334 L589 324" stroke="#153A76"
+                  stroke-width="5" stroke-linecap="round"/>
+            <path d="M589 324 L600 323 L594 331Z" fill="#D7E8FF"/>
+        </g>
+    </svg>
+</div>
 
 
    
