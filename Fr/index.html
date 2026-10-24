@@ -454,13 +454,32 @@
     <h2>📄 Resume Analyzer</h2>
     <p>Analyze your resume and discover areas to improve.</p>
 
-    <div class="card">
-        <label for="analyzerFile">Upload Resume (.txt)</label>
-        <input
-            type="file"
-            id="analyzerFile"
-            accept=".txt,text/plain"
-        >
+   
+<div class="card">
+    <label for="analyzerFile">Upload Resume (PDF or TXT)</label>
+
+    <input
+        type="file"
+        id="analyzerFile"
+        accept=".pdf,.txt,application/pdf,text/plain"
+    >
+
+    <label for="jobDescription">Job Description (optional)</label>
+    <textarea
+        id="jobDescription"
+        placeholder="Paste the job description here..."
+    ></textarea>
+
+    <button type="button" onclick="analyzeResume()">
+        Analyze Resume
+    </button>
+
+    <button type="button" onclick="clearAnalyzer()">
+        Clear
+    </button>
+</div>
+
+<div id="analyzerResult" class="card" aria-live="polite"></div>
 
         <label for="jobDescription">Job Description (optional)</label>
         <textarea
@@ -533,17 +552,33 @@
 <!-- =====================================================
      JAVASCRIPT
      ===================================================== -->
+
+<!-- PDF.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- PDF worker setup -->
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+</script>
+
+<!-- SkillBridge JavaScript -->
 <script src="/script.js"></script>
 
+<!-- Service Worker -->
 <script>
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
             navigator.serviceWorker.register("/service-worker.js")
                 .then(() => console.log("SkillBridge PWA ready"))
-                .catch(error => console.log("Service Worker error:", error));
+                .catch(error =>
+                    console.log("Service Worker error:", error)
+                );
         });
     }
 </script>
 
 </body>
+</html>
+
 </html>
