@@ -706,10 +706,15 @@ function renderLearningHistory() {
     }
 }
 
+/* HOME PAGE - TRENDING TOPICS */
+
 function openLearningTopic(topic) {
     const input = document.getElementById("learningSkill");
 
-    if (!input) return;
+    if (!input) {
+        alert("Learning Hub is not available.");
+        return;
+    }
 
     input.value = topic;
 
