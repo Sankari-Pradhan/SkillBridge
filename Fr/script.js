@@ -537,71 +537,59 @@ function printResume() {
    TXT ANALYSIS
    ========================================= */
 
-async function analyzeResume() {
-    const fileInput = document.getElementById("resumeFile");
-    const result = document.getElementById("analysisResult");
 
-    if (!fileInput || !fileInput.files.length) {
-        alert("Please upload your resume first.");
+async function analyzeResume() {
+    const fileInput = document.getElementById("analyzerFile");
+    const result = document.getElementById("analyzerResult");
+    const jobInput = document.getElementById("jobDescription");
+
+    if (!fileInput || !result) {
+        console.error("Resume Analyzer HTML elements not found.");
         return;
     }
 
     const file = fileInput.files[0];
-    const extension = file.name.split(".").pop().toLowerCase();
 
-    if (!["txt", "pdf"].includes(extension)) {
-        alert("Please upload a PDF or TXT file.");
+    if (!file) {
+        result.textContent = "Please upload your resume first.";
         return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-        alert("Please upload a file smaller than 10 MB.");
+    if (!file.name.toLowerCase().endsWith(".txt")) {
+        result.textContent =
+            "This version supports TXT files only. PDF support requires a PDF parser.";
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        result.textContent = "Please upload a TXT file smaller than 2 MB.";
         return;
     }
 
     result.textContent = "Analyzing your resume...";
 
     try {
-        if (extension === "pdf") {
-            result.innerHTML = `
-                <div class="result-box">
-                    <h3>PDF Resume</h3>
-                    <p>
-                        PDF text extraction requires a PDF parser
-                        or backend analyzer. This JavaScript version
-                        can analyze TXT files.
-                    </p>
-                </div>
-            `;
-            return;
-        }
-
         const text = await file.text();
         const content = text.toLowerCase();
 
+        if (!content.trim()) {
+            result.textContent = "The uploaded file is empty.";
+            return;
+        }
+
         const sections = {
-            "Education": /\beducation\b/.test(content),
-            "Skills": /\bskills?\b/.test(content),
+            "Education": /\beducation\b|\bdegree\b|\bcollege\b|\buniversity\b/.test(content),
+            "Skills": /\bskills?\b|\btechnologies\b/.test(content),
             "Projects": /\bprojects?\b/.test(content),
-            "Experience": /\bexperience\b|\binternship\b/.test(content),
-            "Contact Information": /@/.test(content)
+            "Experience": /\bexperience\b|\binternship\b|\bemployment\b/.test(content),
+            "Contact Information": /@|\bphone\b|\bmobile\b/.test(content),
+            "Certifications": /\bcertifications?\b|\bcertificates?\b/.test(content)
         };
 
         const skillList = [
-            "python",
-            "java",
-            "javascript",
-            "html",
-            "css",
-            "sql",
-            "c++",
-            "machine learning",
-            "data science",
-            "excel",
-            "react",
-            "node.js",
-            "git",
-            "aws"
+            "python", "java", "javascript", "html", "css", "sql",
+            "c++", "machine learning", "data science", "excel",
+            "react", "node.js", "git", "aws", "fastapi"
         ];
 
         const detectedSkills = skillList.filter(skill =>
@@ -609,72 +597,104 @@ async function analyzeResume() {
         );
 
         const total = Object.keys(sections).length;
-
-        const present = Object.values(sections)
-            .filter(Boolean).length;
-
+        const present = Object.values(sections).filter(Boolean).length;
         const score = Math.round((present / total) * 100);
 
-        const sectionHTML = Object.entries(sections)
-            .map(([name, found]) => `
-                <li>
-                    ${escapeHTML(name)}:
-                    <strong>${found ? "Found" : "Missing"}</strong>
-                </li>
-            `)
-            .join("");
+        result.replaceChildren();
 
-        result.innerHTML = `
-            <div class="result-box">
+        const heading = document.createElement("h3");
+        heading.textContent = "Resume Analysis Report";
+        result.appendChild(heading);
 
-                <h3>Resume Analysis Report</h3>
+        const scoreHeading = document.createElement("h2");
+        scoreHeading.textContent = `Basic Section Score: ${score}/100`;
+        result.appendChild(scoreHeading);
 
-                <p>
-                    <strong>Basic Section Score:</strong>
-                    ${score}/100
-                </p>
+        const note = document.createElement("p");
+        note.textContent =
+            "This score checks for common resume sections only. It is not an official ATS score or a prediction of hiring success.";
+        result.appendChild(note);
 
-                <p>
-                    This checks basic section presence only.
-                    It is not an ATS score.
-                </p>
+        const sectionHeading = document.createElement("h3");
+        sectionHeading.textContent = "Section Check";
+        result.appendChild(sectionHeading);
 
-                <h3>Section Check</h3>
-                <ul>${sectionHTML}</ul>
+        const sectionList = document.createElement("ul");
 
-                <h3>Detected Skills</h3>
+        Object.entries(sections).forEach(([name, found]) => {
+            const li = document.createElement("li");
+            li.textContent = `${found ? "✅" : "⚠️"} ${name}: ${found ? "Found" : "Missing"}`;
+            sectionList.appendChild(li);
+        });
 
-                <p>
-                    ${
-                        detectedSkills.length
-                            ? detectedSkills.map(escapeHTML).join(", ")
-                            : "No matching skills detected."
-                    }
-                </p>
+        result.appendChild(sectionList);
 
-                <h3>Suggestions</h3>
+        const skillHeading = document.createElement("h3");
+        skillHeading.textContent = "Detected Skills";
+        result.appendChild(skillHeading);
 
-                <ul>
-                    ${
-                        Object.entries(sections)
-                            .filter(([, found]) => !found)
-                            .map(([name]) =>
-                                `<li>Consider adding ${escapeHTML(name)}.</li>`
-                            )
-                            .join("")
-                    }
+        const skillText = document.createElement("p");
+        skillText.textContent = detectedSkills.length
+            ? detectedSkills.join(", ")
+            : "No matching skills detected.";
+        result.appendChild(skillText);
 
-                    <li>Use clear headings and consistent formatting.</li>
-                    <li>Check spelling, dates and contact details.</li>
-                    <li>Tailor your resume to the job description.</li>
-                </ul>
+        const suggestionHeading = document.createElement("h3");
+        suggestionHeading.textContent = "Suggestions";
+        result.appendChild(suggestionHeading);
 
-                <button onclick="downloadAnalysisReport()">
-                    Download Analysis Report
-                </button>
+        const suggestions = document.createElement("ul");
+        Object.entries(sections)
+            .filter(([, found]) => !found)
+            .forEach(([name]) => {
+                const li = document.createElement("li");
+                li.textContent = `Consider adding a ${name} section if relevant.`;
+                suggestions.appendChild(li);
+            });
 
-            </div>
-        `;
+        [
+            "Use clear headings and consistent formatting.",
+            "Check spelling, dates and contact details.",
+            "Describe your contribution and results in project entries."
+        ].forEach(tip => {
+            const li = document.createElement("li");
+            li.textContent = tip;
+            suggestions.appendChild(li);
+        });
+
+        result.appendChild(suggestions);
+
+        const jobText = jobInput?.value.trim().toLowerCase() || "";
+
+        if (jobText) {
+            const words = jobText.match(/\b[a-z][a-z+#.-]{2,}\b/g) || [];
+            const stopWords = new Set([
+                "the", "and", "for", "with", "you", "our", "are",
+                "will", "this", "that", "from", "your", "have",
+                "has", "who", "job", "role", "work"
+            ]);
+
+            const keywords = [...new Set(words)].filter(word =>
+                !stopWords.has(word)
+            );
+
+            const matched = keywords.filter(word => content.includes(word));
+            const missing = keywords.filter(word => !content.includes(word));
+
+            const jobHeading = document.createElement("h3");
+            jobHeading.textContent = "Job Description Keyword Comparison";
+            result.appendChild(jobHeading);
+
+            const jobResult = document.createElement("p");
+            jobResult.textContent =
+                `Matched keywords: ${matched.length}. Keywords to review: ${missing.length}.`;
+            result.appendChild(jobResult);
+
+            const missingText = document.createElement("p");
+            missingText.textContent =
+                "Keywords not detected: " + (missing.slice(0, 25).join(", ") || "None");
+            result.appendChild(missingText);
+        }
 
         window.lastResumeAnalysis = {
             filename: file.name,
@@ -683,15 +703,22 @@ async function analyzeResume() {
             detectedSkills
         };
 
-        void logActivity("resume_analyzer");
+        const downloadButton = document.createElement("button");
+        downloadButton.type = "button";
+        downloadButton.textContent = "Download Analysis Report";
+        downloadButton.addEventListener("click", downloadAnalysisReport);
+        result.appendChild(downloadButton);
+
+        if (typeof logActivity === "function") {
+            void logActivity("resume_analyzer");
+        }
 
     } catch (error) {
-        result.textContent =
-            "Unable to analyze the file. Please try again.";
-
-        console.error(error);
+        console.error("Resume analysis failed:", error);
+        result.textContent = "Unable to analyze the file. Please try again.";
     }
 }
+
 
 /* =========================================
    DOWNLOAD ANALYSIS REPORT
