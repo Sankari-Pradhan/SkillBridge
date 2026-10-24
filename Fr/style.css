@@ -93,14 +93,17 @@ button:hover {
    SECTIONS
    ========================================= */
 
+
 .section {
     display: none;
-    max-width: 1100px;
-    margin: 30px auto;
-    padding: 30px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+    width: calc(100% - 40px);
+    max-width: 1280px;
+    margin: 24px auto;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #e2ebf7;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(31, 60, 136, 0.06);
 }
 
 .section.active {
@@ -108,7 +111,7 @@ button:hover {
 }
 
 .section h2 {
-    color: #1f3c88;
+    color: #17478e;
     margin-bottom: 20px;
     font-size: 27px;
 }
@@ -117,6 +120,21 @@ button:hover {
     margin-top: 15px;
 }
 
+#home {
+    width: calc(100% - 40px);
+    max-width: 1280px;
+    margin: 20px auto;
+    padding: 24px;
+}
+
+@media (max-width: 600px) {
+    .section,
+    #home {
+        width: calc(100% - 20px);
+        margin: 10px auto;
+        padding: 14px;
+    }
+}
 
 /* =========================================
    HOME CARDS
