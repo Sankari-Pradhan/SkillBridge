@@ -129,35 +129,65 @@
     </div>
 
     <!-- FEATURE CARDS -->
-    <div class="home-shortcuts">
-        <button onclick="showSection('learning')"><span>📘</span><b>Learning Hub</b><small>Explore courses and resources</small></button>
-        <button onclick="showSection('career')"><span>💼</span><b>Career Opportunities</b><small>Jobs and internships</small></button>
-        <button onclick="showSection('resume')"><span>📄</span><b>Resume Builder</b><small>Create your resume</small></button>
-        <button onclick="showSection('analyzer')"><span>🔍</span><b>Resume Analyzer</b><small>Improve your resume</small></button>
-        <button onclick="showSection('profile')"><span>👤</span><b>Profile</b><small>Manage your account</small></button>
-    </div>
+    
+<!-- FEATURE CARDS -->
+<div class="home-shortcuts">
+    <button onclick="showSection('learning')">
+        <span class="dashboard-icon"><img src="/assets/icons/learning.svg" alt="" width="42" height="42"></span>
+        <b>Learning Hub</b>
+        <small>Explore courses and resources</small>
+    </button>
 
-    <!-- TRENDING + QUICK ACCESS -->
-    <div class="home-reference-grid">
-        <div class="home-panel">
-            <h2>🔥 Trending Now</h2>
-            <p class="panel-subtitle">Explore popular skills and technologies.</p>
+    <button onclick="showSection('career')">
+        <span class="dashboard-icon"><img src="/assets/icons/career.svg" alt="" width="42" height="42"></span>
+        <b>Career Opportunities</b>
+        <small>Jobs and internships</small>
+    </button>
 
-            <div class="trending-item"><span>🐍</span><div><h3>Python for Beginners</h3><p>Start learning Python.</p></div><button onclick="openLearningTopic('Python')">Explore</button></div>
-            <div class="trending-item"><span>📊</span><div><h3>Data Science</h3><p>Learn data analysis.</p></div><button onclick="openLearningTopic('Data Science')">Explore</button></div>
-            <div class="trending-item"><span>🌐</span><div><h3>Web Development</h3><p>Build websites.</p></div><button onclick="openLearningTopic('Web Development')">Explore</button></div>
-            <div class="trending-item"><span>🤖</span><div><h3>Machine Learning</h3><p>Discover AI fundamentals.</p></div><button onclick="openLearningTopic('Machine Learning')">Explore</button></div>
-        </div>
+    <button onclick="showSection('resume')">
+        <span class="dashboard-icon"><img src="/assets/icons/resume.svg" alt="" width="42" height="42"></span>
+        <b>Resume Builder</b>
+        <small>Create your resume</small>
+    </button>
 
-        <div class="home-panel">
-            <h2>⚡ Quick Access</h2>
-            <p class="panel-subtitle">Get started with useful tools.</p>
-            <button class="quick-access-btn" onclick="showSection('resume')">📄 Build Your Resume →</button>
-            <button class="quick-access-btn" onclick="showSection('analyzer')">🔍 Analyze Your Resume →</button>
-            <button class="quick-access-btn" onclick="showSection('learning')">📚 Find Learning Resources →</button>
-            <button class="quick-access-btn" onclick="showSection('career')">💼 Explore Career Opportunities →</button>
-        </div>
-    </div>
+    <button onclick="showSection('analyzer')">
+        <span class="dashboard-icon"><img src="/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
+        <b>Resume Analyzer</b>
+        <small>Improve your resume</small>
+    </button>
+
+    <button onclick="showSection('profile')">
+        <span class="dashboard-icon"><img src="/assets/icons/profile.svg" alt="" width="42" height="42"></span>
+        <b>Profile</b>
+        <small>Manage your account</small>
+    </button>
+</div>
+
+
+<div class="trending-item">
+    <span class="dashboard-icon"><img src="/assets/icons/learning.svg" alt="" width="42" height="42"></span>
+    <div><h3>Python for Beginners</h3><p>Start learning Python.</p></div>
+    <button onclick="openLearningTopic('Python')">Explore</button>
+</div>
+
+<div class="trending-item">
+    <span class="dashboard-icon"><img src="/assets/icons/analyzer.svg" alt="" width="42" height="42"></span>
+    <div><h3>Data Science</h3><p>Learn data analysis.</p></div>
+    <button onclick="openLearningTopic('Data Science')">Explore</button>
+</div>
+
+<div class="trending-item">
+    <span class="dashboard-icon"><img src="/assets/icons/career.svg" alt="" width="42" height="42"></span>
+    <div><h3>Web Development</h3><p>Build websites.</p></div>
+    <button onclick="openLearningTopic('Web Development')">Explore</button>
+</div>
+
+<div class="trending-item">
+    <span class="dashboard-icon"><img src="/assets/icons/resume.svg" alt="" width="42" height="42"></span>
+    <div><h3>Machine Learning</h3><p>Discover AI fundamentals.</p></div>
+    <button onclick="openLearningTopic('Machine Learning')">Explore</button>
+</div>
+
 
     <!-- BOTTOM DASHBOARD -->
     <div class="home-activity-grid">
