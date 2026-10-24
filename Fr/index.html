@@ -20,15 +20,18 @@
 <body>
 
     
+
 <!-- LOGIN & REGISTRATION -->
 <section id="authSection" class="section active">
+
     <h2>🔐 Welcome to SkillBridge</h2>
-<p>Log in to your account or create a new one.</p>
+    <p>Log in to your account or create a new one.</p>
 
     <div class="card">
         <h3>Login</h3>
 
         <form id="loginForm" onsubmit="loginUser(event)">
+
             <input
                 type="email"
                 id="loginEmail"
@@ -45,16 +48,27 @@
                 required
             >
 
+            <p style="text-align:right; margin:0 0 15px;">
+                <a href="/forgot-password.html">
+                    Forgot Password?
+                </a>
+            </p>
+
             <button type="submit">Login</button>
         </form>
-        
-       <p>Don't have an account? <a href="/register.html">Create Account</a></p>
+
+        <p>
+            Don't have an account?
+            <a href="/Fr/register.html">Create Account</a>
+        </p>
 
     </div>
 
     <p id="authMessage" role="status"></p>
+
 </section>
 
+<div id="appContent" style="display:none;">
 
 <div id="appContent" style="display: none;"> 
 <!-- =====================================================
