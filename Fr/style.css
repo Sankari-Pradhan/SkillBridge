@@ -1015,3 +1015,78 @@ gap: 20px;
     margin: 0 auto;
 }
 
+
+/* =========================================================
+   SKILLBRIDGE FINAL OVERRIDES
+   Home layout spacing + hide duplicate standalone panels
+   ========================================================= */
+
+#appContent {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+}
+
+#home {
+    width: calc(100% - 32px) !important;
+    max-width: 1280px !important;
+    margin: 12px auto 20px !important;
+    padding: 24px !important;
+}
+
+#home .home-hero {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#home .home-feature-cards {
+    margin-bottom: 20px;
+}
+
+#home .home-bottom-grid {
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+/* Hide duplicate panels outside Home; keep Learning Hub panels intact */
+#appContent > .learning-bottom-grid,
+#appContent > .home-learning-bottom-grid,
+#appContent > .continue-history-grid,
+#appContent > #homeLearningHistory,
+#appContent > #homeContinueLearning,
+#appContent > #continueLearningSection,
+#appContent > #historySection {
+    display: none !important;
+}
+
+#appContent > div:has(> #continueLearningList),
+#appContent > div:has(> #learningHistoryList) {
+    display: none !important;
+}
+
+#authSection {
+    margin: 0 auto;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+@media (max-width: 900px) {
+    #home {
+        width: calc(100% - 24px) !important;
+        padding: 18px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    #home {
+        width: calc(100% - 16px) !important;
+        margin: 8px auto 14px !important;
+        padding: 12px !important;
+    }
+}
