@@ -1218,3 +1218,83 @@ nav {
         grid-template-columns: 1fr;
     }
 }
+
+
+
+
+/* ===== SkillBridge Brand Logo ===== */
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #e3f0ff;
+    border-radius: 10px;
+    font-size: 28px;
+}
+
+.brand-text h1 {
+    margin: 0;
+    color: #174a9c;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.brand-text small {
+    display: block;
+    color: #526783;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+}
+
+/* ===== Home Dashboard Icon Tiles ===== */
+.home-shortcuts > button > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    background: #e8f2ff;
+    font-size: 25px;
+}
+
+.home-shortcuts > button:nth-child(2) > span {
+    background: #f0e8ff;
+}
+
+.home-shortcuts > button:nth-child(3) > span {
+    background: #e2f8ec;
+}
+
+.home-shortcuts > button:nth-child(4) > span {
+    background: #fff0df;
+}
+
+.home-shortcuts > button:nth-child(5) > span {
+    background: #ffe8ef;
+}
+
+.trending-item > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #eaf3ff;
+    font-size: 25px;
+}
+
+.home-panel h2 {
+    color: #174a9c;
+}
