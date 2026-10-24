@@ -981,3 +981,37 @@ gap: 20px;
 #learningResult .resource-card {
     background: #f8fbff;
 }
+
+
+/* ===== SkillBridge Home Page Fix ===== */
+
+/* Remove unnecessary top spacing */
+#home {
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+/* Hide Continue Learning and History below Home */
+#appContent > .learning-bottom-grid {
+    display: none !important;
+}
+
+/* Keep Home dashboard compact */
+#home .home-hero {
+    margin-bottom: 20px;
+}
+
+#home .home-feature-cards {
+    margin-bottom: 20px;
+}
+
+#home .home-bottom-grid {
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+/* Login section should not create extra spacing */
+#authSection {
+    margin: 0 auto;
+}
+
