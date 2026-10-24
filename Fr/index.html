@@ -405,48 +405,156 @@ HOME SECTION
 
 
 
-<!-- =====================================================
-     LEARNING HUB
-     ===================================================== -->
 
+<!-- LEARNING HUB -->
 <section id="learning" class="section">
 
-    <h2>
-        📚 Learning Hub
-    </h2>
+    <div class="learning-hero">
+        <span class="hero-badge">📚 LEARN • PRACTICE • GROW</span>
+        <h2>Learning Hub</h2>
+        <p>Discover resources, build new skills and move closer to your career goals.</p>
 
+        <div class="learning-search">
+            <input
+                type="text"
+                id="learningSkill"
+                placeholder="🔍 Search Python, Java, Data Science..."
+                onkeydown="if(event.key==='Enter') findLearningResources()"
+            >
+            <button onclick="findLearningResources()">Find Resources →</button>
+        </div>
+    </div>
 
-    <p>
-        What do you want to learn?
-    </p>
+    <div class="learning-resource-heading">
+        <h2>Explore Learning Resources</h2>
+        <p>Choose a resource to start learning.</p>
+    </div>
 
+    <div class="resource-grid learning-resource-grid">
 
-    <p>
-        You can search for any topic, skill or subject.
-        For example: Python, Java, Machine Learning,
-        Photography, Digital Marketing, Mathematics, etc.
-    </p>
+        <div class="resource-card">
+            <h3>📚 Books & eBooks</h3>
+            <p>Find books and eBooks for your subject.</p>
+            <a href="https://books.google.com/" target="_blank" rel="noopener noreferrer">Explore Books →</a>
+        </div>
 
+        <div class="resource-card">
+            <h3>🎥 YouTube Lectures</h3>
+            <p>Learn from video lectures and tutorials.</p>
+            <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Watch Videos →</a>
+        </div>
 
-    <!-- SEARCH -->
+        <div class="resource-card">
+            <h3>🎓 NPTEL</h3>
+            <p>Explore academic courses and lectures.</p>
+            <a href="https://nptel.ac.in/" target="_blank" rel="noopener noreferrer">Explore NPTEL →</a>
+        </div>
 
-    <input
-        type="text"
-        id="learningSkill"
-        placeholder="Example: Python, Java, AI, Photography, Mathematics..."
-    >
+        <div class="resource-card">
+            <h3>🆓 Free Courses</h3>
+            <p>Discover free online learning opportunities.</p>
+            <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer">Start Learning →</a>
+        </div>
 
+        <div class="resource-card">
+            <h3>🎓 Coursera</h3>
+            <p>Explore courses from universities and companies.</p>
+            <a href="https://www.coursera.org/" target="_blank" rel="noopener noreferrer">Explore Courses →</a>
+        </div>
 
-    <!-- SEARCH BUTTON -->
+        <div class="resource-card">
+            <h3>🎓 edX</h3>
+            <p>Discover university-level online courses.</p>
+            <a href="https://www.edx.org/" target="_blank" rel="noopener noreferrer">Explore edX →</a>
+        </div>
 
-    <button onclick="findLearningResources()">
+        <div class="resource-card">
+            <h3>💻 freeCodeCamp</h3>
+            <p>Practice coding with free tutorials.</p>
+            <a href="https://www.freecodecamp.org/" target="_blank" rel="noopener noreferrer">Learn Coding →</a>
+        </div>
 
-        🔍 Find Resources
+        <div class="resource-card">
+            <h3>📖 GeeksforGeeks</h3>
+            <p>Explore programming tutorials and questions.</p>
+            <a href="https://www.geeksforgeeks.org/" target="_blank" rel="noopener noreferrer">Explore GFG →</a>
+        </div>
 
-    </button>
+        <div class="resource-card">
+            <h3>🐙 GitHub Projects</h3>
+            <p>Explore code repositories and projects.</p>
+            <a href="https://github.com/" target="_blank" rel="noopener noreferrer">Find Projects →</a>
+        </div>
 
+        <div class="resource-card">
+            <h3>🧪 Kaggle</h3>
+            <p>Practice with datasets and notebooks.</p>
+            <a href="https://www.kaggle.com/" target="_blank" rel="noopener noreferrer">Explore Kaggle →</a>
+        </div>
 
-    <!-- RESULTS -->
+        <div class="resource-card">
+            <h3>📘 Official Documentation</h3>
+            <p>Learn directly from official documentation.</p>
+            <a href="https://developer.mozilla.org/" target="_blank" rel="noopener noreferrer">Read Documentation →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>✍️ Practice</h3>
+            <p>Improve your skills through coding exercises.</p>
+            <a href="https://leetcode.com/" target="_blank" rel="noopener noreferrer">Practice Now →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>🌐 Web Resources</h3>
+            <p>Find tutorials, articles and learning guides.</p>
+            <a href="https://www.google.com/" target="_blank" rel="noopener noreferrer">Search Web →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>💡 Project Ideas</h3>
+            <p>Find ideas for hands-on projects.</p>
+            <a href="https://github.com/topics" target="_blank" rel="noopener noreferrer">Explore Ideas →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>📝 Study Notes & PDFs</h3>
+            <p>Search for notes and study materials.</p>
+            <a href="https://www.google.com/search?q=study+notes+PDF" target="_blank" rel="noopener noreferrer">Find Notes →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>❓ MCQ Quiz</h3>
+            <p>Test your knowledge with practice quizzes.</p>
+            <a href="https://www.google.com/search?q=programming+MCQ+quiz" target="_blank" rel="noopener noreferrer">Take a Quiz →</a>
+        </div>
+
+        <div class="resource-card">
+            <h3>📈 Learning Progress</h3>
+            <p>Review your learning goals and progress.</p>
+            <button onclick="showLearningHistory()">View History →</button>
+        </div>
+
+    </div>
+
+    <div class="learning-bottom-grid">
+
+        <div class="learning-panel">
+            <h2>▶️ Continue Learning</h2>
+            <p>Your recently searched topics will appear here.</p>
+            <div id="continueLearningList">
+                <p>Search for a topic above to get started.</p>
+            </div>
+        </div>
+
+        <div class="learning-panel" id="learningHistory">
+            <h2>🕘 History</h2>
+            <p>Your learning searches will appear here.</p>
+            <div id="learningHistoryList">
+                <p>No learning history yet.</p>
+            </div>
+        </div>
+
+    </div>
 
     <div id="learningResult"></div>
 
