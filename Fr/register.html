@@ -1,76 +1,344 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Create Account | SkillBridge</title>
     <link rel="stylesheet" href="/assets/style.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #eff6ff, #dbeafe, #f8fafc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .register-card {
+            background: #ffffff;
+            padding: 35px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 45px rgba(30, 64, 175, 0.13);
+            border: 1px solid #e5edff;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 14px;
+            background: #2563eb;
+            color: white;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        .brand h1 {
+            color: #172554;
+            font-size: 27px;
+            margin: 0 0 9px;
+        }
+
+        .brand p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            background: #fff;
+        }
+
+        .form-group input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        .password-wrap {
+            display: flex;
+            gap: 8px;
+        }
+
+        .password-wrap input {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .toggle-password {
+            padding: 0 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .primary-btn,
+        .secondary-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .primary-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-btn {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 8px 0 14px;
+        }
+
+        .terms input {
+            margin-top: 3px;
+        }
+
+        .terms a,
+        .login-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms a:hover,
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        #registerMessage {
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .login-link {
+            text-align: center;
+            margin: 23px 0 0;
+            padding-top: 19px;
+            border-top: 1px solid #e2e8f0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-home a {
+            color: #475569;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .register-card {
+                padding: 28px 20px;
+            }
+
+            .brand h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <section class="section active">
-        <div class="card">
-            <h1>🚀 Join SkillBridge</h1>
-            <p>Create your account to get started.</p>
+    <main class="register-wrapper">
+        <div class="register-card">
 
+            <div class="brand">
+                <div class="brand-icon">🚀</div>
+                <h1>Join SkillBridge</h1>
+                <p>Create your account and take the next step in your career.</p>
+            </div>
+
+            <!-- STEP 1: Registration -->
             <form id="registerForm">
-                <input
-                    type="text"
-                    id="registerName"
-                    placeholder="Full Name"
-                    maxlength="100"
-                    required
-                >
 
-                <input
-                    type="email"
-                    id="registerEmail"
-                    placeholder="Email Address"
-                    required
-                >
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input
+                        type="text"
+                        id="registerName"
+                        placeholder="Enter your full name"
+                        maxlength="100"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
 
-                <input
-                    type="password"
-                    id="registerPassword"
-                    placeholder="Create Password (minimum 8 characters)"
-                    minlength="8"
-                    required
-                >
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
 
-                <button type="submit" id="sendOtpBtn">
+                <div class="form-group">
+                    <label for="registerPassword">Create Password</label>
+                    <div class="password-wrap">
+                        <input
+                            type="password"
+                            id="registerPassword"
+                            placeholder="Minimum 8 characters"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            onclick="togglePasswordVisibility('registerPassword', this)"
+                            aria-label="Show or hide password"
+                        >Show</button>
+                    </div>
+                </div>
+
+                <label class="terms">
+                    <input type="checkbox" id="agreeTerms" required>
+                    <span>
+                        I agree to the
+                        <a href="/terms.html" target="_blank">Terms &amp; Conditions</a>
+                    </span>
+                </label>
+
+                <button type="submit" class="primary-btn" id="sendOtpBtn">
                     Send OTP
                 </button>
             </form>
 
+            <!-- STEP 2: OTP verification -->
             <form id="verifyOtpForm" hidden>
-                <p>Enter the 6-digit OTP sent to your email.</p>
+                <h3 style="color:#172554; margin-top:0;">Verify Your Email</h3>
 
-                <input
-                    type="text"
-                    id="registerOTP"
-                    placeholder="Enter 6-digit OTP"
-                    inputmode="numeric"
-                    pattern="[0-9]{6}"
-                    maxlength="6"
-                    autocomplete="one-time-code"
-                    required
-                >
+                <p style="color:#64748b; font-size:14px; line-height:1.6;">
+                    Enter the 6-digit OTP sent to your email address.
+                </p>
 
-                <button type="submit" id="verifyOtpBtn">
-                    Verify OTP & Create Account
+                <div class="form-group">
+                    <label for="registerOTP">Email Verification Code</label>
+                    <input
+                        type="text"
+                        id="registerOTP"
+                        placeholder="Enter 6-digit OTP"
+                        inputmode="numeric"
+                        pattern="[0-9]{6}"
+                        maxlength="6"
+                        autocomplete="one-time-code"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="primary-btn" id="verifyOtpBtn">
+                    Verify OTP &amp; Create Account
                 </button>
 
-                <button type="button" id="resendOtpBtn">
+                <button type="button" class="secondary-btn" id="resendOtpBtn">
                     Resend OTP
                 </button>
             </form>
 
             <p id="registerMessage" role="status" aria-live="polite"></p>
 
-            <p>Already have an account?
+            <p class="login-link">
+                Already have an account?
                 <a href="/">Login here</a>
             </p>
+
         </div>
-    </section>
+
+        <div class="back-home">
+            <a href="/">← Back to Login</a>
+        </div>
+    </main>
+
+    <script>
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+
+            if (!input) return;
+
+            const isPassword = input.type === "password";
+            input.type = isPassword ? "text" : "password";
+            button.textContent = isPassword ? "Hide" : "Show";
+        }
+    </script>
 
     <script src="/assets/register.js"></script>
 </body>
