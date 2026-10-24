@@ -9,9 +9,7 @@
     <link rel="stylesheet" href="/assets/style.css">
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
@@ -30,10 +28,10 @@
         }
 
         .register-card {
-            background: #ffffff;
+            background: #fff;
             padding: 35px 30px;
             border-radius: 20px;
-            box-shadow: 0 15px 45px rgba(30, 64, 175, 0.13);
+            box-shadow: 0 15px 45px rgba(30, 64, 175, .13);
             border: 1px solid #e5edff;
         }
 
@@ -68,9 +66,7 @@
             margin: 0;
         }
 
-        .form-group {
-            margin-bottom: 17px;
-        }
+        .form-group { margin-bottom: 17px; }
 
         .form-group label {
             display: block;
@@ -92,7 +88,7 @@
 
         .form-group input:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .10);
         }
 
         .password-wrap {
@@ -106,7 +102,7 @@
         }
 
         .toggle-password {
-            padding: 0 10px;
+            padding: 0 12px;
             border: 1px solid #cbd5e1;
             border-radius: 10px;
             background: #f8fafc;
@@ -114,11 +110,9 @@
             cursor: pointer;
         }
 
-        .primary-btn,
-        .secondary-btn {
+        .primary-btn, .secondary-btn {
             width: 100%;
             padding: 14px;
-            border: none;
             border-radius: 10px;
             font-size: 15px;
             font-weight: 700;
@@ -129,11 +123,10 @@
         .primary-btn {
             background: #2563eb;
             color: white;
+            border: none;
         }
 
-        .primary-btn:hover {
-            background: #1d4ed8;
-        }
+        .primary-btn:hover { background: #1d4ed8; }
 
         .secondary-btn {
             background: #eff6ff;
@@ -142,7 +135,7 @@
         }
 
         button:disabled {
-            opacity: 0.6;
+            opacity: .6;
             cursor: not-allowed;
         }
 
@@ -156,26 +149,27 @@
             margin: 8px 0 14px;
         }
 
-        .terms input {
-            margin-top: 3px;
-        }
+        .terms input { margin-top: 3px; }
 
-        .terms a,
-        .login-link a {
+        .terms a, .login-link a, .forgot-link a {
             color: #2563eb;
             text-decoration: none;
             font-weight: 600;
         }
 
-        .terms a:hover,
-        .login-link a:hover {
-            text-decoration: underline;
-        }
+        .terms a:hover, .login-link a:hover,
+        .forgot-link a:hover { text-decoration: underline; }
 
         #registerMessage {
             font-size: 14px;
             line-height: 1.5;
             overflow-wrap: anywhere;
+        }
+
+        .forgot-link {
+            text-align: right;
+            margin: 15px 0 0;
+            font-size: 13px;
         }
 
         .login-link {
@@ -199,17 +193,9 @@
         }
 
         @media (max-width: 480px) {
-            body {
-                padding: 15px;
-            }
-
-            .register-card {
-                padding: 28px 20px;
-            }
-
-            .brand h1 {
-                font-size: 24px;
-            }
+            body { padding: 15px; }
+            .register-card { padding: 28px 20px; }
+            .brand h1 { font-size: 24px; }
         }
     </style>
 </head>
@@ -229,44 +215,29 @@
 
                 <div class="form-group">
                     <label for="registerName">Full Name</label>
-                    <input
-                        type="text"
-                        id="registerName"
-                        placeholder="Enter your full name"
-                        maxlength="100"
-                        autocomplete="name"
-                        required
-                    >
+                    <input type="text" id="registerName"
+                           placeholder="Enter your full name"
+                           maxlength="100" autocomplete="name" required>
                 </div>
 
                 <div class="form-group">
                     <label for="registerEmail">Email Address</label>
-                    <input
-                        type="email"
-                        id="registerEmail"
-                        placeholder="Enter your email address"
-                        autocomplete="email"
-                        required
-                    >
+                    <input type="email" id="registerEmail"
+                           placeholder="Enter your email address"
+                           autocomplete="email" required>
                 </div>
 
                 <div class="form-group">
                     <label for="registerPassword">Create Password</label>
                     <div class="password-wrap">
-                        <input
-                            type="password"
-                            id="registerPassword"
-                            placeholder="Minimum 8 characters"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
-                        <button
-                            type="button"
-                            class="toggle-password"
-                            onclick="togglePasswordVisibility('registerPassword', this)"
-                            aria-label="Show or hide password"
-                        >Show</button>
+                        <input type="password" id="registerPassword"
+                               placeholder="Minimum 8 characters"
+                               minlength="8" autocomplete="new-password" required>
+
+                        <button type="button" class="toggle-password"
+                                onclick="togglePasswordVisibility('registerPassword', this)">
+                            Show
+                        </button>
                     </div>
                 </div>
 
@@ -283,7 +254,7 @@
                 </button>
             </form>
 
-            <!-- STEP 2: OTP verification -->
+            <!-- STEP 2: OTP Verification -->
             <form id="verifyOtpForm" hidden>
                 <h3 style="color:#172554; margin-top:0;">Verify Your Email</h3>
 
@@ -293,16 +264,10 @@
 
                 <div class="form-group">
                     <label for="registerOTP">Email Verification Code</label>
-                    <input
-                        type="text"
-                        id="registerOTP"
-                        placeholder="Enter 6-digit OTP"
-                        inputmode="numeric"
-                        pattern="[0-9]{6}"
-                        maxlength="6"
-                        autocomplete="one-time-code"
-                        required
-                    >
+                    <input type="text" id="registerOTP"
+                           placeholder="Enter 6-digit OTP"
+                           inputmode="numeric" pattern="[0-9]{6}"
+                           maxlength="6" autocomplete="one-time-code" required>
                 </div>
 
                 <button type="submit" class="primary-btn" id="verifyOtpBtn">
@@ -316,11 +281,15 @@
 
             <p id="registerMessage" role="status" aria-live="polite"></p>
 
+            <p class="forgot-link">
+                Forgot your password?
+                <a href="/forgot-password.html">Reset Password</a>
+            </p>
+
             <p class="login-link">
                 Already have an account?
                 <a href="/">Login here</a>
             </p>
-
         </div>
 
         <div class="back-home">
@@ -331,7 +300,6 @@
     <script>
         function togglePasswordVisibility(inputId, button) {
             const input = document.getElementById(inputId);
-
             if (!input) return;
 
             const isPassword = input.type === "password";
