@@ -391,6 +391,7 @@ const TOKEN_KEY = "skillbridge_access_token";
  */
 
 async function logActivity(action) {
+    recordHomeActivity(action);
     const token = sessionStorage.getItem(TOKEN_KEY);
 
     if (!token) {
@@ -641,6 +642,7 @@ function getLearningHistory() {
     }
 }
 
+
 function saveLearningTopic(topic) {
     const skill = String(topic || "").trim();
 
@@ -668,6 +670,7 @@ function saveLearningTopic(topic) {
     }
 
     renderLearningHistory();
+    renderHomeDashboard();
 }
 
 function renderLearningHistory() {
@@ -744,40 +747,20 @@ document.addEventListener("DOMContentLoaded", renderLearningHistory);
 
 /* =========================================
    HOME DASHBOARD DATA
+   Keeps the existing learning history format
    ========================================= */
 
-const HOME_LEARNING_KEY = "skillbridge_learning_history";
 const HOME_ACTIVITY_KEY = "skillbridge_recent_activity";
 
-function readHomeData(key) {
+function readHomeActivities() {
     try {
-        const data = JSON.parse(localStorage.getItem(key) || "[]");
+        const data = JSON.parse(
+            localStorage.getItem(HOME_ACTIVITY_KEY) || "[]"
+        );
         return Array.isArray(data) ? data : [];
-    } catch {
+    } catch (error) {
         return [];
     }
-}
-
-function saveLearningTopic(topic) {
-    if (!topic || !topic.trim()) return;
-
-    let history = readHomeData(HOME_LEARNING_KEY);
-
-    history = history.filter(
-        item => item.topic.toLowerCase() !== topic.toLowerCase()
-    );
-
-    history.unshift({
-        topic: topic.trim(),
-        date: new Date().toLocaleDateString()
-    });
-
-    localStorage.setItem(
-        HOME_LEARNING_KEY,
-        JSON.stringify(history.slice(0, 20))
-    );
-
-    renderHomeDashboard();
 }
 
 function recordHomeActivity(action) {
@@ -787,17 +770,21 @@ function recordHomeActivity(action) {
         cover_letter: "Generated a cover letter"
     };
 
-    let activities = readHomeData(HOME_ACTIVITY_KEY);
+    const activities = readHomeActivities();
 
     activities.unshift({
         label: labels[action] || action,
         date: new Date().toLocaleString()
     });
 
-    localStorage.setItem(
-        HOME_ACTIVITY_KEY,
-        JSON.stringify(activities.slice(0, 10))
-    );
+    try {
+        localStorage.setItem(
+            HOME_ACTIVITY_KEY,
+            JSON.stringify(activities.slice(0, 10))
+        );
+    } catch (error) {
+        console.warn("Could not save recent activity:", error);
+    }
 
     renderHomeDashboard();
 }
@@ -807,15 +794,17 @@ function renderHomeDashboard() {
     const historyBox = document.getElementById("homeLearningHistory");
     const activityBox = document.getElementById("homeRecentActivity");
 
-    const history = readHomeData(HOME_LEARNING_KEY);
-    const activities = readHomeData(HOME_ACTIVITY_KEY);
+    // Use the existing learning history, which stores topic strings.
+    const history = getLearningHistory();
+    const activities = readHomeActivities();
 
     if (continueBox) {
         continueBox.innerHTML = history.length
-            ? history.slice(0, 3).map(item => `
-                <button class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(item.topic)})">
-                    📘 ${escapeHTML(item.topic)}
+            ? history.slice(0, 3).map(topic => `
+                <button type="button"
+                    class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, "\\u003c")})">
+                    📘 ${escapeHTML(topic)}
                 </button>
             `).join("")
             : "<p>Search a topic in Learning Hub to get started.</p>";
@@ -823,11 +812,11 @@ function renderHomeDashboard() {
 
     if (historyBox) {
         historyBox.innerHTML = history.length
-            ? history.slice(0, 5).map(item => `
-                <button class="learning-topic-btn"
-                    onclick="openLearningTopic(${JSON.stringify(item.topic)})">
-                    📚 ${escapeHTML(item.topic)}
-                    <small> — ${escapeHTML(item.date || "")}</small>
+            ? history.slice(0, 5).map(topic => `
+                <button type="button"
+                    class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(topic).replace(/</g, "\\u003c")})">
+                    📚 ${escapeHTML(topic)}
                 </button>
             `).join("")
             : "<p>Your learning history will appear here.</p>";
@@ -837,11 +826,12 @@ function renderHomeDashboard() {
         activityBox.innerHTML = activities.length
             ? activities.slice(0, 5).map(item => `
                 <p>• ${escapeHTML(item.label)}
-                <small> — ${escapeHTML(item.date)}</small></p>
+                <small> — ${escapeHTML(item.date || "")}</small></p>
             `).join("")
             : "<p>Your recent activities will appear here.</p>";
     }
 }
 
 document.addEventListener("DOMContentLoaded", renderHomeDashboard);
+
 
