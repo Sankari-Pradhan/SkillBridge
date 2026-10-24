@@ -739,3 +739,109 @@ function showLearningHistory() {
 
 // Restore history when the page opens.
 document.addEventListener("DOMContentLoaded", renderLearningHistory);
+
+
+
+/* =========================================
+   HOME DASHBOARD DATA
+   ========================================= */
+
+const HOME_LEARNING_KEY = "skillbridge_learning_history";
+const HOME_ACTIVITY_KEY = "skillbridge_recent_activity";
+
+function readHomeData(key) {
+    try {
+        const data = JSON.parse(localStorage.getItem(key) || "[]");
+        return Array.isArray(data) ? data : [];
+    } catch {
+        return [];
+    }
+}
+
+function saveLearningTopic(topic) {
+    if (!topic || !topic.trim()) return;
+
+    let history = readHomeData(HOME_LEARNING_KEY);
+
+    history = history.filter(
+        item => item.topic.toLowerCase() !== topic.toLowerCase()
+    );
+
+    history.unshift({
+        topic: topic.trim(),
+        date: new Date().toLocaleDateString()
+    });
+
+    localStorage.setItem(
+        HOME_LEARNING_KEY,
+        JSON.stringify(history.slice(0, 20))
+    );
+
+    renderHomeDashboard();
+}
+
+function recordHomeActivity(action) {
+    const labels = {
+        learning_hub: "Searched learning resources",
+        resume_analyzer: "Analyzed a resume",
+        cover_letter: "Generated a cover letter"
+    };
+
+    let activities = readHomeData(HOME_ACTIVITY_KEY);
+
+    activities.unshift({
+        label: labels[action] || action,
+        date: new Date().toLocaleString()
+    });
+
+    localStorage.setItem(
+        HOME_ACTIVITY_KEY,
+        JSON.stringify(activities.slice(0, 10))
+    );
+
+    renderHomeDashboard();
+}
+
+function renderHomeDashboard() {
+    const continueBox = document.getElementById("homeContinueList");
+    const historyBox = document.getElementById("homeLearningHistory");
+    const activityBox = document.getElementById("homeRecentActivity");
+
+    const history = readHomeData(HOME_LEARNING_KEY);
+    const activities = readHomeData(HOME_ACTIVITY_KEY);
+
+    if (continueBox) {
+        continueBox.innerHTML = history.length
+            ? history.slice(0, 3).map(item => `
+                <button class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(item.topic)})">
+                    📘 ${escapeHTML(item.topic)}
+                </button>
+            `).join("")
+            : "<p>Search a topic in Learning Hub to get started.</p>";
+    }
+
+    if (historyBox) {
+        historyBox.innerHTML = history.length
+            ? history.slice(0, 5).map(item => `
+                <button class="learning-topic-btn"
+                    onclick="openLearningTopic(${JSON.stringify(item.topic)})">
+                    📚 ${escapeHTML(item.topic)}
+                    <small> — ${escapeHTML(item.date || "")}</small>
+                </button>
+            `).join("")
+            : "<p>Your learning history will appear here.</p>";
+    }
+
+    if (activityBox) {
+        activityBox.innerHTML = activities.length
+            ? activities.slice(0, 5).map(item => `
+                <p>• ${escapeHTML(item.label)}
+                <small> — ${escapeHTML(item.date)}</small></p>
+            `).join("")
+            : "<p>Your recent activities will appear here.</p>";
+    }
+}
+
+document.addEventListener("DOMContentLoaded", renderHomeDashboard);
+
