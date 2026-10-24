@@ -26,15 +26,24 @@ function showSection(sectionId) {
    CREATE RESUME
    ========================================= */
 
+
+/* =========================================
+   RESUME BUILDER
+   ========================================= */
+
 function generateResume() {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const profile = document.getElementById("profile").value.trim();
-    const education = document.getElementById("education").value.trim();
-    const skills = document.getElementById("skills").value.trim();
-    const projects = document.getElementById("projects").value.trim();
-    const experience = document.getElementById("experience").value.trim();
+    const getValue = id =>
+        document.getElementById(id)?.value?.trim() || "";
+
+    const name = getValue("name");
+    const email = getValue("email");
+    const phone = getValue("phone");
+    const profile = getValue("profile");
+    const education = getValue("education");
+    const skills = getValue("skills");
+    const projects = getValue("projects");
+    const experience = getValue("experience");
+    const certifications = getValue("certifications");
 
     if (!name) {
         alert("Please enter your name.");
@@ -43,123 +52,248 @@ function generateResume() {
 
     const preview = document.getElementById("resumePreview");
 
+    if (!preview) {
+        alert("Resume preview area was not found.");
+        return;
+    }
+
+    const section = (title, content) => {
+        if (!content) return "";
+
+        return `
+            <section class="resume-section">
+                <h2>${escapeHTML(title)}</h2>
+                <p>${formatText(content)}</p>
+            </section>
+        `;
+    };
+
     preview.innerHTML = `
-        <h1>${escapeHTML(name)}</h1>
-        <p>
-            ${escapeHTML(email)}
-            ${email && phone ? " | " : ""}
-            ${escapeHTML(phone)}
-        </p>
-        <h2>Profile</h2>
-        <p>${formatText(profile)}</p>
-        <h2>Education</h2>
-        <p>${formatText(education)}</p>
-        <h2>Skills</h2>
-        <p>${formatText(skills)}</p>
-        <h2>Projects</h2>
-        <p>${formatText(projects)}</p>
-        <h2>Experience</h2>
-        <p>${formatText(experience)}</p>
+        <article class="generated-resume">
+            <header class="resume-header">
+                <h1>${escapeHTML(name)}</h1>
+                <p class="resume-contact">
+                    ${escapeHTML(email)}
+                    ${email && phone ? " | " : ""}
+                    ${escapeHTML(phone)}
+                </p>
+            </header>
+
+            ${section("Professional Profile", profile)}
+            ${section("Education", education)}
+            ${section("Skills", skills)}
+            ${section("Work Experience", experience)}
+            ${section("Projects", projects)}
+            ${section("Certifications", certifications)}
+        </article>
     `;
 
-    alert("Resume generated successfully! ✅");
+    applyResumeTemplate();
+    saveResumeData(false);
+
+    alert("Resume generated successfully!");
 }
 
 /* =========================================
-   PRINT / SAVE PDF
+   RESUME TEMPLATES
+   ========================================= */
+
+function applyResumeTemplate() {
+    const preview = document.getElementById("resumePreview");
+    const selector = document.getElementById("resumeTemplate");
+
+    if (!preview) return;
+
+    const templates = [
+        "modern",
+        "professional",
+        "minimal",
+        "creative",
+        "classic",
+        "elegant"
+    ];
+
+    const selected = selector?.value || "modern";
+
+    templates.forEach(template => {
+        preview.classList.remove(`template-${template}`);
+    });
+
+    preview.classList.add(
+        `template-${templates.includes(selected) ? selected : "modern"}`
+    );
+}
+
+/* =========================================
+   RESUME CUSTOMIZATION
+   ========================================= */
+
+function customizeResume() {
+    const preview = document.getElementById("resumePreview");
+
+    if (!preview) return;
+
+    const color = document.getElementById("resumeColor")?.value;
+    const font = document.getElementById("resumeFont")?.value;
+    const fontSize = document.getElementById("resumeFontSize")?.value;
+
+    if (color && /^#[0-9a-f]{6}$/i.test(color)) {
+        preview.style.setProperty("--resume-color", color);
+    }
+
+    const allowedFonts = {
+        Arial: "Arial, sans-serif",
+        Georgia: "Georgia, serif",
+        Roboto: "Roboto, Arial, sans-serif",
+        "Times New Roman": '"Times New Roman", serif'
+    };
+
+    if (font && allowedFonts[font]) {
+        preview.style.fontFamily = allowedFonts[font];
+    }
+
+    if (fontSize) {
+        const size = Number(fontSize);
+
+        if (size >= 10 && size <= 20) {
+            preview.style.fontSize = `${size}px`;
+        }
+    }
+}
+
+/* =========================================
+   SAVE RESUME
+   ========================================= */
+
+function saveResumeData(showMessage = true) {
+    const ids = [
+        "name",
+        "email",
+        "phone",
+        "profile",
+        "education",
+        "skills",
+        "projects",
+        "experience",
+        "certifications"
+    ];
+
+    const resumeData = {};
+
+    ids.forEach(id => {
+        const input = document.getElementById(id);
+
+        if (input) {
+            resumeData[id] = input.value;
+        }
+    });
+
+    try {
+        localStorage.setItem(
+            "skillbridge_resume_data",
+            JSON.stringify(resumeData)
+        );
+
+        if (showMessage) {
+            alert("Resume saved on this device!");
+        }
+    } catch (error) {
+        console.error("Could not save resume:", error);
+
+        if (showMessage) {
+            alert("Could not save resume in this browser.");
+        }
+    }
+}
+
+/* =========================================
+   LOAD SAVED RESUME
+   ========================================= */
+
+function loadResumeData() {
+    try {
+        const saved = localStorage.getItem("skillbridge_resume_data");
+
+        if (!saved) return;
+
+        const resumeData = JSON.parse(saved);
+
+        Object.entries(resumeData).forEach(([id, value]) => {
+            const input = document.getElementById(id);
+
+            if (input && typeof value === "string") {
+                input.value = value;
+            }
+        });
+    } catch (error) {
+        console.error("Could not load saved resume:", error);
+    }
+}
+
+/* =========================================
+   RESET RESUME
+   ========================================= */
+
+function resetResume() {
+    if (!confirm("Are you sure you want to reset your resume?")) {
+        return;
+    }
+
+    const ids = [
+        "name",
+        "email",
+        "phone",
+        "profile",
+        "education",
+        "skills",
+        "projects",
+        "experience",
+        "certifications"
+    ];
+
+    ids.forEach(id => {
+        const input = document.getElementById(id);
+
+        if (input) input.value = "";
+    });
+
+    const preview = document.getElementById("resumePreview");
+
+    if (preview) {
+        preview.innerHTML = "";
+        preview.className = preview.className
+            .split(/\s+/)
+            .filter(name => !name.startsWith("template-"))
+            .join(" ");
+        preview.style.removeProperty("--resume-color");
+        preview.style.removeProperty("font-family");
+        preview.style.removeProperty("font-size");
+    }
+
+    try {
+        localStorage.removeItem("skillbridge_resume_data");
+    } catch (error) {
+        console.error("Could not clear saved resume:", error);
+    }
+}
+
+/* =========================================
+   PRINT / SAVE AS PDF
    ========================================= */
 
 function printResume() {
     const preview = document.getElementById("resumePreview");
 
-    if (!preview.innerHTML.trim()) {
-        alert("First generate your resume.");
+    if (!preview || !preview.innerText.trim()) {
+        alert("Please generate your resume first.");
         return;
     }
 
     window.print();
 }
 
-/* =========================================
-   RESUME ANALYZER
-   ========================================= */
 
-async function analyzeResume() {
-    const fileInput = document.getElementById("resumeFile");
-    const result = document.getElementById("analysisResult");
 
-    if (!fileInput.files.length) {
-        result.innerHTML = `
-            <p class="error">
-                Please select a PDF or TXT resume first.
-            </p>
-        `;
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-
-    result.innerHTML = "<p>Analyzing your resume... ⏳</p>";
-
-    try {
-        const response = await fetch(`${API}/api/analyze-resume`, {
-            method: "POST",
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            result.innerHTML = `
-                <p class="error">${escapeHTML(data.error || "Resume analysis failed.")}</p>
-            `;
-            return;
-        }
-
-        const skillsHTML = data.skills?.length
-            ? data.skills.map(skill => `<li>✅ ${escapeHTML(skill)}</li>`).join("")
-            : "<li>No recognized skills found.</li>";
-
-        const suggestionsHTML = data.suggestions?.length
-            ? data.suggestions.map(item => `<li>${escapeHTML(item)}</li>`).join("")
-            : "<li>No major suggestions. 🎉</li>";
-
-        const sections = data.sections || {};
-
-        result.innerHTML = `
-            <h3>Resume Score: ${Number(data.score) || 0}/100</h3>
-
-            <div class="result-box">
-                <h3>Detected Skills</h3>
-                <ul>${skillsHTML}</ul>
-            </div>
-
-            <div class="result-box">
-                <h3>Resume Sections</h3>
-                <p>Email: ${sections.email ? "✅" : "❌"}</p>
-                <p>Phone: ${sections.phone ? "✅" : "❌"}</p>
-                <p>Education: ${sections.education ? "✅" : "❌"}</p>
-                <p>Projects: ${sections.projects ? "✅" : "❌"}</p>
-                <p>Experience: ${sections.experience ? "✅" : "❌"}</p>
-                <p>Skills: ${sections.skills ? "✅" : "❌"}</p>
-            </div>
-
-            <div class="result-box">
-                <h3>Suggestions</h3>
-                <ul>${suggestionsHTML}</ul>
-            </div>
-        `;
-
-        void logActivity("resume_analyzer");
-    } catch (error) {
-        result.innerHTML = `
-            <p class="error">Could not connect to SkillBridge server.</p>
-            <p>Please try again later.</p>
-        `;
-        console.error(error);
-    }
-}
 
 /* =========================================
    LEARNING HUB
@@ -350,16 +484,19 @@ function copyCoverLetter() {
    HTML SAFETY
    ========================================= */
 
+
+
 function escapeHTML(text) {
     if (text === null || text === undefined) return "";
 
     return String(text)
-        .replace(/&/g, "&")
-        .replace(/</g, "<")
-        .replace(/>/g, ">")
-        .replace(/"/g, """)
-        .replace(/'/g, "'");
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
+
 
 /* =========================================
    TEXT FORMATTING
@@ -611,3 +748,17 @@ async function checkLoginSession() {
    ========================================= */
 
 document.addEventListener("DOMContentLoaded", checkLoginSession);
+
+
+function togglePassword(inputId, button) {
+    const passwordInput = document.getElementById(inputId);
+
+    if (!passwordInput) return;
+
+    const isHidden = passwordInput.type === "password";
+    passwordInput.type = isHidden ? "text" : "password";
+    button.setAttribute(
+        "aria-label",
+        isHidden ? "Hide password" : "Show password"
+    );
+}
