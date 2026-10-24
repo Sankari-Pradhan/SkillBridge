@@ -70,35 +70,29 @@
 
     <!-- NAVIGATION -->
 
-    <nav>
+   
+<nav>
+    <button onclick="showSection('home')">
+        🏠 Home
+    </button>
 
-        <button onclick="showSection('home')">
-            🏠 Home
-        </button>
+    <button onclick="showSection('learning')">
+        📚 Learning Hub
+    </button>
 
+    <button onclick="showSection('career')">
+        💼 Career Opportunities
+    </button>
 
-        <button onclick="showSection('resume')">
-            📄 Create Resume
-        </button>
+    <button onclick="showSection('resumeHub')">
+        📄 Create Resume
+    </button>
 
-
-        <button onclick="showSection('analyzer')">
-            🔍 Resume Analyzer
-        </button>
-
-
-        <button onclick="showSection('learning')">
-            📚 Learning Hub
-        </button>
-
-
-        <button onclick="showSection('cover')">
-            ✉️ Cover Letter
-        </button>
-
-        <button onclick="logoutUser()">🚪 Logout</button>
-    </nav>
-
+    <button onclick="showSection('profileSection')">
+        👤 Profile
+    </button>
+</nav>
+    
 </header>
 
 
@@ -114,13 +108,12 @@
     </h2>
 
 
-    <p>
-        SkillBridge is your personal career and learning
-        assistant. Create resumes, analyze your resume,
-        discover learning resources and generate
-        professional cover letters.
-    </p>
-
+<p>
+    SkillBridge is your personal career and learning
+    assistant. Explore learning resources, discover career
+    opportunities, create professional resumes and analyze
+    your existing resume.
+</p>
 
     <!-- HOME CARDS -->
 
@@ -141,40 +134,9 @@
                 professional information.
             </p>
 
-            <button
-                onclick="showSection('resume')">
-
-                Start
-
-            </button>
+           <button onclick="showSection('resumeHub')"> Start </button>
 
         </div>
-
-
-
-        <!-- ANALYZER -->
-
-        <div class="card">
-
-            <h3>
-                🔍 Resume Analyzer
-            </h3>
-
-            <p>
-                Upload your PDF or TXT resume and check
-                important sections, detected skills,
-                resume score and suggestions.
-            </p>
-
-            <button
-                onclick="showSection('analyzer')">
-
-                Analyze
-
-            </button>
-
-        </div>
-
 
 
         <!-- LEARNING -->
@@ -202,33 +164,175 @@
 
 
 
-        <!-- COVER LETTER -->
+    </div>
+
+</section>
+
+
+    
+<!-- =====================================================
+     LEARNING HUB
+     ===================================================== -->
+
+<section id="learning" class="section">
+
+    <h2>
+        📚 Learning Hub
+    </h2>
+
+
+    <p>
+        What do you want to learn?
+    </p>
+
+
+    <p>
+        You can search for any topic, skill or subject.
+        For example: Python, Java, Machine Learning,
+        Photography, Digital Marketing, Mathematics, etc.
+    </p>
+
+
+    <!-- SEARCH -->
+
+    <input
+        type="text"
+        id="learningSkill"
+        placeholder="Example: Python, Java, AI, Photography, Mathematics..."
+    >
+
+
+    <!-- SEARCH BUTTON -->
+
+    <button onclick="findLearningResources()">
+
+        🔍 Find Resources
+
+    </button>
+
+
+    <!-- RESULTS -->
+
+    <div id="learningResult"></div>
+
+</section>
+
+
+
+<!-- CAREER OPPORTUNITIES -->
+
+<section id="career" class="section">
+
+    <h2>💼 Career Opportunities</h2>
+
+    <p>
+        Explore jobs, internships and career resources.
+    </p>
+
+    <div class="cards">
 
         <div class="card">
-
-            <h3>
-                ✉️ Cover Letter
-            </h3>
-
-            <p>
-                Generate a professional cover letter
-                based on your job role, company and skills.
-            </p>
-
-            <button
-                onclick="showSection('cover')">
-
-                Generate
-
-            </button>
-
+            <h3>💻 Private Jobs</h3>
+            <p>Explore fresher jobs and private-sector opportunities.</p>
+            <a href="https://www.naukri.com/"
+               target="_blank" rel="noopener noreferrer">
+                <button>Explore Jobs</button>
+            </a>
         </div>
 
+        <div class="card">
+            <h3>🏢 Government Jobs</h3>
+            <p>Find official government recruitment notifications.</p>
+            <a href="https://www.ncs.gov.in/"
+               target="_blank" rel="noopener noreferrer">
+                <button>Explore Jobs</button>
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>🎓 Internships</h3>
+            <p>Discover internships and practical work experience.</p>
+            <a href="https://internshala.com/"
+               target="_blank" rel="noopener noreferrer">
+                <button>Find Internships</button>
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>🏠 Remote Jobs</h3>
+            <p>Explore work-from-home opportunities.</p>
+            <a href="https://www.linkedin.com/jobs/"
+               target="_blank" rel="noopener noreferrer">
+                <button>Explore Remote Jobs</button>
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>🎯 Interview Preparation</h3>
+            <p>
+                Prepare for technical interviews, HR questions
+                and aptitude tests.
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>📌 Saved Opportunities</h3>
+            <p>
+                Keep track of jobs and internships you want to apply for.
+            </p>
+        </div>
 
     </div>
 
 </section>
 
+
+
+
+    <!-- RESUME HUB -->
+
+<section id="resumeHub" class="section">
+
+    <h2>📄 Create Resume</h2>
+
+    <p>
+        Create a professional resume or analyze
+        your existing resume.
+    </p>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>📝 Resume Builder</h3>
+
+            <p>
+                Create your resume using your personal
+                details, education, skills, projects
+                and experience.
+            </p>
+
+            <button onclick="showSection('resume')">
+                Create Resume
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>🔍 Resume Analyzer</h3>
+
+            <p>
+                Upload your existing PDF or TXT resume
+                to check skills, important sections,
+                score and suggestions.
+            </p>
+
+            <button onclick="showSection('analyzer')">
+                Analyze Resume
+            </button>
+        </div>
+
+    </div>
+
+</section>
 
 
 <!-- =====================================================
@@ -247,6 +351,20 @@
     </p>
 
 
+     <label for="resumePhoto">📷 Upload Profile Photo</label>
+<input
+    type="file"
+    id="resumePhoto"
+    accept="image/*"
+>
+
+<img
+    id="resumePhotoPreview"
+    alt="Resume Profile Photo"
+    style="display:none; width:120px; height:140px;
+           object-fit:cover; border-radius:8px;"
+>
+    
     <!-- NAME -->
 
     <input
@@ -338,165 +456,49 @@
 
 
 
-<!-- =====================================================
-     RESUME ANALYZER
-     ===================================================== -->
+<!-- PROFILE -->
 
-<section id="analyzer" class="section">
+<section id="profileSection" class="section">
 
-    <h2>
-        🔍 Resume Analyzer
-    </h2>
+    <h2>👤 My Profile</h2>
 
+    <div class="card">
 
-    <p>
-        Upload your resume in PDF or TXT format.
-    </p>
+        <h3>Personal Information</h3>
 
+        <input type="text"
+               id="profileName"
+               placeholder="Full Name">
 
-    <!-- FILE -->
+        <input type="email"
+               id="profileEmail"
+               placeholder="Email Address">
 
-    <input
-        type="file"
-        id="resumeFile"
-        accept=".pdf,.txt"
-    >
+        <input type="text"
+               id="profileEducation"
+               placeholder="Education">
 
+        <textarea id="profileSkills"
+                  placeholder="Skills and Interests"></textarea>
 
-    <!-- ANALYZE -->
+        <button onclick="saveProfile()">
+            Save Profile
+        </button>
 
-    <button onclick="analyzeResume()">
+        <p id="profileMessage" role="status"></p>
 
-        Analyze Resume
+    </div>
 
-    </button>
+    <div class="card">
+        <h3>⚙️ Account Settings</h3>
 
-
-    <!-- RESULT -->
-
-    <div id="analysisResult"></div>
-
-</section>
-
-
-
-<!-- =====================================================
-     LEARNING HUB
-     ===================================================== -->
-
-<section id="learning" class="section">
-
-    <h2>
-        📚 Learning Hub
-    </h2>
-
-
-    <p>
-        What do you want to learn?
-    </p>
-
-
-    <p>
-        You can search for any topic, skill or subject.
-        For example: Python, Java, Machine Learning,
-        Photography, Digital Marketing, Mathematics, etc.
-    </p>
-
-
-    <!-- SEARCH -->
-
-    <input
-        type="text"
-        id="learningSkill"
-        placeholder="Example: Python, Java, AI, Photography, Mathematics..."
-    >
-
-
-    <!-- SEARCH BUTTON -->
-
-    <button onclick="findLearningResources()">
-
-        🔍 Find Resources
-
-    </button>
-
-
-    <!-- RESULTS -->
-
-    <div id="learningResult"></div>
+        <button onclick="logoutUser()">
+            🚪 Logout
+        </button>
+    </div>
 
 </section>
-
-
-
-<!-- =====================================================
-     COVER LETTER
-     ===================================================== -->
-
-<section id="cover" class="section">
-
-    <h2>
-        ✉️ Cover Letter Generator
-    </h2>
-
-
-    <p>
-        Enter your details to generate a professional
-        job application cover letter.
-    </p>
-
-
-    <!-- NAME -->
-
-    <input
-        type="text"
-        id="coverName"
-        placeholder="Your Name"
-    >
-
-
-    <!-- JOB ROLE -->
-
-    <input
-        type="text"
-        id="coverRole"
-        placeholder="Job Role"
-    >
-
-
-    <!-- COMPANY -->
-
-    <input
-        type="text"
-        id="coverCompany"
-        placeholder="Company Name"
-    >
-
-
-    <!-- SKILLS -->
-
-    <textarea
-        id="coverSkills"
-        placeholder="Your Skills (Example: Python, SQL, Excel)"
-    ></textarea>
-
-
-    <!-- GENERATE -->
-
-    <button onclick="generateCoverLetter()">
-
-        Generate Cover Letter
-
-    </button>
-
-
-    <!-- RESULT -->
-
-    <div id="coverResult"></div>
-
-</section>
-
-
+    
 </div>
 
     
