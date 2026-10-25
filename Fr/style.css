@@ -879,3 +879,176 @@ label {
         display: none !important;
     }
 }
+
+
+
+/* ==============================
+   QUICK ACCESS SECTION
+============================== */
+
+.quick-access-title {
+    color: #24428D;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 32px 0 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e5eaf5;
+}
+
+/* ==============================
+   CARDS GRID
+============================== */
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    margin: 20px 0 35px;
+    align-items: stretch;
+}
+
+/* ==============================
+   INDIVIDUAL CARD
+============================== */
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e3e8f2;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    box-shadow: 0 4px 14px rgba(31, 55, 100, 0.06);
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+/* Hover effect */
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 26px rgba(36, 66, 141, 0.13);
+    border-color: #b9c8ed;
+}
+
+/* Card heading */
+
+.card h3 {
+    color: #24428D;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0 0 12px;
+}
+
+/* Card description */
+
+.card p {
+    color: #647084;
+    font-size: 14px;
+    line-height: 1.8;
+    margin: 0 0 20px;
+    flex-grow: 1;
+}
+
+/* Card buttons */
+
+.card button {
+    background: #24428D;
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: auto;
+}
+
+.card button:hover {
+    background: #3155A4;
+}
+
+.card button:focus-visible {
+    outline: 3px solid #9bb5f5;
+    outline-offset: 3px;
+}
+
+/* ==============================
+   HOME PAGE SPACING
+============================== */
+
+#home > p {
+    color: #647084;
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 24px;
+}
+
+#home > h2:first-child {
+    color: #1f2937;
+    font-size: 28px;
+    margin-bottom: 14px;
+}
+
+/* ==============================
+   TABLET
+============================== */
+
+@media (max-width: 768px) {
+    .cards {
+        gap: 16px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .quick-access-title {
+        font-size: 22px;
+    }
+}
+
+/* ==============================
+   MOBILE
+============================== */
+
+@media (max-width: 520px) {
+    .cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 14px;
+    }
+
+    .card h3 {
+        font-size: 18px;
+    }
+
+    .card p {
+        font-size: 14px;
+    }
+
+    .card button {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .quick-access-title {
+        font-size: 21px;
+        margin-top: 28px;
+    }
+
+    #home > h2:first-child {
+        font-size: 24px;
+    }
+}
+
