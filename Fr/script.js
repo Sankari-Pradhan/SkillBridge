@@ -1392,3 +1392,135 @@ function logout() {
 
     window.scrollTo(0, 0);
 }
+
+
+
+/* ==================================
+   SKILLBRIDGE: CAREER ROADMAP
+================================== */
+
+function openCareerRoadmap() {
+    showSection("careerRoadmap");
+}
+
+
+/* ==================================
+   SKILLBRIDGE: LEARNING PROGRESS
+================================== */
+
+function updateLearningProgress() {
+    const tasks = document.querySelectorAll(".learning-task");
+    const completed = document.querySelectorAll(
+        ".learning-task:checked"
+    ).length;
+
+    const percentage = tasks.length
+        ? Math.round((completed / tasks.length) * 100)
+        : 0;
+
+    const text = document.getElementById("progressText");
+    const bar = document.getElementById("learningProgressBar");
+
+    if (text) {
+        text.textContent = `Your progress: ${percentage}%`;
+    }
+
+    if (bar) {
+        bar.value = percentage;
+    }
+
+    tasks.forEach(task => {
+        localStorage.setItem(
+            "skillbridge-progress-" + task.dataset.course,
+            task.checked ? "completed" : "incomplete"
+        );
+    });
+}
+
+function loadLearningProgress() {
+    const tasks = document.querySelectorAll(".learning-task");
+
+    tasks.forEach(task => {
+        task.checked =
+            localStorage.getItem(
+                "skillbridge-progress-" + task.dataset.course
+            ) === "completed";
+
+        task.addEventListener("change", updateLearningProgress);
+    });
+
+    updateLearningProgress();
+}
+
+
+/* ==================================
+   SKILLBRIDGE: FAQ
+================================== */
+
+function openFAQ() {
+    showSection("faq");
+}
+
+
+/* ==================================
+   SKILLBRIDGE: CONTACT FORM
+================================== */
+
+function setupContactForm() {
+    const form = document.getElementById("contactForm");
+
+    if (!form || form.dataset.initialized === "true") {
+        return;
+    }
+
+    form.dataset.initialized = "true";
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const name =
+            document.getElementById("contactName")?.value.trim();
+
+        const email =
+            document.getElementById("contactEmail")?.value.trim();
+
+        const message =
+            document.getElementById("contactMessage")?.value.trim();
+
+        const status = document.getElementById("contactStatus");
+
+        if (!name || !email || !message) {
+            if (status) {
+                status.textContent = "Please fill in all fields.";
+            }
+            return;
+        }
+
+        const subject = encodeURIComponent(
+            "SkillBridge Contact Message"
+        );
+
+        const body = encodeURIComponent(
+            `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+        );
+
+        if (status) {
+            status.textContent = "Opening your email application...";
+        }
+
+        // Replace with your own email address.
+        window.location.href =
+            "pkcbca66@gmail.com" +
+            subject + "&body=" + body;
+    });
+}
+
+
+/* ==================================
+   INITIALIZE FEATURES
+================================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+    loadLearningProgress();
+    setupContactForm();
+});
