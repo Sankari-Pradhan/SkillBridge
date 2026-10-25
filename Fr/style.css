@@ -882,8 +882,9 @@ label {
 
 
 
+
 /* ==============================
-   QUICK ACCESS SECTION
+   QUICK ACCESS & SECTION HEADINGS
 ============================== */
 
 .quick-access-title {
@@ -927,7 +928,7 @@ label {
         border-color 0.25s ease;
 }
 
-/* Hover effect */
+/* Hover Effect */
 
 .card:hover {
     transform: translateY(-5px);
@@ -935,7 +936,7 @@ label {
     border-color: #b9c8ed;
 }
 
-/* Card heading */
+/* Card Heading */
 
 .card h3 {
     color: #24428D;
@@ -945,7 +946,7 @@ label {
     margin: 0 0 12px;
 }
 
-/* Card description */
+/* Card Description */
 
 .card p {
     color: #647084;
@@ -955,7 +956,7 @@ label {
     flex-grow: 1;
 }
 
-/* Card buttons */
+/* Card Buttons */
 
 .card button {
     background: #24428D;
@@ -977,6 +978,21 @@ label {
 .card button:focus-visible {
     outline: 3px solid #9bb5f5;
     outline-offset: 3px;
+}
+
+/* ==============================
+   HELP & SUPPORT BUTTONS
+============================== */
+
+.card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.card-actions button {
+    margin-top: 0;
 }
 
 /* ==============================
@@ -1042,6 +1058,15 @@ label {
         padding: 12px;
     }
 
+    .card-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .card-actions button {
+        width: 100%;
+    }
+
     .quick-access-title {
         font-size: 21px;
         margin-top: 28px;
@@ -1051,4 +1076,5 @@ label {
         font-size: 24px;
     }
 }
+
 
