@@ -456,7 +456,7 @@ def login_user(user: UserLogin):
                 text("""
                     SELECT id, name, email, password_hash, is_active
                     FROM users
-                    WHERE email = :email
+                    WHERE lower(email) = lower(:email)
                 """),
                 {"email": user.email}
             ).mappings().first()
