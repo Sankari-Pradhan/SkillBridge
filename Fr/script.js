@@ -102,9 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.readAsDataURL(file);
         });
     }
-
-    loadResumeData();
-    loadProfile();
     checkLoginSession();
 });
 
@@ -1296,20 +1293,22 @@ async function checkLoginSession() {
 
         if (response.ok) {
             showAppContent();
-            loadProfile();
-            loadResumeData();
-
-        } else {
+            showSection("home");
+           
+             loadProfile();
+             loadResumeData();
+         } 
+        else {
             sessionStorage.removeItem(TOKEN_KEY);
 
-            if (authSection) {
-                authSection.style.display = "block";
+              if (authSection) {
+                    authSection.style.display = "block";
+               }
+         
+           if (appContent) {
+              appContent.style.display = "none";
             }
-
-            if (appContent) {
-                appContent.style.display = "none";
-            }
-        }
+}
 
     } catch (error) {
         if (authSection) {
