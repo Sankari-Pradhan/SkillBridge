@@ -597,11 +597,12 @@ async function analyzeResume() {
         return;
     }
 
-    if (!file.name.toLowerCase().endsWith(".txt")) {
-        result.textContent =
-            "This version supports TXT files only. PDF support requires a PDF parser.";
-        return;
-    }
+  const fileName = file.name.toLowerCase();
+
+if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
+    result.textContent = "Please upload a PDF or TXT resume.";
+    return;
+}
 
     if (file.size > 2 * 1024 * 1024) {
         result.textContent = "Please upload a TXT file smaller than 2 MB.";
