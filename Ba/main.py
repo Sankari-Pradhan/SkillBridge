@@ -1583,69 +1583,43 @@ async def analyze_resume(file: UploadFile = File(...)):
         filename = file.filename.lower()
 
 
-        # -------------------------------------------------
+  
         # Read uploaded file
-        # -------------------------------------------------
-
         content = await file.read()
 
-
-        # -------------------------------------------------
         # PDF
-        # -------------------------------------------------
-
         if filename.endswith(".pdf"):
+            try:
+                pdf_file = io.BytesIO(content)
+                reader = PdfReader(pdf_file)
 
-            pdf_file = io.BytesIO(content)
+                text = ""
+                for page in reader.pages:
+                    text += (page.extract_text() or "") + "\n"
 
-            reader = PdfReader(pdf_file)
+            except Exception:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Could not read this PDF file. Please upload a valid PDF."
+                )
 
-            text = ""
-
-            for page in reader.pages:
-
-                page_text = page.extract_text()
-
-                if page_text:
-
-                    text += page_text + "\n"
-
-
-        # -------------------------------------------------
         # TXT
-        # -------------------------------------------------
-
         elif filename.endswith(".txt"):
+            text = content.decode("utf-8", errors="ignore")
 
-            text = content.decode(
-                "utf-8",
-                errors="ignore"
+        # Unsupported file
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Only PDF and TXT files are supported."
             )
 
-
-        # -------------------------------------------------
-        # Unsupported file
-        # -------------------------------------------------
-
-        else:
-
-            return {
-                "error": "Only PDF and TXT files are supported."
-            }
-
-
-        # -------------------------------------------------
         # Empty resume
-        # -------------------------------------------------
-
         if not text.strip():
-
-            return {
-                "error": "Could not extract text from the resume."
-            }
-
-
-        text_lower = text.lower()
+            raise HTTPException(
+                status_code=400,
+                detail="Could not extract text from the resume. Try a text-based PDF or TXT file."
+            )
 
 
         # =================================================
