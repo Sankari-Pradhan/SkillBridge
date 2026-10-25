@@ -645,6 +645,149 @@
     }
 </script>
 
+
+    
+<!-- CAREER ROADMAP SECTION -->
+<section id="careerRoadmap" class="section">
+    <h2>🚀 Career Roadmap</h2>
+    <p>Follow these steps to build your career.</p>
+
+    <div class="card">
+        <h3>Step 1: Learn Programming</h3>
+        <p>Learn Python, Java, or JavaScript basics.</p>
+    </div>
+
+    <div class="card">
+        <h3>Step 2: Build Your Skills</h3>
+        <p>Practice problem-solving, GitHub, and projects.</p>
+    </div>
+
+    <div class="card">
+        <h3>Step 3: Choose Your Career</h3>
+        <p>Explore Web Development, Data Analytics, or Software Development.</p>
+    </div>
+
+    <div class="card">
+        <h3>Step 4: Build Projects</h3>
+        <p>Create projects and upload them to GitHub.</p>
+    </div>
+
+    <div class="card">
+        <h3>Step 5: Prepare for Jobs</h3>
+        <p>Prepare your resume, practice interviews, and apply for opportunities.</p>
+    </div>
+
+    <button onclick="showSection('home')">Back to Home</button>
+</section>
+
+
+    
+<!-- LEARNING PROGRESS SECTION -->
+<section id="progress" class="section">
+    <h2>📊 Learning Progress</h2>
+    <p>Track your learning goals and completed topics.</p>
+
+    <div class="card">
+        <h3>Python Basics</h3>
+        <label>
+            <input type="checkbox" class="learning-task"
+                   data-course="python">
+            I have completed Python Basics
+        </label>
+    </div>
+
+    <div class="card">
+        <h3>Web Development</h3>
+        <label>
+            <input type="checkbox" class="learning-task"
+                   data-course="web">
+            I have completed Web Development Basics
+        </label>
+    </div>
+
+    <div class="card">
+        <h3>Data Analytics</h3>
+        <label>
+            <input type="checkbox" class="learning-task"
+                   data-course="data">
+            I have completed Data Analytics Basics
+        </label>
+    </div>
+
+    <h3 id="progressText">Your progress: 0%</h3>
+    <progress id="learningProgressBar" value="0" max="100"></progress>
+
+    <br><br>
+    <button onclick="showSection('home')">Back to Home</button>
+</section>
+
+
+<!-- FAQ SECTION -->
+<section id="faq" class="section">
+    <h2>❓ FAQs & Help</h2>
+    <p>Find answers to common SkillBridge questions.</p>
+
+    <div class="card">
+        <h3>What is SkillBridge?</h3>
+        <p>SkillBridge helps users explore careers, learn skills,
+           and create resumes.</p>
+    </div>
+
+    <div class="card">
+        <h3>How can I create a resume?</h3>
+        <p>Open Create Resume from the dashboard and fill in
+           your details.</p>
+    </div>
+
+    <div class="card">
+        <h3>How can I analyze my resume?</h3>
+        <p>Open Resume Analyzer, upload a supported resume file,
+           and click Analyze.</p>
+    </div>
+
+    <div class="card">
+        <h3>How can I track my learning?</h3>
+        <p>Open Learning Progress and tick the topics you have completed.</p>
+    </div>
+
+    <button onclick="showSection('home')">Back to Home</button>
+</section>
+
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="section">
+    <h2>📩 Contact Us</h2>
+    <p>Have a question or suggestion? Send us a message.</p>
+
+    <div class="card">
+        <form id="contactForm">
+            <label for="contactName">Your Name</label>
+            <input type="text" id="contactName"
+                   placeholder="Enter your name" required>
+
+            <br><br>
+
+            <label for="contactEmail">Your Email</label>
+            <input type="email" id="contactEmail"
+                   placeholder="Enter your email" required>
+
+            <br><br>
+
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage"
+                      placeholder="Write your message"
+                      rows="5" required></textarea>
+
+            <br><br>
+            <button type="submit">Send Message</button>
+            <p id="contactStatus" role="status"></p>
+        </form>
+    </div>
+
+    <button onclick="showSection('home')">Back to Home</button>
+</section>
+
+    
 </body>
 </html>
 
