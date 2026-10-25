@@ -345,10 +345,12 @@ def record_activity(
         )
 
     allowed_actions = {
-        "resume_analyzer",
-        "cover_letter",
-        "learning_hub"
-    }
+    "home",
+    "learning_hub",
+    "career_opportunities",
+    "create_resume",
+    "profile"
+}
 
     if action not in allowed_actions:
         raise HTTPException(
@@ -1249,43 +1251,121 @@ def ensure_admin_user_columns():
         """))
 
 @app.get("/api/admin/account-history")
-def get_admin_account_history(admin: bool = Depends(verify_admin_key)):
-    """Combine login and feature activity history for the admin dashboard."""
+def get_admin_account_history(
+    admin: bool = Depends(verify_admin_key)
+):
+    """Return login and page activity history for the admin dashboard."""
+
     if engine is None:
-        raise HTTPException(status_code=503, detail="Database is not configured.")
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
     try:
         ensure_admin_user_columns()
+
         with engine.connect() as connection:
+
             logins = connection.execute(text("""
-                SELECT id, user_id, email, login_at AS event_at, 'login' AS event_type,
-                       'Successful login' AS details
+                SELECT
+                    id,
+                    user_id,
+                    email,
+                    login_at AS event_at,
+                    'login' AS event_type,
+                    'Successful login' AS details
                 FROM login_history
                 ORDER BY login_at DESC
                 LIMIT 200
             """)).mappings().all()
+
             activities = connection.execute(text("""
-                SELECT id, user_id, email, created_at AS event_at, 'activity' AS event_type,
-                       action AS details
+                SELECT
+                    id,
+                    user_id,
+                    email,
+                    created_at AS event_at,
+                    'activity' AS event_type,
+                    action AS details
                 FROM activity_logs
+                WHERE action IN (
+                    'home',
+                    'learning_hub',
+                    'career_opportunities',
+                    'create_resume',
+                    'profile',
+                    'resume_analyzer',
+                    'cover_letter'
+                )
                 ORDER BY created_at DESC
                 LIMIT 200
             """)).mappings().all()
+
         events = []
-        for row in list(logins) + list(activities):
+
+        page_names = {
+            "home": "🏠 Home",
+            "learning_hub": "📚 Learning Hub",
+            "career_opportunities": "💼 Career Opportunities",
+            "create_resume": "📄 Create Resume",
+            "profile": "👤 Profile",
+            "resume_analyzer": "Resume Analyzer",
+            "cover_letter": "Cover Letter Generator"
+        }
+
+        for row in logins:
             events.append({
                 "id": row["id"],
                 "user_id": row["user_id"],
                 "email": row["email"],
-                "event_at": row["event_at"].isoformat() if row["event_at"] else None,
-                "event_type": row["event_type"],
-                "details": row["details"]
+                "event_at": (
+                    row["event_at"].isoformat()
+                    if row["event_at"] else None
+                ),
+                "event_type": "Login",
+                "details": "Successful login"
             })
-        events.sort(key=lambda x: x["event_at"] or "", reverse=True)
-        return {"success": True, "total": len(events[:300]), "history": events[:300]}
+
+        for row in activities:
+            action = row["details"]
+
+            events.append({
+                "id": row["id"],
+                "user_id": row["user_id"],
+                "email": row["email"],
+                "event_at": (
+                    row["event_at"].isoformat()
+                    if row["event_at"] else None
+                ),
+                "event_type": "Page Activity",
+                "details": page_names.get(action, action)
+            })
+
+        events.sort(
+            key=lambda item: item["event_at"] or "",
+            reverse=True
+        )
+
+        events = events[:300]
+
+        return {
+            "success": True,
+            "total": len(events),
+            "history": events
+        }
+
     except SQLAlchemyError:
         import logging
-        logging.exception("Could not retrieve admin account history")
-        raise HTTPException(status_code=500, detail="Could not retrieve account history.")
+
+        logging.exception(
+            "Could not retrieve admin account history"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Could not retrieve account history."
+        )
 
 @app.patch("/api/admin/users/{user_id}")
 def admin_update_user(
@@ -2130,3 +2210,50 @@ if __name__ == "__main__":
         port=8000,
         reload=False
     )
+
+
+// ==================================
+// SkillBridge Activity Tracking
+// ==================================
+
+async function trackPageActivity(action) {
+    const accessToken = sessionStorage.getItem(TOKEN_KEY);
+    if (!accessToken) {
+        console.log("Activity not recorded: user is not logged in.");
+        return;
+    }
+
+    const allowedActions = [
+        "home",
+        "learning_hub",
+        "career_opportunities",
+        "create_resume",
+        "profile"
+    ];
+
+    if (!allowedActions.includes(action)) {
+        console.error("Invalid activity:", action);
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            `/api/activity?action=${encodeURIComponent(action)}`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            console.error(
+                "Activity tracking failed:",
+                response.status
+            );
+        }
+    } catch (error) {
+        console.error("Activity tracking error:", error);
+    }
+}
