@@ -2212,9 +2212,9 @@ if __name__ == "__main__":
     )
 
 
-// ==================================
-// SkillBridge Activity Tracking
-// ==================================
+# ==================================
+# SkillBridge Activity Tracking
+# ==================================
 
 async function trackPageActivity(action) {
     const accessToken = sessionStorage.getItem(TOKEN_KEY);
