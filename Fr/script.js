@@ -534,8 +534,6 @@ function printResume() {
    TXT ANALYSIS
    ========================================= */
 
-
-
 async function extractResumeText(file) {
     const extension = file.name.split(".").pop().toLowerCase();
 
@@ -545,10 +543,13 @@ async function extractResumeText(file) {
 
     if (extension === "pdf") {
         if (typeof pdfjsLib === "undefined") {
-            throw new Error("PDF reader load হয়নি। Internet connection পরীক্ষা করো।");
+            throw new Error(
+                "PDF reader could not be loaded. Please check your internet connection."
+            );
         }
 
         const buffer = await file.arrayBuffer();
+
         const pdf = await pdfjsLib.getDocument({
             data: new Uint8Array(buffer)
         }).promise;
@@ -566,18 +567,15 @@ async function extractResumeText(file) {
 
         if (!fullText.trim()) {
             throw new Error(
-                "PDF থেকে text পাওয়া যায়নি। এটি scanned PDF হলে OCR প্রয়োজন।"
+                "No text could be extracted from the PDF. If it is a scanned PDF, OCR is required."
             );
         }
 
         return fullText;
     }
 
-    throw new Error("শুধুমাত্র PDF অথবা TXT file upload করো।");
+    throw new Error("Only PDF and TXT files are supported.");
 }
-
-
-
 
 
 async function analyzeResume() {
@@ -597,22 +595,23 @@ async function analyzeResume() {
         return;
     }
 
-  const fileName = file.name.toLowerCase();
+    const fileName = file.name.toLowerCase();
 
-if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
-    result.textContent = "Please upload a PDF or TXT resume.";
-    return;
-}
+    if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
+        result.textContent = "Please upload a PDF or TXT resume.";
+        return;
+    }
 
     if (file.size > 2 * 1024 * 1024) {
-        result.textContent = "Please upload a TXT file smaller than 2 MB.";
+        result.textContent =
+            "Please upload a PDF or TXT file smaller than 2 MB.";
         return;
     }
 
     result.textContent = "Analyzing your resume...";
 
     try {
-         const text = await extractResumeText(file);
+        const text = await extractResumeText(file);
         const content = text.toLowerCase();
 
         if (!content.trim()) {
@@ -666,7 +665,8 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
 
         Object.entries(sections).forEach(([name, found]) => {
             const li = document.createElement("li");
-            li.textContent = `${found ? "✅" : "⚠️"} ${name}: ${found ? "Found" : "Missing"}`;
+            li.textContent =
+                `${found ? "✅" : "⚠️"} ${name}: ${found ? "Found" : "Missing"}`;
             sectionList.appendChild(li);
         });
 
@@ -687,11 +687,13 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
         result.appendChild(suggestionHeading);
 
         const suggestions = document.createElement("ul");
+
         Object.entries(sections)
             .filter(([, found]) => !found)
             .forEach(([name]) => {
                 const li = document.createElement("li");
-                li.textContent = `Consider adding a ${name} section if relevant.`;
+                li.textContent =
+                    `Consider adding a ${name} section if relevant.`;
                 suggestions.appendChild(li);
             });
 
@@ -710,7 +712,9 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
         const jobText = jobInput?.value.trim().toLowerCase() || "";
 
         if (jobText) {
-            const words = jobText.match(/\b[a-z][a-z+#.-]{2,}\b/g) || [];
+            const words =
+                jobText.match(/\b[a-z][a-z+#.-]{2,}\b/g) || [];
+
             const stopWords = new Set([
                 "the", "and", "for", "with", "you", "our", "are",
                 "will", "this", "that", "from", "your", "have",
@@ -721,11 +725,17 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
                 !stopWords.has(word)
             );
 
-            const matched = keywords.filter(word => content.includes(word));
-            const missing = keywords.filter(word => !content.includes(word));
+            const matched = keywords.filter(word =>
+                content.includes(word)
+            );
+
+            const missing = keywords.filter(word =>
+                !content.includes(word)
+            );
 
             const jobHeading = document.createElement("h3");
-            jobHeading.textContent = "Job Description Keyword Comparison";
+            jobHeading.textContent =
+                "Job Description Keyword Comparison";
             result.appendChild(jobHeading);
 
             const jobResult = document.createElement("p");
@@ -735,7 +745,8 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
 
             const missingText = document.createElement("p");
             missingText.textContent =
-                "Keywords not detected: " + (missing.slice(0, 25).join(", ") || "None");
+                "Keywords not detected: " +
+                (missing.slice(0, 25).join(", ") || "None");
             result.appendChild(missingText);
         }
 
@@ -749,7 +760,10 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
         const downloadButton = document.createElement("button");
         downloadButton.type = "button";
         downloadButton.textContent = "Download Analysis Report";
-        downloadButton.addEventListener("click", downloadAnalysisReport);
+        downloadButton.addEventListener(
+            "click",
+            downloadAnalysisReport
+        );
         result.appendChild(downloadButton);
 
         if (typeof logActivity === "function") {
@@ -758,10 +772,10 @@ if (!fileName.endsWith(".txt") && !fileName.endsWith(".pdf")) {
 
     } catch (error) {
         console.error("Resume analysis failed:", error);
-        result.textContent = "Unable to analyze the file. Please try again.";
+        result.textContent =
+            error.message || "Unable to analyze the file. Please try again.";
     }
 }
-
 
 /* =========================================
    DOWNLOAD ANALYSIS REPORT
