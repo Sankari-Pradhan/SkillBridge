@@ -1,4 +1,3 @@
-```javascript
 const resetForm = document.getElementById("resetForm");
 const sendOtpBtn = document.getElementById("sendOtpBtn");
 const message = document.getElementById("message");
@@ -102,4 +101,4 @@ resetForm.addEventListener("submit", async (event) => {
         submitButton.textContent = "Reset Password";
     }
 });
-```
+
