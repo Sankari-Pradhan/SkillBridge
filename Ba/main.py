@@ -332,6 +332,24 @@ class ActivityLog(Base):
     )
 
 
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    user_id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    education = Column(Text, nullable=True)
+    skills = Column(Text, nullable=True)
+
+    updated_at = Column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False
+    )
+
 
 @app.post("/api/activity")
 def record_activity(
