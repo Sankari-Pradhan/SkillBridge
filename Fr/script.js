@@ -998,31 +998,74 @@ function saveProfile() {
     }
 }
 
-function loadProfile() {
+
+async function loadProfile() {
+    const token = localStorage.getItem(TOKEN_KEY);
+
+    if (!token) {
+        return;
+    }
+
+    const nameInput = document.getElementById("profileName");
+    const emailInput = document.getElementById("profileEmail");
+    const educationInput = document.getElementById("profileEducation");
+    const skillsInput = document.getElementById("profileSkills");
+    const message = document.getElementById("profileMessage");
+
+    // Load previously saved profile details from this device.
     try {
         const stored = localStorage.getItem("skillbridge_profile");
 
-        if (!stored) return;
+        if (stored) {
+            const profile = JSON.parse(stored);
 
-        const profile = JSON.parse(stored);
+            if (educationInput) {
+                educationInput.value = profile.education || "";
+            }
 
-        const fields = {
-            profileName: profile.name,
-            profileEmail: profile.email,
-            profileEducation: profile.education,
-            profileSkills: profile.skills
-        };
+            if (skillsInput) {
+                skillsInput.value = profile.skills || "";
+            }
+        }
+    } catch (error) {
+        console.error("Could not load saved profile:", error);
+    }
 
-        Object.entries(fields).forEach(([id, value]) => {
-            const element = document.getElementById(id);
-
-            if (element && typeof value === "string") {
-                element.value = value;
+    // Load the logged-in user's name and email from the backend.
+    try {
+        const response = await fetch(`${API}/api/me`, {
+            headers: {
+                Authorization: `Bearer ${token}`
             }
         });
 
+        if (response.status === 401) {
+            console.warn("Session expired. Please log in again.");
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Profile request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.user) {
+            if (nameInput) {
+                nameInput.value = data.user.name || "";
+            }
+
+            if (emailInput) {
+                emailInput.value = data.user.email || "";
+            }
+        }
     } catch (error) {
-        console.error("Could not load profile:", error);
+        console.error("Could not load account details:", error);
+
+        if (message) {
+            message.textContent =
+                "Could not load account details. Please try again.";
+        }
     }
 }
 
