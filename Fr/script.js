@@ -1038,6 +1038,8 @@ async function saveProfile() {
 
 async function loadProfile() {
     const token = sessionStorage.getItem(TOKEN_KEY);
+console.log("Token exists:", !!token);
+console.log("Profile loading started");
 
     if (!token) {
         return;
