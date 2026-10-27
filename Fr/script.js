@@ -972,35 +972,66 @@ function findLearningResources() {
    Saves data in this browser
    ========================================= */
 
-function saveProfile() {
-    const profile = {
-        name: getValue("profileName"),
-        email: getValue("profileEmail"),
-        education: getValue("profileEducation"),
-        skills: getValue("profileSkills")
-    };
+async function saveProfile() {
+    const token = sessionStorage.getItem(TOKEN_KEY);
 
-    if (!profile.name) {
-        alert("Please enter your name.");
+    if (!token) {
+        alert("Please log in first.");
         return;
     }
 
-    try {
-        localStorage.setItem(
-            "skillbridge_profile",
-            JSON.stringify(profile)
-        );
+    const profile = {
+        education: document.getElementById("profileEducation")?.value.trim() || "",
+        skills: document.getElementById("profileSkills")?.value.trim() || ""
+    };
 
-        const message = document.getElementById("profileMessage");
+    const message = document.getElementById("profileMessage");
+
+    try {
+        if (message) {
+            message.textContent = "Saving profile...";
+            message.className = "";
+        }
+
+        const response = await fetch(`${API}/api/profile`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(profile)
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.status === 401) {
+            throw new Error("Your session has expired. Please log in again.");
+        }
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Could not save profile.");
+        }
 
         if (message) {
-            message.textContent = "Profile saved in this browser.";
+            message.textContent = "Profile saved successfully!";
             message.className = "success";
         }
 
+        // Keep a local backup on this device.
+        localStorage.setItem("skillbridge_profile", JSON.stringify({
+            education: profile.education,
+            skills: profile.skills
+        }));
+
     } catch (error) {
-        alert("Unable to save your profile in this browser.");
-        console.error(error);
+        console.error("Could not save profile:", error);
+
+        if (message) {
+            message.textContent = error.message || "Could not save profile.";
+            message.className = "error";
+        } else {
+            alert(error.message || "Could not save profile.");
+        }
     }
 }
 
@@ -1018,28 +1049,9 @@ async function loadProfile() {
     const skillsInput = document.getElementById("profileSkills");
     const message = document.getElementById("profileMessage");
 
-    // Load previously saved profile details from this device.
     try {
-        const stored = localStorage.getItem("skillbridge_profile");
-
-        if (stored) {
-            const profile = JSON.parse(stored);
-
-            if (educationInput) {
-                educationInput.value = profile.education || "";
-            }
-
-            if (skillsInput) {
-                skillsInput.value = profile.skills || "";
-            }
-        }
-    } catch (error) {
-        console.error("Could not load saved profile:", error);
-    }
-
-    // Load the logged-in user's name and email from the backend.
-    try {
-        const response = await fetch(`${API}/api/me`, {
+        const response = await fetch(`${API}/api/profile`, {
+            method: "GET",
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -1056,21 +1068,36 @@ async function loadProfile() {
 
         const data = await response.json();
 
-        if (data.success && data.user) {
+        if (data.success && data.profile) {
+            const profile = data.profile;
+
             if (nameInput) {
-                nameInput.value = data.user.name || "";
+                nameInput.value = profile.name || "";
             }
 
             if (emailInput) {
-                emailInput.value = data.user.email || "";
+                emailInput.value = profile.email || "";
+            }
+
+            if (educationInput) {
+                educationInput.value = profile.education || "";
+            }
+
+            if (skillsInput) {
+                skillsInput.value = profile.skills || "";
+            }
+
+            if (message) {
+                message.textContent = "";
             }
         }
     } catch (error) {
-        console.error("Could not load account details:", error);
+        console.error("Could not load profile:", error);
 
         if (message) {
             message.textContent =
-                "Could not load account details. Please try again.";
+                "Could not load your profile. Please try again.";
+            message.className = "error";
         }
     }
 }
