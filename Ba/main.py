@@ -351,6 +351,139 @@ class UserProfile(Base):
     )
 
 
+# ==========================================
+# USER PROFILE API
+# ==========================================
+
+class UserProfileUpdate(BaseModel):
+    education: str = ""
+    skills: str = ""
+
+
+@app.get("/api/profile")
+def get_profile(
+    payload: dict = Depends(verify_access_token)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    user_id = int(payload["sub"])
+
+    try:
+        with engine.connect() as connection:
+            user = connection.execute(
+                text("""
+                    SELECT id, name, email
+                    FROM users
+                    WHERE id = :user_id
+                """),
+                {"user_id": user_id}
+            ).mappings().first()
+
+            if user is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="User not found."
+                )
+
+            profile = connection.execute(
+                text("""
+                    SELECT education, skills
+                    FROM user_profiles
+                    WHERE user_id = :user_id
+                """),
+                {"user_id": user_id}
+            ).mappings().first()
+
+        return {
+            "success": True,
+            "profile": {
+                "name": user["name"],
+                "email": user["email"],
+                "education": profile["education"] if profile else "",
+                "skills": profile["skills"] if profile else ""
+            }
+        }
+
+    except HTTPException:
+        raise
+    except (SQLAlchemyError, ValueError):
+        import logging
+        logging.exception("Could not load profile")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not load profile."
+        )
+
+
+@app.post("/api/profile")
+def save_profile(
+    profile: UserProfileUpdate,
+    payload: dict = Depends(verify_access_token)
+):
+    if engine is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not configured."
+        )
+
+    user_id = int(payload["sub"])
+
+    try:
+        with engine.begin() as connection:
+            user = connection.execute(
+                text("""
+                    SELECT id
+                    FROM users
+                    WHERE id = :user_id
+                """),
+                {"user_id": user_id}
+            ).first()
+
+            if user is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="User not found."
+                )
+
+            connection.execute(
+                text("""
+                    INSERT INTO user_profiles
+                        (user_id, education, skills, updated_at)
+                    VALUES
+                        (:user_id, :education, :skills, :updated_at)
+                    ON CONFLICT (user_id)
+                    DO UPDATE SET
+                        education = EXCLUDED.education,
+                        skills = EXCLUDED.skills,
+                        updated_at = EXCLUDED.updated_at
+                """),
+                {
+                    "user_id": user_id,
+                    "education": profile.education,
+                    "skills": profile.skills,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            )
+
+        return {
+            "success": True,
+            "message": "Profile saved successfully."
+        }
+
+    except HTTPException:
+        raise
+    except (SQLAlchemyError, ValueError):
+        import logging
+        logging.exception("Could not save profile")
+        raise HTTPException(
+            status_code=500,
+            detail="Could not save profile."
+        )
+
 @app.post("/api/activity")
 def record_activity(
     action: str,
