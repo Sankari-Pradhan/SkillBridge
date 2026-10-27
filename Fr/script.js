@@ -18,6 +18,12 @@ function showSection(sectionId) {
 
     if (selected) {
         selected.classList.add("active");
+
+        // Load the logged-in user's profile when Profile is opened.
+        if (sectionId === "profileSection") {
+            loadProfile();
+        }
+
         window.scrollTo({
             top: 0,
             behavior: "smooth"
@@ -1000,7 +1006,7 @@ function saveProfile() {
 
 
 async function loadProfile() {
-    const token = localStorage.getItem(TOKEN_KEY);
+    const token = sessionStorage.getItem(TOKEN_KEY);
 
     if (!token) {
         return;
