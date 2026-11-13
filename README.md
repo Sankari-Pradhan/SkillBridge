@@ -143,7 +143,7 @@ The SkillBridge application is deployed using Render.
 
 **Sankari Pradhan**
 
-BCA Graduate | Aspiring Data Analyst
+BCA Graduate | Tech Explorer | Continuous Learner
 
 GitHub: [Sankari-Pradhan](https://github.com/Sankari-Pradhan)
 
